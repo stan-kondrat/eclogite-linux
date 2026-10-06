@@ -1,0 +1,9 @@
+{
+  "schema": "eclogite.platform/v1",
+  "name": "arm64",
+  "architecture": "aarch64",
+  "abi": "linux-gnu",
+  "libc": "glibc",
+  "isa": "armv8-a-baseline",
+  "kernel_architecture": "arm64"
+}

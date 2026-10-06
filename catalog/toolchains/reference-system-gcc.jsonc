@@ -1,0 +1,18 @@
+{
+  "schema": "eclogite.toolchain/v1",
+  "name": "reference-system-gcc",
+  // Mirrors linux-libre-vm: native compiler for the host-matching target,
+  // distro-provided GNU cross compiler and sysroot for the other target.
+  "provider": "external",
+  "compiler": "gcc",
+  "targets": {
+    "x86_64": {
+      "triplet": "x86_64-linux-gnu",
+      "cross_prefix": "x86_64-linux-gnu-"
+    },
+    "arm64": {
+      "triplet": "aarch64-linux-gnu",
+      "cross_prefix": "aarch64-linux-gnu-"
+    }
+  }
+}

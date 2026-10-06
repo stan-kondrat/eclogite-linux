@@ -1,0 +1,6 @@
+{
+  "schema": "eclogite.system/v1",
+  "name": "utm-arm64",
+  "machine": "utm-arm64",
+  "software": "minimal-arm64"
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "base-files",
+  "version": "1",
+  // Source-less package. Reference templates will later move into files/.
+  "source": {
+    "type": "none"
+  },
+  "builder": "files",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": ["bash", "coreutils", "dhcpcd", "runit"]
+  },
+  "arguments": {
+    "hostname": "linux-libre",
+    "serial_console": {
+      "x86_64": "ttyS0",
+      "arm64": "ttyAMA0"
+    }
+  }
+}

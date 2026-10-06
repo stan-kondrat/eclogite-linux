@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Eclogite Linux documentation for system JSON, catalog references, CLI workflows, architecture, VM bundles, storage, and CI.">
+  <title>Documentation — Eclogite Linux</title>
+  <link rel="stylesheet" href="assets/styles.css?v=20261006-4">
+  <script src="assets/catalog-data.js?v=20261006-4" defer></script>
+  <script src="assets/site.js?v=20261006-4" defer></script>
+</head>
+<body data-page="docs">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <aside class="alpha-banner" aria-label="Project status">
+    <strong>Alpha</strong>
+    <span>Eclogite Linux is in active development. Interfaces, schemas, and catalog definitions may change.</span>
+    <a href="#ci-migration">Project status <span aria-hidden="true">→</span></a>
+  </aside>
+  <header class="site-header site-header-compact">
+    <a class="brand" href="index.html" aria-label="Eclogite Linux home">
+      <span class="brand-mark" aria-hidden="true"><i></i></span>
+      <span>Eclogite <strong>Linux</strong></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+      <a href="index.html">Overview</a>
+      <a href="packages.html">Packages</a>
+      <a href="machines.html">Machines</a>
+      <a class="is-active" href="docs.html">Documentation</a>
+    </nav>
+  </header>
+
+  <main id="main" class="docs-layout">
+    <aside class="docs-sidebar" aria-label="Documentation sections">
+      <div class="docs-sidebar-title">
+        <span>Documentation</span>
+        <strong>Eclogite Linux</strong>
+      </div>
+      <nav class="docs-nav">
+        <div class="docs-nav-group">
+          <span>Start here</span>
+          <a href="#getting-started">Getting started</a>
+          <a href="#system-file">System file</a>
+          <a href="#reference-rules">Reference rules</a>
+        </div>
+        <div class="docs-nav-group">
+          <span>Core concepts</span>
+          <a href="#cli-workflow">CLI workflow</a>
+          <a href="#configuration-model">Configuration model</a>
+          <a href="#architecture">Architecture</a>
+        </div>
+        <div class="docs-nav-group">
+          <span>Operations</span>
+          <a href="#vm-bundles">VM bundles</a>
+          <a href="#storage-cache">Storage and cache</a>
+          <a href="#ci-migration">CI and migration</a>
+        </div>
+      </nav>
+      <div class="docs-sidebar-note">
+        <span>Current phase</span>
+        <p>Research, schemas, catalog, and interface design. The C builder is not implemented yet.</p>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <header class="docs-title" id="getting-started">
+        <p class="docs-breadcrumb">Documentation <span>/</span> Getting started</p>
+        <h1>Build a machine from one system file.</h1>
+        <p class="docs-lede">A system file links a machine profile to a software profile. Eclogite validates both branches, resolves the complete graph, locks every input, and produces either a VM bundle or a physical-machine image.</p>
+        <div class="docs-status-row">
+          <span>single JSON input</span>
+          <span>typed references</span>
+          <span>immutable output</span>
+        </div>
+      </header>
+
+      <section class="docs-section" id="system-file">
+        <p class="docs-kicker">01 · Input</p>
+        <h2>The system file</h2>
+        <p>The preferred interface is one strict JSON or JSONC system definition passed with <code>--config</code>. The checked-in UTM example uses aliases for predefined catalog objects:</p>
+        <pre><code>{
+  "schema": "eclogite.system/v1",
+  "name": "utm-arm64",
+  "machine": "utm-arm64",
+  "software": "minimal-arm64"
+}</code></pre>
+        <p>Keep the configuration outside the empty output directory, then run:</p>
+        <pre><code>mkdir machine &amp;&amp; cd machine
+eclogite create \
+  --config ../examples/utm-arm64.json \
+  --fetch
+./vm.sh run</code></pre>
+        <div class="docs-callout"><strong>Why one file?</strong><p>The machine and software remain independently reusable, but the system file is the complete reviewed decision about which pair becomes one output.</p></div>
+      </section>
+
+      <section class="docs-section" id="reference-rules">
+        <p class="docs-kicker">02 · Resolution</p>
+        <h2>Aliases and file links</h2>
+        <p>Each reference has one deterministic interpretation. Resolution never searches by prefix or downloads an arbitrary URL.</p>
+        <table class="docs-table">
+          <thead><tr><th>Input</th><th>Meaning</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Bare string</td><td>Exact typed catalog name or declared alias</td><td><code>utm-arm64</code></td></tr>
+            <tr><td><code>./</code> or <code>../</code></td><td>File relative to the system file</td><td><code>../software/base.jsonc</code></td></tr>
+            <tr><td>Absolute path</td><td>Rejected in persisted intent</td><td><code>/Users/…</code></td></tr>
+            <tr><td>HTTP or Git URL</td><td>Rejected; use a pinned catalog source</td><td><code>https://…</code></td></tr>
+          </tbody>
+        </table>
+        <p>The lock records the canonical object name, defining catalog or file, content hash, and alias provenance. Changing a linked file changes the input hash.</p>
+      </section>
+
+      <section class="docs-section" id="cli-workflow">
+        <p class="docs-kicker">03 · Commands</p>
+        <h2>One selector across the CLI</h2>
+        <p>Validation, inspection, locking, and creation consume the same file:</p>
+        <pre><code>eclogite validate system.json
+eclogite graph --config system.json --format tree
+eclogite plan --config system.json
+eclogite lock --config system.json
+eclogite create --config system.json --fetch</code></pre>
+        <p><code>--machine</code> and <code>--software</code> remain available as an interactive shorthand. Scripts and CI should use <code>--config</code> so the complete intent is reviewable.</p>
+        <p class="docs-source">Detailed source document: <code>docs/cli.md</code></p>
+      </section>
+
+      <section class="docs-section" id="configuration-model">
+        <p class="docs-kicker">04 · Data model</p>
+        <h2>Machine and software stay separate</h2>
+        <div class="docs-columns">
+          <div><h3>Machine profile</h3><ul><li>Architecture and exact CPU model</li><li>vCPU count and memory</li><li>Boot method and firmware</li><li>Storage, network, and console</li><li>QEMU, UTM, or physical runtime contract</li></ul></div>
+          <div><h3>Software profile</h3><ul><li>Platform and build stages</li><li>Kernel or operating-system family</li><li>Packages, services, and init</li><li>Read-only root policy</li><li>Image format and tests</li></ul></div>
+        </div>
+        <p>Compatibility validation requires both profiles to resolve to the same platform and checks that the machine provides every device capability required by the software.</p>
+        <p class="docs-source">Detailed source document: <code>docs/configuration.md</code></p>
+      </section>
+
+      <section class="docs-section" id="architecture">
+        <p class="docs-kicker">05 · Build design</p>
+        <h2>Resolve before executing</h2>
+        <pre><code>system.json
+    ↓ validate + resolve
+system.lock.json
+    ↓ emit deterministic plan
+state/plan.mk
+    ↓ execute inside pinned build VM
+immutable layers
+    ↓ compose + test
+VM bundle or hardware image</code></pre>
+        <p>The standalone C host tool owns parsing, schemas, graph resolution, locks, cache keys, and plan generation. GNU Make schedules generic builders. Package JSON is data and never becomes an embedded scripting language.</p>
+        <p class="docs-source">Detailed source document: <code>docs/architecture.md</code></p>
+      </section>
+
+      <section class="docs-section" id="vm-bundles">
+        <p class="docs-kicker">06 · Deployment</p>
+        <h2>QEMU and UTM use the same public runner</h2>
+        <p>A virtual output contains immutable artifacts, <code>vm.json</code>, a generated backend driver, and a bundle-local <code>vm.sh</code>. The public lifecycle stays consistent:</p>
+        <pre><code>./vm.sh validate
+./vm.sh run
+./vm.sh start
+./vm.sh console
+./vm.sh status
+./vm.sh stop</code></pre>
+        <p>The UTM ARM64 profile requires Apple Silicon and UTM 5 or newer. It uses UTM's QEMU backend with HVF, direct kernel boot, an imported disk copy, serial console, shared NAT, and VirtFS/9p.</p>
+        <p class="docs-source">Detailed source document: <code>docs/vm-bundle.md</code></p>
+      </section>
+
+      <section class="docs-section" id="storage-cache">
+        <p class="docs-kicker">07 · Local and remote state</p>
+        <h2>Downloads and layers are shared</h2>
+        <p>The single <code>eclogite</code> executable uses per-user storage under <code>~/.cache/eclogite/</code> for catalog snapshots, Git mirrors, package sources, and immutable build layers. Projects keep only their intent, locks, plans, and outputs.</p>
+        <p>Remote layers are accepted only when the input key, immutable digest, manifest hashes, and trusted workflow provenance all match.</p>
+        <p class="docs-source">Detailed source document: <code>docs/storage.md</code></p>
+      </section>
+
+      <section class="docs-section" id="ci-migration">
+        <p class="docs-kicker">08 · Project status</p>
+        <h2>Design first, then migrate package by package</h2>
+        <p>GitHub CI will validate the C tool, schemas, catalog, plans, shell contracts, and generated site on Linux and macOS. Dedicated KVM-capable runners will build and publish signed layers. UTM receives a separate Apple Silicon smoke-test environment.</p>
+        <p>The current repository remains at the research and layout milestone. No C builder, generic Make builders, operational <code>vm.sh</code>, or GitHub workflows have been implemented yet.</p>
+        <div class="docs-callout"><strong>Reference implementation</strong><p><code>linux-libre-vm</code> remains independent and buildable throughout migration. Its images, kernel settings, runners, and boot tests are the compatibility oracle.</p></div>
+        <p class="docs-source">Detailed source documents: <code>docs/ci.md</code> and <code>docs/migration.md</code></p>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="brand brand-footer"><span class="brand-mark" aria-hidden="true"><i></i></span><span>Eclogite <strong>Linux</strong></span></div>
+    <p>Configuration is reviewed input. The lock is resolved truth.</p>
+    <p>Static, dependency-free interface · <span data-year></span></p>
+  </footer>
+</body>
+</html>

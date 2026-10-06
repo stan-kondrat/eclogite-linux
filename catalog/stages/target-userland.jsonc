@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.stage/v1",
+  "name": "target-userland",
+  "context": "target",
+  "after": [],
+  "toolchain": "reference-system-gcc",
+  "packages": ["@reference-system"]
+}

@@ -1,0 +1,10 @@
+.DS_Store
+/_site/
+/_site-src/
+/tools/eclogite/build/
+/tools/eclogite/dist/
+/out/
+/state/
+/sources/
+*.swp
+*~

@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "iproute2",
+  "version": "7.1.0",
+  "source": {
+    "type": "git",
+    "url": "https://git.kernel.org/pub/scm/network/iproute2/iproute2.git",
+    "revision": "d7d8203844bad5f9d8a6f3708c9b39141369aa51"
+  },
+  "builder": "iproute2",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr"]
+  }
+}

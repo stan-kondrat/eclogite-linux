@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "grep",
+  "version": "3.11",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/grep.git",
+    "revision": "f951840aa510277fe48e5f2579a98f517246ea86"
+  },
+  "builder": "gnulib-autotools",
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

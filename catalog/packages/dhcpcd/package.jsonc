@@ -1,0 +1,27 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "dhcpcd",
+  "version": "10.3.2",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/NetworkConfiguration/dhcpcd.git",
+    "revision": "243ad84ac67a87d631ff7eb83b2eed2727acebb5"
+  },
+  "builder": "dhcpcd",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": [
+      "--prefix=/usr",
+      "--sysconfdir=/etc",
+      "--datadir=/usr/share",
+      "--libexecdir=/usr/libexec",
+      "--dbdir=/var/db/dhcpcd",
+      "--rundir=/var/run/dhcpcd"
+    ]
+  }
+}

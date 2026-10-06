@@ -1,0 +1,21 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "coreutils",
+  "version": "9.6",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/coreutils.git",
+    "revision": "e2a405981ff5441dcfb217797699c94968218aca"
+  },
+  "builder": "gnulib-autotools",
+  // The reference build has 01-glib-acl-ch-rename.patch; migration is intentionally pending.
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

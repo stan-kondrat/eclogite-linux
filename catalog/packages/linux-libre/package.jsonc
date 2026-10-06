@@ -1,0 +1,23 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "linux-libre",
+  "version": "7.1.3-gnu",
+  "source": {
+    "type": "git",
+    "url": "git://linux-libre.fsfla.org/releases.git",
+    "revision": "3e85aed47058aaeb9916cf756f2c2cbd41e32589"
+  },
+  "builder": "kernel",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "targets": {
+      "x86_64": "bzImage",
+      "arm64": "Image.gz"
+    }
+  }
+}

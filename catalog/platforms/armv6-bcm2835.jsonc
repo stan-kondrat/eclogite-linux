@@ -1,0 +1,9 @@
+{
+  "schema": "eclogite.platform/v1",
+  "name": "armv6-bcm2835",
+  "architecture": "arm",
+  "abi": "linux-gnueabihf",
+  "libc": "glibc",
+  "isa": "armv6zk-vfp",
+  "kernel_architecture": "arm"
+}

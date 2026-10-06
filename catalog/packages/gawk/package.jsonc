@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "gawk",
+  "version": "5.4.1",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/gawk.git",
+    "revision": "52af7f12758da12db0ddbdb117a84e0685cd2f72"
+  },
+  "builder": "configure",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

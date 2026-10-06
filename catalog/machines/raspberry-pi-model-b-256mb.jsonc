@@ -1,0 +1,41 @@
+{
+  "schema": "eclogite.machine/v1",
+  "name": "raspberry-pi-model-b-256mb",
+  "aliases": ["raspberrypi-b-256", "rpi-b-256"],
+  "platform": "armv6-bcm2835",
+  "status": "profile-only",
+  "resources": {
+    "cpu": {
+      "soc": "BCM2835",
+      "model": "ARM1176JZF-S",
+      "cores": 1
+    },
+    "memory_mib": 256
+  },
+  "runtime": {
+    "backend": "physical",
+    "board": "raspberry-pi-model-b"
+  },
+  "boot": {
+    "method": "sd-card-firmware",
+    "boot_media": "sd-card",
+    "firmware_policy": "unresolved"
+  },
+  "gpio": {
+    "header_pins": 26
+  },
+  "devices": [
+    { "kind": "display", "model": "hdmi" },
+    { "kind": "usb", "model": "usb-2.0", "count": 2 },
+    { "kind": "camera", "model": "csi" },
+    { "kind": "display", "model": "dsi" },
+    { "kind": "audio", "model": "3.5mm-analog" },
+    { "kind": "video", "model": "rca-composite" },
+    { "kind": "network", "model": "ethernet", "speed_mbps": 100 },
+    { "kind": "block", "model": "sd-card" },
+    { "kind": "power", "model": "micro-usb" }
+  ],
+  "references": [
+    "https://www.raspberrypi.com/documentation/computers/processors.html#bcm2835"
+  ]
+}

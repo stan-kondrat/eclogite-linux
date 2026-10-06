@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse Eclogite Linux physical and virtual machine profiles and compose a machine JSON definition.">
+  <title>Machines — Eclogite Linux</title>
+  <link rel="stylesheet" href="assets/styles.css?v=20261006-4">
+  <script src="assets/catalog-data.js?v=20261006-4" defer></script>
+  <script src="assets/site.js?v=20261006-4" defer></script>
+  <script src="assets/machines.js?v=20261006-4" defer></script>
+</head>
+<body data-page="machines">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <aside class="alpha-banner" aria-label="Project status">
+    <strong>Alpha</strong>
+    <span>Eclogite Linux is in active development. Interfaces, schemas, and catalog definitions may change.</span>
+    <a href="docs.html#ci-migration">Project status <span aria-hidden="true">→</span></a>
+  </aside>
+  <header class="site-header site-header-compact">
+    <a class="brand" href="index.html" aria-label="Eclogite Linux home">
+      <span class="brand-mark" aria-hidden="true"><i></i></span>
+      <span>Eclogite <strong>Linux</strong></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+      <a href="index.html">Overview</a>
+      <a href="packages.html">Packages</a>
+      <a class="is-active" href="machines.html">Machines</a>
+      <a href="docs.html">Documentation</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="catalog-hero machine-hero">
+      <div>
+        <p class="eyebrow">Hardware catalog</p>
+        <h1>Describe the target.<br>Keep software separate.</h1>
+      </div>
+      <div class="catalog-intro">
+        <p>A machine profile fixes architecture, CPU model, memory, boot path, devices, and whether the target is physical, plain QEMU, or UTM. It never silently selects software, a kernel, or an operating-system family.</p>
+        <div class="catalog-badges">
+          <span><i class="dot dot-machine"></i><b data-stat="machines">6</b> profiles</span>
+          <span><i class="dot dot-platform"></i><b data-stat="platforms">3</b> platforms</span>
+          <span><i class="machine-kind-dot is-virtual"></i><b id="virtual-machine-count">4</b> virtual</span>
+          <span><i class="machine-kind-dot is-physical"></i><b id="physical-machine-count">2</b> physical</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section machine-catalog" aria-labelledby="machine-catalog-title">
+      <div class="section-heading machine-section-heading">
+        <div>
+          <p class="eyebrow">Predefined profiles</p>
+          <h2 id="machine-catalog-title">Known machines</h2>
+        </div>
+        <p>Profiles may be buildable through a system composition or remain hardware-only until compatible software exists.</p>
+      </div>
+
+      <div class="machine-filters" aria-label="Machine profile filters">
+        <label class="field field-search">
+          <span>Find a profile</span>
+          <input id="machine-search" type="search" placeholder="Raspberry Pi, ARMv6, QEMU, UTM…" autocomplete="off">
+        </label>
+        <label class="field">
+          <span>Target kind</span>
+          <select id="machine-kind-filter">
+            <option value="all">Physical + virtual</option>
+            <option value="qemu">Virtual / QEMU</option>
+            <option value="utm">Virtual / UTM</option>
+            <option value="physical">Physical hardware</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Platform</span>
+          <select id="machine-platform-filter"><option value="all">All platforms</option></select>
+        </label>
+        <p id="machine-result-count" class="machine-result-count" aria-live="polite">6 profiles</p>
+      </div>
+
+      <div id="machine-profile-grid" class="machine-profile-grid"></div>
+    </section>
+
+    <section class="section machine-builder" aria-labelledby="machine-builder-title">
+      <div class="machine-builder-heading">
+        <div>
+          <p class="eyebrow">Definition builder · design preview</p>
+          <h2 id="machine-builder-title">Build a machine JSON file.</h2>
+        </div>
+        <p>Start from a known profile, then make hardware choices explicit. The generated document is local and declarative; this page performs no build and contacts no service.</p>
+      </div>
+
+      <div class="machine-builder-layout">
+        <form id="machine-builder-form" class="machine-builder-form">
+          <label class="builder-field builder-field-wide">
+            <span>Start from profile</span>
+            <select id="builder-profile"></select>
+          </label>
+          <label class="builder-field builder-field-wide">
+            <span>Machine name</span>
+            <input id="builder-name" required pattern="[a-z0-9][a-z0-9._-]*" autocomplete="off">
+          </label>
+          <label class="builder-field">
+            <span>Platform contract</span>
+            <select id="builder-platform"></select>
+          </label>
+          <label class="builder-field">
+            <span>Target kind</span>
+            <select id="builder-backend">
+              <option value="qemu">Virtual / QEMU</option>
+              <option value="utm">Virtual / UTM</option>
+              <option value="physical">Physical hardware</option>
+            </select>
+          </label>
+          <label class="builder-field builder-field-wide">
+            <span>Exact CPU model</span>
+            <input id="builder-cpu" placeholder="cortex-a72 or ARM1176JZF-S" autocomplete="off">
+            <small>Stored as a locked machine input. Backend defaults should be resolved before a release build.</small>
+          </label>
+          <label class="builder-field">
+            <span>CPU cores / vCPUs</span>
+            <input id="builder-cores" type="number" min="1" max="512" step="1">
+          </label>
+          <label class="builder-field">
+            <span>Memory · MiB</span>
+            <input id="builder-memory" type="number" min="16" step="16">
+          </label>
+          <label class="builder-field builder-field-wide">
+            <span>Board or VM model</span>
+            <input id="builder-runtime-model" placeholder="virt, q35, raspi1ap…" autocomplete="off">
+          </label>
+
+          <div class="kernel-pairing builder-field-wide">
+            <label class="builder-field">
+              <span>Paired software · kernel / OS</span>
+              <select id="builder-kernel">
+                <option value="linux-libre">Linux-libre</option>
+                <option value="linux-mainline">Linux mainline</option>
+                <option value="linux-rt">Linux with PREEMPT_RT</option>
+                <option value="bsd-future" disabled>BSD family · future schema</option>
+              </select>
+            </label>
+            <p><strong>Software boundary:</strong> kernel choice is shown here for compatibility planning, but it is written to the software profile—not to <code>machine.json</code>.</p>
+          </div>
+        </form>
+
+        <div class="machine-output-panel">
+          <div class="machine-output-toolbar">
+            <div><span class="output-status"></span><strong>machine.json</strong></div>
+            <div>
+              <button id="copy-machine-json" class="text-button" type="button">Copy</button>
+              <button id="download-machine-json" class="text-button" type="button">Download</button>
+            </div>
+          </div>
+          <pre id="machine-json-output" tabindex="0"></pre>
+          <div class="software-pairing-preview">
+            <span>Software pairing</span>
+            <p><code id="pairing-platform">arm64</code> · kernel / OS <code id="pairing-kernel">linux-libre</code></p>
+            <small>A complete software profile also selects stages, packages, root policy, image format, and tests. A future BSD family requires an OS-profile schema, not merely a Linux kernel substitution.</small>
+          </div>
+          <p id="machine-builder-message" class="builder-message" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="brand brand-footer"><span class="brand-mark" aria-hidden="true"><i></i></span><span>Eclogite <strong>Linux</strong></span></div>
+    <p>Machine profiles describe hardware. Software profiles describe what boots on it.</p>
+    <p>Static, dependency-free interface · <span data-year></span></p>
+  </footer>
+</body>
+</html>

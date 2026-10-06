@@ -1,0 +1,23 @@
+{
+  "schema": "eclogite.software/v1",
+  "name": "reference-x86_64",
+  "aliases": ["minimal-x86_64"],
+  "platform": "x86_64",
+  "stages": ["target-userland", "target-kernel", "image"],
+  "kernel": {
+    "package": "linux-libre",
+    // Full reference kernel config has not yet been migrated into package config/.
+    "fragments": []
+  },
+  "root": {
+    "hostname": "linux-libre",
+    "init": "runit",
+    "readonly": true,
+    "tmpfs": ["/run", "/tmp"]
+  },
+  "image": {
+    "format": "ext4",
+    "size_mib": 256
+  },
+  "tests": ["boot-shell", "dhcp", "shutdown"]
+}

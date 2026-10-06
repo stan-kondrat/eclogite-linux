@@ -1,0 +1,19 @@
+{
+  "schema": "eclogite.metapackage/v1",
+  "name": "base",
+  "members": [
+    "base-files",
+    "bash",
+    "coreutils",
+    "grep",
+    "sed",
+    "gawk",
+    "findutils",
+    "diffutils",
+    "gzip",
+    "tar",
+    "procps-ng",
+    "util-linux",
+    "runit"
+  ]
+}

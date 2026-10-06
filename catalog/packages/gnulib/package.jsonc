@@ -1,0 +1,19 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "gnulib",
+  "version": "snapshot-added3409",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/gnulib.git",
+    "revision": "added3409c778144f5f80e7ec1b7b7a7847272c0"
+  },
+  // Produces an immutable build-input tree; it is not installed in the guest.
+  "builder": "source-tree",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {}
+}

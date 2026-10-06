@@ -1,0 +1,18 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "runit",
+  "version": "2.3.1",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/g-pape/runit.git",
+    "revision": "0e52a89654d375a8d634c5d9d18ab29fdb666976"
+  },
+  "builder": "runit",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {}
+}

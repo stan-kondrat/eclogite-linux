@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.stage/v1",
+  "name": "target-kernel",
+  "context": "target",
+  "after": [],
+  "toolchain": "reference-system-gcc",
+  "packages": ["linux-libre"]
+}

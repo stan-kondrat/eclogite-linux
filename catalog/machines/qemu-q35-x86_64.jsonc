@@ -1,0 +1,26 @@
+{
+  "schema": "eclogite.machine/v1",
+  "name": "qemu-q35-x86_64",
+  "aliases": ["qemu-x86_64", "x86_64-vm"],
+  "platform": "x86_64",
+  "resources": {
+    "vcpus": 1,
+    "memory_mib": 256
+  },
+  "runtime": {
+    "backend": "qemu",
+    "machine": "q35",
+    "machine_options": [],
+    "acceleration": "auto"
+  },
+  "boot": {
+    "method": "direct-kernel",
+    "console": "ttyS0",
+    "kernel_arguments": ["root=/dev/vda", "ro", "console=ttyS0"]
+  },
+  "devices": [
+    { "kind": "block", "model": "virtio-blk-pci" },
+    { "kind": "network", "model": "virtio-net-pci" },
+    { "kind": "shared-directory", "model": "virtio-9p-pci", "optional": true }
+  ]
+}

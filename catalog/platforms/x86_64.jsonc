@@ -1,0 +1,9 @@
+{
+  "schema": "eclogite.platform/v1",
+  "name": "x86_64",
+  "architecture": "x86_64",
+  "abi": "linux-gnu",
+  "libc": "glibc",
+  "isa": "x86-64-baseline",
+  "kernel_architecture": "x86_64"
+}

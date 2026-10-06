@@ -1,0 +1,5 @@
+{
+  "schema": "eclogite.metapackage/v1",
+  "name": "reference-system",
+  "members": ["@base", "@network", "@editor"]
+}

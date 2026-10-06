@@ -1,0 +1,21 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "tar",
+  "version": "1.35",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/tar.git",
+    "revision": "e545d446dfe6564265cdf4186641ee76f4acc7fa"
+  },
+  // The pinned paxutils nested submodule must be represented before fetching.
+  "builder": "tar-gnulib-autotools",
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

@@ -1,0 +1,151 @@
+name: Publish website
+
+on:
+  pull_request:
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Validate and stage website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Validate HTML links and anchors
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import unquote, urlsplit
+
+          root = Path("site").resolve()
+          html_files = sorted(root.rglob("*.html"))
+          if not html_files:
+              raise SystemExit("site contains no HTML pages")
+
+
+          class PageParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = set()
+                  self.references = []
+
+              def handle_starttag(self, tag, attrs):
+                  values = dict(attrs)
+                  if "id" in values:
+                      self.ids.add(values["id"])
+                  attribute = "href" if tag in {"a", "link"} else "src"
+                  if attribute in values:
+                      self.references.append(values[attribute])
+
+
+          pages = {}
+          for path in html_files:
+              parser = PageParser()
+              parser.feed(path.read_text(encoding="utf-8"))
+              pages[path] = parser
+
+          failures = []
+          for source, page in list(pages.items()):
+              for reference in page.references:
+                  parts = urlsplit(reference)
+                  if parts.scheme or parts.netloc or reference.startswith(("mailto:", "data:")):
+                      continue
+
+                  target = source if not parts.path else (source.parent / unquote(parts.path)).resolve()
+                  try:
+                      target.relative_to(root)
+                  except ValueError:
+                      failures.append(f"{source.relative_to(root)}: reference escapes site: {reference}")
+                      continue
+
+                  if target.is_dir():
+                      target = target / "index.html"
+                  if not target.exists():
+                      failures.append(f"{source.relative_to(root)}: missing {reference}")
+                      continue
+                  if parts.fragment and target.suffix == ".html":
+                      target_page = pages.get(target)
+                      if target_page is None:
+                          parser = PageParser()
+                          parser.feed(target.read_text(encoding="utf-8"))
+                          target_page = parser
+                          pages[target] = parser
+                      if unquote(parts.fragment) not in target_page.ids:
+                          failures.append(
+                              f"{source.relative_to(root)}: missing anchor {reference}"
+                          )
+
+          if failures:
+              raise SystemExit("\n".join(failures))
+          print(f"Validated {len(html_files)} HTML pages and their local references.")
+          PY
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          for file in site/assets/*.js; do
+            node --check "$file"
+          done
+
+      - name: Reject symbolic links
+        shell: bash
+        run: |
+          if find site -type l -print -quit | grep -q .; then
+            echo "The Pages artifact must not contain symbolic links."
+            exit 1
+          fi
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Stage website
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          mkdir -p _site
+          cp -R site/. _site/
+          find _site -maxdepth 1 -name README.md -delete
+          find _site -name .DS_Store -delete
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy website
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

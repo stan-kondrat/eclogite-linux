@@ -1,0 +1,39 @@
+{
+  "schema": "eclogite.machine/v1",
+  "name": "utm-virt-arm64",
+  "aliases": ["utm-arm64", "arm64-utm"],
+  "platform": "arm64",
+  "resources": {
+    "vcpus": 1,
+    "memory_mib": 256
+  },
+  "runtime": {
+    "backend": "utm",
+    "application": "UTM",
+    "minimum_version": "5",
+    "host": {
+      "os": "macos",
+      "architecture": "arm64"
+    },
+    "virtualization_backend": "qemu",
+    "machine": "virt",
+    "machine_options": ["gic-version=3"],
+    "acceleration": "hvf",
+    "bundle_format": "utm",
+    "disk_import": "copy"
+  },
+  "boot": {
+    "method": "direct-kernel",
+    "console": "ttyAMA0",
+    "kernel_arguments": ["root=/dev/vda", "ro", "console=ttyAMA0"]
+  },
+  "devices": [
+    { "kind": "block", "model": "virtio-blk-device" },
+    { "kind": "network", "model": "virtio-net-device", "mode": "shared" },
+    { "kind": "shared-directory", "model": "virtio-9p-device", "optional": true }
+  ],
+  "limitations": [
+    "This profile requires macOS on Apple Silicon and UTM 5 or newer.",
+    "UTM imports the root disk into its bundle; it does not modify the immutable source image."
+  ]
+}

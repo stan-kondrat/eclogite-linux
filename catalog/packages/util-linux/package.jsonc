@@ -1,0 +1,29 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "util-linux",
+  "version": "2.40.4",
+  "source": {
+    "type": "git",
+    "url": "https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git",
+    "revision": "dbcc687f6ab1568982cdf3fe391c0beb818b7e28"
+  },
+  "builder": "autoreconf",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": [
+      "--prefix=/usr",
+      "--disable-nls",
+      "--disable-silent-rules",
+      "--disable-liblastlog2",
+      "--disable-makeinstall-chown",
+      "--disable-makeinstall-setuid",
+      "--without-python"
+    ],
+    "cross": ["--without-ncursesw", "--without-ncurses", "--without-tinfo"]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "sed",
+  "version": "4.9",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/sed.git",
+    "revision": "7e2e575a36bc88c0f3f3d6d8083c5f5b0ed44009"
+  },
+  "builder": "gnulib-autotools",
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

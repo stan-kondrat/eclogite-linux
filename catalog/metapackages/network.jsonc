@@ -1,0 +1,5 @@
+{
+  "schema": "eclogite.metapackage/v1",
+  "name": "network",
+  "members": ["iproute2", "dhcpcd"]
+}

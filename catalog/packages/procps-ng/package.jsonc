@@ -1,0 +1,29 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "procps-ng",
+  "version": "4.0.5",
+  "source": {
+    "type": "git",
+    "url": "https://gitlab.com/procps-ng/procps.git",
+    "revision": "f46b2f7929cdfe2913ed0a7f585b09d6adbf994e"
+  },
+  "builder": "autoreconf",
+  // The reference build has 01-capnames-portable-echo.patch; migration is pending.
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": [
+      "--prefix=/usr",
+      "--disable-nls",
+      "--disable-silent-rules",
+      "--disable-liblastlog2"
+    ],
+    "platform": {
+      "arm64": ["--without-ncurses"]
+    }
+  }
+}

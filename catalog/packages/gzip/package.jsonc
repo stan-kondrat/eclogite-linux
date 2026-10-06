@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "gzip",
+  "version": "1.13",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/gzip.git",
+    "revision": "0ff67062bc123d07dfb1f05c78231107aa9d1869"
+  },
+  "builder": "gnulib-autotools",
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Eclogite turns reviewed JSON configuration into reproducible virtual-machine bundles and physical-machine images.">
+  <title>Eclogite Linux — machines from intent</title>
+  <link rel="stylesheet" href="assets/styles.css?v=20261006-4">
+  <script src="assets/catalog-data.js?v=20261006-4" defer></script>
+  <script src="assets/site.js?v=20261006-4" defer></script>
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <aside class="alpha-banner" aria-label="Project status">
+    <strong>Alpha</strong>
+    <span>Eclogite Linux is in active development. Interfaces, schemas, and catalog definitions may change.</span>
+    <a href="docs.html#ci-migration">Project status <span aria-hidden="true">→</span></a>
+  </aside>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Eclogite Linux home">
+      <span class="brand-mark" aria-hidden="true"><i></i></span>
+      <span>Eclogite <strong>Linux</strong></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+      <a class="is-active" href="index.html">Overview</a>
+      <a href="packages.html">Packages</a>
+      <a href="machines.html">Machines</a>
+      <a href="docs.html">Documentation</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Configuration-first · immutable outputs · reproducible builds</p>
+        <h1>Build the whole machine.<br><em>Keep the intent.</em></h1>
+        <p class="hero-lede">Eclogite turns reviewed JSON configuration into a complete machine image. Choose hardware, software, and a kernel or operating-system family; it validates the combination, resolves every input, builds it in a controlled environment, and produces an immutable result for a VM or physical device.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#getting-started">Build your first machine</a>
+          <a class="button button-quiet" href="machines.html">Explore machine profiles <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+
+      <div class="hero-console" aria-label="Example Eclogite workflow">
+        <div class="console-top">
+          <span></span><span></span><span></span>
+          <b>utm-arm64</b>
+        </div>
+        <div class="console-body">
+          <p><span class="prompt">$</span> mkdir arm64-dev &amp;&amp; cd arm64-dev</p>
+          <p><span class="prompt">$</span> eclogite create \\</p>
+          <p class="indent">--config ../examples/utm-arm64.json \\</p>
+          <p class="indent">--fetch</p>
+          <p class="console-muted">resolve&nbsp; machine + software · no cycles</p>
+          <p class="console-good">fetch&nbsp;&nbsp;&nbsp; 18 layers attested</p>
+          <p class="console-muted">runtime&nbsp; dev-arm64@sha256:9b3…</p>
+          <p class="console-muted">mount&nbsp;&nbsp;&nbsp; aarch64-linux-gnu@sha256:6a1…</p>
+          <p class="console-good">image&nbsp;&nbsp;&nbsp; root.img + Image.gz</p>
+          <p class="console-good">publish vm.json written last</p>
+          <p><span class="prompt">$</span> ./vm.sh run</p>
+          <p class="console-muted">booting read-only root on ttyAMA0…</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="stat-band" aria-label="Current catalog statistics">
+      <div><strong data-stat="packages">18</strong><span>buildable software units</span></div>
+      <div><strong data-stat="metapackages">4</strong><span>reusable software groups</span></div>
+      <div><strong data-stat="machines">6</strong><span>machine profiles</span></div>
+      <div><strong data-stat="software">2</strong><span>software profiles</span></div>
+      <div><strong data-stat="systems">3</strong><span>ready machine + software pairs</span></div>
+    </section>
+
+    <section class="section overview-start" id="getting-started" aria-labelledby="getting-started-title">
+      <div class="overview-start-heading">
+        <div>
+          <p class="eyebrow">Getting started</p>
+          <h2 id="getting-started-title">Choose. Review.<br>Build once.</h2>
+        </div>
+        <p>Start with short catalog names, or pass your own JSONC files. The shorthand is expanded into recorded intent before locking, so convenience does not create hidden build state.</p>
+      </div>
+
+      <div class="overview-start-grid">
+        <article class="overview-step">
+          <span>01 / intent</span>
+          <h3>Write one system file.</h3>
+          <p>Machine and software stay reusable, but one reviewed JSON file links the exact pair you want to build.</p>
+          <pre><code>{
+  "schema": "eclogite.system/v1",
+  "name": "utm-arm64",
+  "machine": "utm-arm64",
+  "software": "minimal-arm64"
+}</code></pre>
+          <a href="machines.html">Browse machine profiles <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="overview-step overview-step-primary">
+          <span>02 / references</span>
+          <h3>Use aliases or file links.</h3>
+          <p>Bare names resolve predefined catalog objects. Relative paths resolve from the system file, so the same definition works from any directory.</p>
+          <pre><code>"machine": "utm-arm64"
+"software": "minimal-arm64"
+
+or
+
+"machine": "./my-machine.jsonc"
+"software": "../software/base.jsonc"</code></pre>
+          <a href="docs.html#reference-rules">Read the reference rules <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="overview-step">
+          <span>03 / build</span>
+          <h3>Resolve, review, create.</h3>
+          <p>Every command consumes the same file. The lock records canonical objects and hashes before any builder runs.</p>
+          <pre><code>eclogite plan \
+  --config system.json
+
+eclogite create \
+  --config system.json \
+  --fetch</code></pre>
+          <a href="packages.html">Open the dependency graph <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+
+      <div class="deployment-paths" id="deployment-outputs">
+        <article>
+          <span>virtual target</span>
+          <h3><code>vm.sh</code> runs the completed VM.</h3>
+          <p>A QEMU or UTM profile produces a self-contained bundle with images, runtime metadata, and <code>vm.sh</code> for validate, run, console, status, and stop.</p>
+          <code>./vm.sh run</code>
+        </article>
+        <article>
+          <span>physical target</span>
+          <h3>A bootable hardware image.</h3>
+          <p>A board profile produces the selected kernel or operating-system artifacts, boot files, filesystem image, manifest, and provenance. It does not pretend the physical board is a VM.</p>
+          <code>out/raspberry-pi-model-b.img</code>
+        </article>
+      </div>
+    </section>
+
+    <section class="section composition-section" id="composition" aria-labelledby="composition-title">
+      <div class="composition-heading">
+        <div>
+          <p class="eyebrow">Two inputs · one resolved system</p>
+          <h2 id="composition-title">Describe the machine.<br>Describe the software.</h2>
+        </div>
+        <p>Hardware sizing and device topology do not belong in the package selection. Eclogite keeps both sides independently reusable, then validates their platform contract before it builds.</p>
+      </div>
+
+      <div class="composition-flow">
+        <article class="composition-card composition-machine">
+          <span class="composition-type">machine.json</span>
+          <h3>Machine profile</h3>
+          <ul>
+            <li>architecture and CPU model</li>
+            <li>vCPU count and memory</li>
+            <li>boot method and firmware</li>
+            <li>storage, network, console</li>
+            <li>QEMU or physical device contract</li>
+          </ul>
+        </article>
+        <div class="composition-operator" aria-hidden="true">+</div>
+        <article class="composition-card composition-software">
+          <span class="composition-type">software.json</span>
+          <h3>Software profile</h3>
+          <ul>
+            <li>target platform and stages</li>
+            <li>kernel or operating-system selection</li>
+            <li>packages, services, init</li>
+            <li>read-only root filesystem</li>
+            <li>image policy and tests</li>
+          </ul>
+        </article>
+        <div class="composition-operator" aria-hidden="true">=</div>
+        <article class="composition-result">
+          <span class="composition-type">system.lock.json</span>
+          <h3>Compatible system</h3>
+          <p>One auditable graph, one bootable image, one self-contained deployment bundle.</p>
+        </article>
+      </div>
+
+      <p class="compatibility-gate"><span>compatibility gate</span> machine.platform must equal software.platform · required devices must be present · no hidden runtime overrides</p>
+    </section>
+
+    <section class="section split-section">
+      <div>
+        <p class="eyebrow">One source of truth</p>
+        <h2>The catalog describes.<br>The plan proves.</h2>
+      </div>
+      <div class="prose-large">
+        <p>Package JSON stays declarative: immutable source revisions, typed dependencies, builder selection, and package-owned resources. <code>eclogite</code> validates that intent and emits a deterministic Make plan.</p>
+        <p>Build output never leaks back into the catalog. Locks, source trees, and immutable layers can be inspected, compared, discarded, and reconstructed.</p>
+      </div>
+    </section>
+
+    <section class="section feature-grid" aria-label="Architecture principles">
+      <article class="feature-card feature-card-dark">
+        <span class="feature-index">01</span>
+        <h3>Resolve before executing</h3>
+        <p>Schema validation, meta-package expansion, cycle detection, platform selection, and input hashing complete before a builder runs.</p>
+        <a href="#getting-started">Follow the workflow <span aria-hidden="true">→</span></a>
+      </article>
+      <article class="feature-card">
+        <span class="feature-index">02</span>
+        <h3>Trust before caching</h3>
+        <p>Git mirrors, source snapshots, and package outputs use immutable identities. Remote layers also require signed build provenance before entering the local cache.</p>
+        <a href="packages.html">Inspect package inputs <span aria-hidden="true">→</span></a>
+      </article>
+      <article class="feature-card feature-card-accent">
+        <span class="feature-index">03</span>
+        <h3>Replace, never mutate</h3>
+        <p>Eclogite runs on the host. The produced root and its system software are read-only; changing them means producing and replacing a new tested image.</p>
+        <a href="#deployment-outputs">See the output boundary <span aria-hidden="true">→</span></a>
+      </article>
+    </section>
+
+    <section class="section runtime-section" aria-labelledby="runtime-title">
+      <div class="runtime-heading">
+        <div>
+          <p class="eyebrow">Reproducible build room</p>
+          <h2 id="runtime-title">The host coordinates.<br>The VM builds.</h2>
+        </div>
+        <p>The host compiler is never part of a package build. Eclogite boots one pinned development image, mounts one exact target toolchain read-only, and runs the emitted Make plan offline inside that boundary.</p>
+      </div>
+
+      <div class="runtime-layout">
+        <article class="runtime-trace" aria-label="Build runtime trace">
+          <div class="runtime-window-bar">
+            <span>build.runtime</span>
+            <span class="runtime-online"><i></i> resolved</span>
+          </div>
+          <ol>
+            <li><span>01</span><div><b>Host intent</b><code>system.json + catalog commit</code></div><small>validated</small></li>
+            <li><span>02</span><div><b>Development image</b><code>linux-libre-vm / arm64</code></div><small>sha256 pinned</small></li>
+            <li><span>03</span><div><b>Target toolchain</b><code>/opt/eclogite/toolchains/aarch64-linux-gnu</code></div><small>read-only mount</small></li>
+            <li><span>04</span><div><b>Execution</b><code>make --file state/plan.mk</code></div><small>network off</small></li>
+            <li><span>05</span><div><b>Layer result</b><code>manifest + hashes + provenance</code></div><small>compared</small></li>
+          </ol>
+        </article>
+
+        <aside class="trust-panel">
+          <p class="trust-kicker">remote layer acceptance</p>
+          <h3>Four checks, or build locally.</h3>
+          <ul>
+            <li><span>01</span> exact input key</li>
+            <li><span>02</span> immutable OCI digest</li>
+            <li><span>03</span> manifest and content hashes</li>
+            <li><span>04</span> trusted workflow attestation</li>
+          </ul>
+          <p>A missing or rejected layer never weakens the policy. It becomes a local offline build inside the same runtime.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="comparison-section" aria-labelledby="comparison-title">
+      <div class="comparison-heading">
+        <div>
+          <p class="eyebrow">Ideas in context</p>
+          <h2 id="comparison-title">Borrow proven machinery.<br>Decline accidental complexity.</h2>
+        </div>
+        <p>Eclogite is not a universal package ecosystem or a container runtime. It is a deliberately narrow compiler from reviewed machine intent to a reproducible VM bundle or physical-machine image.</p>
+      </div>
+
+      <div class="comparison-list">
+        <article class="comparison-row">
+          <div class="comparison-name"><span>01</span><h3>Nix</h3><small>Functional package system</small></div>
+          <div><b>What we borrow</b><p>Input-derived identities, fixed source revisions, dependency keys, and a lock that separates human intent from a concrete build.</p></div>
+          <div><b>Eclogite's boundary</b><p>JSON is data, not a lazy programming language. One pinned version per package makes resolution a topological sort, with no overlays or fixpoint override APIs.</p></div>
+        </article>
+
+        <article class="comparison-row">
+          <div class="comparison-name"><span>02</span><h3>Guix</h3><small>Scheme-based system manager</small></div>
+          <div><b>What we borrow</b><p>Explicit build, target, and runtime input roles; immutable store-like outputs; and the ability to reproduce a system from pinned catalog state.</p></div>
+          <div><b>Eclogite's boundary</b><p>No Scheme evaluation, package transformations, grafts, or deep input rewriting. A changed input produces a visible lock and rebuild plan.</p></div>
+        </article>
+
+        <article class="comparison-row">
+          <div class="comparison-name"><span>03</span><h3>Docker / BuildKit</h3><small>Container image pipeline</small></div>
+          <div><b>What we borrow</b><p>A dependency DAG, parallel work, immutable cached results, and the convenience of shipping one self-contained runtime artifact.</p></div>
+          <div><b>Eclogite's boundary</b><p>The output is a bootable VM or hardware image with its selected kernel—not a host-kernel container. Inputs are graph nodes, not mutable network activity hidden inside <code>RUN</code>.</p></div>
+        </article>
+
+        <article class="comparison-row">
+          <div class="comparison-name"><span>04</span><h3>Yocto</h3><small>Embedded distribution builder</small></div>
+          <div><b>What we borrow</b><p>Package groups, feature effects, kernel configuration fragments, task hashing, and tools that explain why a build signature changed.</p></div>
+          <div><b>Eclogite's boundary</b><p>No layer priority, <code>.bbappend</code> chains, override syntax, or inline Python. Defaults live in typed builders and package intent remains inspectable JSON.</p></div>
+        </article>
+
+        <article class="comparison-row">
+          <div class="comparison-name"><span>05</span><h3>Buildroot</h3><small>Root filesystem builder</small></div>
+          <div><b>What we borrow</b><p>Reusable package infrastructures, per-package directories, kernel fragments, and a whole-system image assembled on the host.</p></div>
+          <div><b>Eclogite's boundary</b><p>The catalog is schema-validated data and package outputs receive content-aware input keys, manifests, comparison results, and reusable cache layers.</p></div>
+        </article>
+      </div>
+
+      <p class="comparison-note">Design synthesis from the project’s package-build DSL research. The goal is a smaller problem surface, not feature parity with these systems.</p>
+    </section>
+
+    <section class="section pipeline-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Build flow</p>
+          <h2>From JSON to a bootable image</h2>
+        </div>
+        <p>Human input remains readable. Machine state becomes exact.</p>
+      </div>
+      <ol class="pipeline">
+        <li><span>JSON</span><b>Intent</b><small>systems, packages, stages</small></li>
+        <li><span>LOCK</span><b>Resolution</b><small>commits, graph, input keys</small></li>
+        <li><span>MAKE</span><b>Execution</b><small>inside the pinned build VM</small></li>
+        <li><span>STORE</span><b>Layers</b><small>hashes and signed provenance</small></li>
+        <li><span>OUTPUT</span><b>Deployment</b><small>VM bundle or hardware image</small></li>
+      </ol>
+    </section>
+
+    <section class="section tool-boundary">
+      <article>
+        <p class="tool-label">Host configuration compiler</p>
+        <h2><code>eclogite</code></h2>
+        <ul class="check-list">
+          <li>Parses JSON and validates schemas</li>
+          <li>Resolves the complete dependency graph</li>
+          <li>Builds, tests, compares, and caches layers</li>
+          <li>Creates VM bundles or physical images</li>
+        </ul>
+      </article>
+      <div class="boundary-arrow" aria-hidden="true"><span>creates</span>→</div>
+      <article class="output-boundary-card">
+        <p class="tool-label">Deployment outputs</p>
+        <h2>Virtual <em>or</em> physical</h2>
+        <div class="output-kind">
+          <b><code>vm.sh</code> · virtual profiles</b>
+          <p>Runs and controls the completed VM bundle.</p>
+        </div>
+        <div class="output-kind">
+          <b><code>*.img</code> · physical profiles</b>
+          <p>Boot-media image and manifest for the selected board.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="section final-cta">
+      <div>
+        <p class="eyebrow">See what selects what</p>
+        <h2>Inspect the current catalog as a graph.</h2>
+      </div>
+      <a class="button button-light" href="packages.html">Open packages <span aria-hidden="true">→</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="brand brand-footer"><span class="brand-mark" aria-hidden="true"><i></i></span><span>Eclogite <strong>Linux</strong></span></div>
+    <p>Build definitions are the product. Machines are reproducible outputs.</p>
+    <p>Catalog snapshot · <span data-year></span></p>
+  </footer>
+</body>
+</html>

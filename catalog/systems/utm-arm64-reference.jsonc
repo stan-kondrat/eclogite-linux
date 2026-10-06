@@ -1,0 +1,6 @@
+{
+  "schema": "eclogite.system/v1",
+  "name": "utm-arm64-reference",
+  "machine": "utm-virt-arm64",
+  "software": "reference-arm64"
+}

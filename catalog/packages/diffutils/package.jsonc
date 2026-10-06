@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "diffutils",
+  "version": "3.10",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/diffutils.git",
+    "revision": "b1a657b85a7142b146b004a0db6a03dc6374b164"
+  },
+  "builder": "gnulib-autotools",
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}

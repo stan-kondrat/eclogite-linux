@@ -1,0 +1,44 @@
+{
+  "schema": "eclogite.machine/v1",
+  "name": "qemu-raspi1ap-armv6",
+  "aliases": ["qemu-rpi-armv6", "rpi-armv6-vm"],
+  "platform": "armv6-bcm2835",
+  "status": "profile-only",
+  "resources": {
+    "cpu": {
+      "soc": "BCM2835",
+      "model": "ARM1176JZF-S",
+      "cores": 1
+    },
+    "memory_mib": 512
+  },
+  "runtime": {
+    "backend": "qemu",
+    "executable": "qemu-system-arm",
+    "machine": "raspi1ap",
+    "machine_options": [],
+    "acceleration": "tcg"
+  },
+  "boot": {
+    "method": "direct-kernel",
+    "console": "ttyAMA0",
+    "kernel_arguments": ["ro", "console=ttyAMA0"]
+  },
+  "devices": [
+    { "kind": "gpio", "model": "bcm2835" },
+    { "kind": "serial", "model": "pl011" },
+    { "kind": "serial", "model": "bcm2835-aux" },
+    { "kind": "display", "model": "framebuffer" },
+    { "kind": "usb", "model": "usb-host" },
+    { "kind": "block", "model": "sd-mmc" },
+    { "kind": "spi", "model": "bcm2835" },
+    { "kind": "i2c", "model": "bcm2835" }
+  ],
+  "limitations": [
+    "QEMU raspi1ap models Raspberry Pi 1 Model A+, not Model B.",
+    "The emulated board does not provide the Model B onboard Ethernet device."
+  ],
+  "references": [
+    "https://www.qemu.org/docs/master/system/arm/raspi.html"
+  ]
+}

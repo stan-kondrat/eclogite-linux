@@ -1,0 +1,34 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "vim",
+  "version": "9.2.0725",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/vim/vim.git",
+    "revision": "d22ff1c955ff87e8273210eae125aab0e85b6c30"
+  },
+  // The reference cross build creates a termcap stub; model it as a hook later.
+  "builder": "vim",
+  "patches": [],
+  "dependencies": {
+    "build": [],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": [
+      "--prefix=/usr",
+      "--with-features=tiny",
+      "--disable-gui",
+      "--without-x",
+      "--disable-netbeans",
+      "--disable-channel",
+      "--disable-gpm",
+      "--disable-acl",
+      "--disable-nls",
+      "--disable-smack",
+      "--disable-selinux",
+      "--enable-gui=no"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "schema": "eclogite.system/v1",
+  "name": "qemu-x86_64-reference",
+  "machine": "qemu-q35-x86_64",
+  "software": "reference-x86_64"
+}

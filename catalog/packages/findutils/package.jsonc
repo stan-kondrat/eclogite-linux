@@ -1,0 +1,20 @@
+{
+  "schema": "eclogite.package/v1",
+  "name": "findutils",
+  "version": "4.10.0",
+  "source": {
+    "type": "git",
+    "url": "https://git.savannah.gnu.org/git/findutils.git",
+    "revision": "c67264238d9487d5313a131674cd7a01ca299927"
+  },
+  "builder": "gnulib-autotools",
+  "patches": [],
+  "dependencies": {
+    "build": ["gnulib"],
+    "link": [],
+    "run": []
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
+  }
+}
