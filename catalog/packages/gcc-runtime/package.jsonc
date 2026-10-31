@@ -1,0 +1,40 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "gcc-runtime",
+  "version": "15.3.0",
+  // GCC's target runtime libraries only: libgcc_s, libstdc++, libatomic.
+  // The compiler itself is never installed in a guest.
+  "source": {
+    "type": "git",
+    "url": "https://gcc.gnu.org/git/gcc.git",
+    "revision": "4db0e8df15bef836558857c291c323add11d035c"
+  },
+  // C++ programs need the GLIBCXX_*/GCC_* symbol versions of the compiler
+  // that linked them: the lock fails unless builder:gcc has this revision.
+  "matches_builder_tool": "gcc",
+  // libgcc_s is the compiler runtime and unwinder, libstdc++ the C++ library
+  "provides": ["cc-runtime", "c++-runtime"],
+  "compatible": {
+    "build": { "compiler": { "eq": "gcc" } }
+  },
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"],
+    "link": ["libc"]
+  },
+  "arguments": {
+    "out_of_tree": true,
+    "configure": [
+      "--prefix=/usr",
+      "--enable-languages=c,c++",
+      "--disable-multilib",
+      "--disable-bootstrap",
+      "--disable-nls"
+    ],
+    // Build and install the target libraries only, not the compiler
+    "make_targets": ["all-target-libgcc", "all-target-libstdc++-v3", "all-target-libatomic"],
+    "install_targets": ["install-target-libgcc", "install-target-libstdc++-v3", "install-target-libatomic"],
+    // shared objects only: no headers, static libraries or Python pretty-printers
+    "remove": ["/usr/include", "/usr/share", "**/*.a", "**/*.la", "**/*-gdb.py"]
+  }
+}

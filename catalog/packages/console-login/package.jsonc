@@ -1,0 +1,30 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "console-login",
+  "version": "1",
+  // Login on the machine's serial console straight into a root shell, as in
+  // the reference build. Works with util-linux's agetty and BusyBox's getty. The console device comes from the selected machine.
+  "source": {
+    "type": "none"
+  },
+  "builder": "files",
+  "parameters": {
+    "CONSOLE": "/machine/boot/console"
+  },
+  "compatible": {
+    "machine": { "devices": { "has": "serial" } }
+  },
+  "dependencies": {
+    // getty and setsid from system-utils, the login shell from sh
+    "run": ["system-utils", "sh", "init"]
+  },
+  "services": {
+    // setsid -c gives agetty the console as controlling terminal
+    "getty": {
+      "run": ["setsid", "-c", "getty", "-L", "-n", "-l", "/bin/sh", "115200", "${CONSOLE}", "vt100"],
+      "stdin": "/dev/${CONSOLE}",
+      "log": false,
+      "restart_delay_seconds": 5
+    }
+  }
+}

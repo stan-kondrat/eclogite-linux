@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "linux-libre",
   "version": "7.1.3-gnu",
   "source": {
@@ -7,17 +7,76 @@
     "url": "git://linux-libre.fsfla.org/releases.git",
     "revision": "3e85aed47058aaeb9916cf756f2c2cbd41e32589"
   },
-  "builder": "kernel",
-  "patches": [],
-  "dependencies": {
-    "build": [],
-    "link": [],
-    "run": []
-  },
-  "arguments": {
-    "targets": {
-      "x86_64": "bzImage",
-      "arm64": "Image.gz"
+  // A kernel is an ordinary package that provides the "kernel" capability,
+  // and "linux" for packages that need a Linux kernel in particular. It is
+  // the default; selecting another provider replaces it.
+  "provides": ["kernel", "linux"],
+  // The options dependents and machine devices may require, as config on
+  // their dependency on "linux". Every required option must be declared here
+  // with an allowed value; an option nobody requires gets its default.
+  // "requires" lists options that must be on for this one to take effect
+  // (Kconfig would silently drop it): they are implied, and a conflicting
+  // requirement is an error. The builder applies the result over the config
+  // fragments and verifies the effective .config.
+  "configurable": {
+    "format": "kconfig",
+    "options": {
+      // Filesystems and pseudo-filesystems: base-files, runit, host-share
+      "CONFIG_PROC_FS": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_SYSFS": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_TMPFS": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_DEVTMPFS": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_UNIX98_PTYS": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_INOTIFY_USER": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_9P_FS": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_NET_9P": "y" } },
+      // virtio: QEMU and UTM machines (catalog/devices.jsonc)
+      "CONFIG_VIRTIO": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_VIRTIO_MMIO": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_VIRTIO": "y" } },
+      "CONFIG_VIRTIO_PCI": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_VIRTIO": "y" } },
+      "CONFIG_VIRTIO_BLK": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_VIRTIO": "y" } },
+      "CONFIG_VIRTIO_NET": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_VIRTIO": "y" } },
+      "CONFIG_NET_9P": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_NET_9P_VIRTIO": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_NET_9P": "y", "CONFIG_VIRTIO": "y" } },
+      // Serial consoles
+      "CONFIG_SERIAL_AMBA_PL011": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_SERIAL_AMBA_PL011_CONSOLE": { "values": ["y", "n"], "default": "n", "requires": { "CONFIG_SERIAL_AMBA_PL011": "y" } },
+      "CONFIG_SERIAL_8250": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_SERIAL_8250_CONSOLE": { "values": ["y", "n"], "default": "n", "requires": { "CONFIG_SERIAL_8250": "y" } },
+      "CONFIG_SERIAL_8250_BCM2835AUX": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_SERIAL_8250": "y" } },
+      // Real-time clocks
+      "CONFIG_RTC_CLASS": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_RTC_HCTOSYS": { "values": ["y", "n"], "default": "n", "requires": { "CONFIG_RTC_CLASS": "y" } },
+      "CONFIG_RTC_DRV_PL031": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_RTC_CLASS": "y" } },
+      "CONFIG_RTC_DRV_CMOS": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_RTC_CLASS": "y" } },
+      // BCM2835 (Raspberry Pi 1)
+      "CONFIG_PINCTRL_BCM2835": { "values": ["y", "n"], "default": "n" },
+      "CONFIG_SPI_BCM2835": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_I2C_BCM2835": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_MMC": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_MMC_BCM2835": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_MMC": "y" } },
+      "CONFIG_USB": { "values": ["y", "m", "n"], "default": "n" },
+      "CONFIG_USB_DWC2": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_USB": "y" } },
+      "CONFIG_USB_USBNET": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_USB": "y" } },
+      "CONFIG_USB_NET_SMSC95XX": { "values": ["y", "m", "n"], "default": "n", "requires": { "CONFIG_USB_USBNET": "y" } },
+      // Policy a software profile may set
+      "CONFIG_PREEMPT": { "values": ["y", "n"], "default": "n" }
     }
-  }
+  },
+  "compatible": {
+    "target": { "os": { "eq": "linux" } }
+  },
+  "builder": "linux-kernel",
+  "tests": {
+    // The guest clock comes from the machine's RTC (catalog/devices.jsonc);
+    // a board without one, such as the Raspberry Pi 1, skips the test
+    "clock": {
+      "when": { "devices": { "has": "rtc" } },
+      "timeout_seconds": 10
+    }
+  },
+  "variants": [
+    { "when": { "arch": { "eq": "aarch64" } }, "arguments": { "image": "Image.gz" } },
+    { "when": { "arch": { "eq": "x86_64" } }, "arguments": { "image": "bzImage" } },
+    { "when": { "arch": { "eq": "arm" } }, "arguments": { "image": "zImage" } }
+  ]
 }

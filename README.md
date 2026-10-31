@@ -7,11 +7,11 @@ the reference implementation and is not modified by this project.
 The new design has two deliberately small layers:
 
 - `eclogite`, written in C17, parses and validates the configuration catalog,
-  resolves meta-packages and stages, emits a deterministic build plan, executes
-  the build, and materializes either a self-contained VM bundle or bootable
-  images for a physical machine.
-- GNU Make consumes that plan, schedules work, and invokes reusable builder
-  rules. Package configuration stays data; Make recipes stay generic.
+  resolves the package closure, writes a deterministic lock, schedules and
+  executes the build, and materializes either a self-contained VM bundle or
+  bootable images for a physical machine.
+- Seven generic builders (`builders/<name>/build.sh`) each know one build style.
+  Package configuration stays data; package exceptions are named hooks.
 
 VM operation is a separate concern: every generated virtual-machine bundle
 contains a `vm.sh` runner. It starts and controls that one already-built VM
@@ -36,6 +36,9 @@ Read these documents before adding packages:
 - [Research: the original build](docs/research/linux-libre-vm.md)
 - [Research: package build language](docs/research/package-build-dsl/README.md)
 - [Architecture](docs/architecture.md)
+- [Build model: builder image, target packages, fetch](docs/build-model.md)
+- [Resolution: how a system becomes a closure and its choices](docs/resolution.md)
+- [Formats: document shapes and open decisions](docs/formats.md)
 - [JSON configuration](docs/configuration.md)
 - [CLI design](docs/cli.md)
 - [Generated VM bundle](docs/vm-bundle.md)
@@ -57,25 +60,32 @@ being downloaded separately into every project.
 ```text
 catalog/
   packages/<name>/
-    package.jsonc    package metadata, sources, dependencies, and builder choice
+    package.jsonc    package metadata, source, builder, dependencies, services,
+                     tests and kernel options; a meta-package such as base or
+                     network has run dependencies only
     patches/         optional package-owned source patches
     hooks/           optional package-specific build hooks
+    tests/           optional checks run in the booted guest
     files/           optional files installed by the package
     config/          optional structured configuration fragments
-  metapackages/      named package selections such as base and network
-  machines/          CPU, memory, boot, device, and runtime profiles
-  software/          kernel, package, rootfs, image, and test profiles
-  platforms/         target architecture, ABI, libc, and ISA policy
-  toolchains/        external toolchain descriptions (never built by Eclogite)
-  stages/            build and image-construction graph contexts
+  machines/          platform, CPU, memory, boot, device, and runtime profiles
+  software/          package, kernel, rootfs, image, and volume profiles
+  platforms/         hardware: architecture, triplet CPU, ISA
+  abis/              operating system, libc, triplet suffix, toolchain
+  toolchains/        the linux-libre-vm builder image (never built by Eclogite)
   systems/           machine + software compositions
-  schemas/           JSON Schema files for catalog and system JSON/JSONC
+  facts.jsonc        fact vocabulary for compatible and variants
+  defaults.jsonc     default ABI and provider per capability
+  devices.jsonc      device models and the kernel options their drivers require
+schemas/             JSON Schema, the source of truth: root config, one per object kind,
+                     one per builder, and the compiled lock
 examples/             complete strict-JSON system inputs for common workflows
-builders/            planned generic Make implementations of build styles
+tests/reference/     golden resolutions: acceptance data for the C resolver
+builders/            planned generic builders, one per build style
 tools/eclogite/      reserved standalone C host-tool boundary
 tools/vm.sh/         reserved bundle-local vm.sh runner boundary
-scripts/             planned repository integration helpers
-site/                maintained static website source and catalog presentation
+site/                maintained static website source and catalog presentation;
+                     site/types/generated/: TypeScript types and catalog, generated from schemas/ and catalog/
 docs/                research, design, and migration decisions
 state/               planned locks, build plans, and explanations (ignored)
 out/                 planned package outputs, roots, and images (ignored)
@@ -99,10 +109,15 @@ changed by editing its JSONC intent, regenerating the strict-JSON lock, and
 building a replacement image.
 
 Hardware and guest contents are separate inputs. A machine profile defines
-vCPU, memory, boot, devices, console, and runtime backend. A software profile
-defines the target platform, stages, kernel, packages, services, root policy,
-image, and tests. A small system file composes one of each; validation rejects
-an incompatible pair before planning.
+the platform, vCPU, memory, boot, devices, console, and runtime backend. A
+software profile defines the packages, root policy, image, and volumes, and
+optionally the ABI (glibc, musl, …), the compiler (gcc, clang) and capability
+providers (BusyBox for the shell and utilities, libc++, another kernel or
+init); everything else comes from the distribution defaults. Services, tests and required kernel options come from the
+packages themselves. A small
+system file composes one of each. Because the machine selects the platform,
+one software profile serves every compatible machine; validation rejects an
+incompatible pair before planning.
 
 The preferred workflow uses one system file. Its `machine` and `software`
 fields accept catalog names or declared aliases; strings beginning with `./` or
@@ -115,8 +130,8 @@ eclogite create --config ../examples/utm-arm64.json --fetch
 ./vm.sh run
 ```
 
-The example resolves `utm-arm64` and `minimal-arm64` aliases to their canonical
-catalog files. The generated bundle keeps the same `vm.sh` lifecycle while its
+The example resolves the `utm-arm64` alias and the `minimal` software profile,
+the smallest bootable system, to their canonical catalog files. The generated bundle keeps the same `vm.sh` lifecycle while its
 driver uses UTM and `utmctl`. Separate `--machine` and `--software` options
 remain an interactive shorthand, not the primary persisted format.
 

@@ -1,0 +1,7 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "editor",
+  "dependencies": {
+    "run": ["vi"]
+  }
+}

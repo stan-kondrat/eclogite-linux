@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Platform",
+  "description": "Hardware only: the architecture and what the CPU guarantees.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.platform/v0.1"
+    },
+    "name": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "architecture": {
+      "description": "Fact `arch`, such as `aarch64`.",
+      "type": "string",
+      "minLength": 1
+    },
+    "triplet_cpu": {
+      "description": "CPU part of the target triplet, such as `armv6`.",
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "cpu": {
+      "type": "object",
+      "properties": {
+        "isa": {
+          "description": "Fact `isa`: a value in the `isa` fact's order for this architecture.",
+          "type": "string",
+          "minLength": 1
+        },
+        "bits": {
+          "enum": [
+            32,
+            64
+          ]
+        },
+        "endian": {
+          "enum": [
+            "little",
+            "big"
+          ]
+        },
+        "features": {
+          "description": "Fact `cpu_features`, beyond the ISA level.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "mmu": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "isa",
+        "bits",
+        "endian",
+        "features",
+        "mmu"
+      ],
+      "additionalProperties": false
+    },
+    "kernel_architecture": {
+      "description": "Linux `ARCH=`. OPEN(17): this makes the platform Linux-specific.",
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "architecture",
+    "triplet_cpu",
+    "cpu",
+    "kernel_architecture"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,10 @@
+runit-init executes runit from /bin: Eclogite systems have no /sbin.
+
+--- a/src/runit.h
++++ b/src/runit.h
+@@ -1,4 +1,4 @@
+-#define RUNIT "/sbin/runit"
++#define RUNIT "/bin/runit"
+ #define STOPIT "/etc/runit/stopit"
+ #define REBOOT "/etc/runit/reboot"
+ #define NOSYNC "/etc/runit/nosync"

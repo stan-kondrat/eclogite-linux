@@ -27,13 +27,12 @@
   var machineMap = indexByName(catalog.machines || []);
   var softwareMap = indexByName(catalog.software || []);
   var toolchainMap = indexByName(catalog.toolchains);
-  var stageMap = indexByName(catalog.stages);
   var systemMap = indexByName(catalog.systems);
 
   var state = {
     system: catalog.systems[0] ? catalog.systems[0].name : "all",
     view: "full",
-    kinds: new Set(["system", "machine", "software", "platform", "stage", "metapackage", "package", "toolchain"]),
+    kinds: new Set(["system", "machine", "software", "platform", "metapackage", "package", "toolchain"]),
     nodes: [],
     edges: [],
     positions: new Map(),
@@ -62,7 +61,6 @@
       machine: "Machine",
       software: "Software",
       platform: "Platform",
-      stage: "Stage",
       metapackage: "Meta-package",
       package: "Package",
       toolchain: "Toolchain"
@@ -97,6 +95,10 @@
 
   function addPackageClosure(name, nodes, edges) {
     var item = packageMap.get(name);
+    if (item && nodes.has(nodeId("package", name))) {
+      // already expanded; run dependencies may form cycles (glibc <-> gcc-runtime)
+      return nodeId("package", name);
+    }
     var id = addNode(nodes, "package", item);
     if (!item || !id) {
       return id;
@@ -104,7 +106,7 @@
 
     ["build", "link", "runtime"].forEach(function (relation) {
       (item.dependencies[relation] || []).forEach(function (dependency) {
-        var dependencyId = addPackageClosure(dependency, nodes, edges);
+        var dependencyId = addSelection(dependency, nodes, edges);
         addEdge(edges, id, dependencyId, relation, relation);
       });
     });
@@ -113,26 +115,29 @@
 
   function addMetaClosure(name, nodes, edges) {
     var item = metaMap.get(name);
+    if (item && nodes.has(nodeId("metapackage", name))) {
+      return nodeId("metapackage", name);
+    }
     var id = addNode(nodes, "metapackage", item);
     if (!item || !id) {
       return id;
     }
 
     item.members.forEach(function (member) {
-      var childId;
-      if (member.charAt(0) === "@") {
-        childId = addMetaClosure(member.slice(1), nodes, edges);
-      } else {
-        childId = addPackageClosure(member, nodes, edges);
-      }
-      addEdge(edges, id, childId, "selection", "includes");
+      addEdge(edges, id, addSelection(member, nodes, edges), "selection", "includes");
     });
     return id;
   }
 
+  // Meta-packages, packages and capabilities share one namespace; a
+  // capability (libc, init, kernel) is shown as its first provider
   function addSelection(selection, nodes, edges) {
-    return selection.charAt(0) === "@"
-      ? addMetaClosure(selection.slice(1), nodes, edges)
+    var providers = (catalog.capabilities || {})[selection];
+    if (providers && !packageMap.has(selection) && !metaMap.has(selection)) {
+      selection = providers[0];
+    }
+    return metaMap.has(selection)
+      ? addMetaClosure(selection, nodes, edges)
       : addPackageClosure(selection, nodes, edges);
   }
 
@@ -143,7 +148,7 @@
       ? catalog.systems
       : [systemMap.get(state.system)].filter(Boolean);
     var includeStructure = state.view !== "packages";
-    var includePackages = state.view !== "stages";
+    var includePackages = state.view !== "structure";
 
     selectedSystems.forEach(function (system) {
       var systemNode = includeStructure ? addNode(nodes, "system", system) : null;
@@ -157,47 +162,25 @@
         addEdge(edges, systemNode, machineNode, "selection", "machine");
         addEdge(edges, systemNode, softwareNode, "selection", "software");
 
-        var machinePlatform = addNode(nodes, "platform", platformMap.get(machine && machine.platform));
-        var softwarePlatform = addNode(nodes, "platform", platformMap.get(software && software.platform));
-        addEdge(edges, machineNode, machinePlatform, "platform", "supports");
-        addEdge(edges, softwareNode, softwarePlatform, "platform", "targets");
+        // The machine selects the platform; the platform names its toolchain
+        var platform = platformMap.get(machine && machine.platform);
+        var platformNode = addNode(nodes, "platform", platform);
+        addEdge(edges, machineNode, platformNode, "platform", "platform");
+        var toolchainNode = addNode(nodes, "toolchain", toolchainMap.get(platform && platform.toolchain));
+        addEdge(edges, platformNode, toolchainNode, "toolchain", "built by");
       }
 
-      (software ? software.stages : []).forEach(function (stageName) {
-        var stage = stageMap.get(stageName);
-        if (!stage) {
-          return;
-        }
-
-        var stageNode = includeStructure ? addNode(nodes, "stage", stage) : null;
-        if (includeStructure) {
-          addEdge(edges, softwareNode, stageNode, "selection", "contains");
-          var toolchainNode = addNode(nodes, "toolchain", toolchainMap.get(stage.toolchain));
-          addEdge(edges, stageNode, toolchainNode, "toolchain", "uses");
-        }
-
-        stage.after.forEach(function (dependencyStage) {
+      if (includePackages && software) {
+        software.packages.forEach(function (selection) {
+          var selectionNode = addSelection(selection, nodes, edges);
           if (includeStructure) {
-            var dependencyNode = addNode(nodes, "stage", stageMap.get(dependencyStage));
-            addEdge(edges, stageNode, dependencyNode, "order", "after");
+            addEdge(edges, softwareNode, selectionNode, "selection", "selects");
           }
         });
-
-        if (includePackages) {
-          stage.selections.forEach(function (selection) {
-            var selectionNode = addSelection(selection, nodes, edges);
-            if (includeStructure) {
-              addEdge(edges, stageNode, selectionNode, "selection", "selects");
-            }
-          });
-        }
-      });
-
-      if (includePackages && software && software.kernel) {
-        var kernelNode = addPackageClosure(software.kernel, nodes, edges);
+        // The kernel is the platform's default provider
+        var kernelNode = addSelection(system.kernel, nodes, edges);
         if (includeStructure) {
-          var kernelStage = addNode(nodes, "stage", stageMap.get("target-kernel"));
-          addEdge(edges, kernelStage, kernelNode, "selection", "kernel");
+          addEdge(edges, softwareNode, kernelNode, "selection", "kernel");
         }
       }
     });
@@ -211,7 +194,7 @@
     });
 
     filteredNodes.sort(function (a, b) {
-      var kindOrder = ["system", "machine", "software", "platform", "stage", "toolchain", "metapackage", "package"];
+      var kindOrder = ["system", "machine", "software", "platform", "toolchain", "metapackage", "package"];
       var delta = kindOrder.indexOf(a.kind) - kindOrder.indexOf(b.kind);
       return delta || a.name.localeCompare(b.name);
     });
@@ -236,7 +219,6 @@
       machine: 1,
       software: 1,
       platform: 2,
-      stage: 2,
       toolchain: 3,
       metapackage: 3,
       package: 4
@@ -496,13 +478,13 @@
     var data = node.data;
     var details = [];
     if (data.builder) { details.push(["Builder", data.builder]); }
-    if (data.context) { details.push(["Context", data.context]); }
     if (data.architecture) { details.push(["Architecture", data.architecture]); }
     if (data.platform) { details.push(["Platform", data.platform]); }
     if (data.toolchain) { details.push(["Toolchain", data.toolchain]); }
     if (data.machine) { details.push(["Machine", data.machine]); }
     if (data.software) { details.push(["Software", data.software]); }
-    if (data.resources) { details.push(["Resources", data.resources.vcpus + " vCPU / " + data.resources.memoryMiB + " MiB"]); }
+    if (data.extends) { details.push(["Extends", data.extends]); }
+    if (data.resources) { details.push(["Resources", (data.resources.vcpus || data.resources.cores) + " vCPU / " + data.resources.memoryMiB + " MiB"]); }
     if (data.source) { details.push(["Source", data.source]); }
     if (data.revision) { details.push(["Revision", data.revision.slice(0, 12)]); }
     if (data.runtime) { details.push(["Runtime", data.runtime.backend + " / " + data.runtime.machine]); }

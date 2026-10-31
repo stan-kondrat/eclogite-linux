@@ -1,0 +1,19 @@
+{
+  "schema": "eclogite.package/v0.1",
+  // Meta-package: the GNU text, file and process tools of the reference
+  // userland that boot does not need; the default "utils" provider
+  "name": "gnu-utils",
+  "provides": ["utils"],
+  "dependencies": {
+    "run": [
+      "grep",
+      "sed",
+      "gawk",
+      "findutils",
+      "diffutils",
+      "gzip",
+      "tar",
+      "procps-ng"
+    ]
+  }
+}

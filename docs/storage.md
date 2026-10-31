@@ -114,7 +114,8 @@ refer to the immutable OCI digest, never trust the tag alone. The artifact
 carries the key document, output manifest, layer contents, and a provenance
 attestation as content-addressed blobs, so identical files are stored once.
 Public packages can be pulled without credentials. An **S3-compatible object
-store** is planned as a second backend with the same contract: input key →
+store** is planned after version 1 ([Migration](migration.md#after-version-1))
+as a second backend with the same contract: input key →
 immutable digest + key document + manifest + content + attestation.
 
 Rules:
@@ -144,7 +145,7 @@ Named stores are declared in the host configuration, not in a system file:
 
 ```jsonc
 {
-  "schema": "eclogite.host/v1",
+  "schema": "eclogite.host/v0.1",
   "default_layer_store": "official",
   "layer_stores": {
     "official": {

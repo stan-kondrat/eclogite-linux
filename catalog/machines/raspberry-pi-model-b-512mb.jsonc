@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.machine/v1",
+  "schema": "eclogite.machine/v0.1",
   "name": "raspberry-pi-model-b-512mb",
   "aliases": ["raspberrypi", "raspberrypi-b", "rpi-b-512"],
   "platform": "armv6-bcm2835",
@@ -19,12 +19,15 @@
   "boot": {
     "method": "sd-card-firmware",
     "boot_media": "sd-card",
+    "console": "ttyAMA0",
     "firmware_policy": "unresolved"
   },
   "gpio": {
     "header_pins": 26
   },
   "devices": [
+    // serial console on the GPIO header; the board has no real-time clock
+    { "kind": "serial", "model": "pl011" },
     { "kind": "display", "model": "hdmi" },
     { "kind": "usb", "model": "usb-2.0", "count": 2 },
     { "kind": "camera", "model": "csi" },
@@ -32,7 +35,7 @@
     { "kind": "audio", "model": "3.5mm-analog" },
     { "kind": "video", "model": "rca-composite" },
     { "kind": "network", "model": "ethernet", "speed_mbps": 100 },
-    { "kind": "block", "model": "sd-card" },
+    { "kind": "block", "model": "sd-card", "count": 1 },
     { "kind": "power", "model": "micro-usb" }
   ],
   "references": [

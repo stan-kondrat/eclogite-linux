@@ -1,0 +1,29 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "host-share",
+  "version": "1",
+  // The VM bundle's share/ directory (docs/vm-bundle.md), exported by the
+  // runtime as 9p tag "share" and mounted at /mnt/shared. The virtio 9p
+  // transport is the machine's device driver (catalog/devices.jsonc); this
+  // package adds only the filesystem and the mount.
+  "source": {
+    "type": "none"
+  },
+  "builder": "files",
+  "compatible": {
+    "machine": { "devices": { "has": "shared-directory" } }
+  },
+  "dependencies": {
+    // the 9p filesystem; the transport is the machine's virtio-9p device
+    "run": [{ "package": "linux", "config": { "CONFIG_9P_FS": "y" } }]
+  },
+  "mounts": {
+    "/mnt/shared": {
+      "type": "9p",
+      "source": "share",
+      "options": ["trans=virtio", "version=9p2000.L", "msize=262144"],
+      // the runtime may start the VM without a share
+      "optional": true
+    }
+  }
+}

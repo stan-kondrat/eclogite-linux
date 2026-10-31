@@ -1,9 +1,16 @@
 {
-  "schema": "eclogite.platform/v1",
+  "schema": "eclogite.platform/v0.1",
   "name": "x86_64",
   "architecture": "x86_64",
-  "abi": "linux-gnu",
-  "libc": "glibc",
-  "isa": "x86-64-baseline",
+  // CPU part of the target triplet; the ABI document adds the rest
+  "triplet_cpu": "x86_64",
+  // Source of the target-scope facts (catalog/facts.jsonc)
+  "cpu": {
+    "isa": "x86-64",
+    "bits": 64,
+    "endian": "little",
+    "features": ["sse2"],
+    "mmu": true
+  },
   "kernel_architecture": "x86_64"
 }

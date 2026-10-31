@@ -1,0 +1,6 @@
+#!/bin/sh
+# runit Ctrl+Alt+Del handler: power off through stage 3.
+
+PATH=/bin
+echo "Ctrl+Alt+Del pressed -- shutting down..."
+exec runit-init 0

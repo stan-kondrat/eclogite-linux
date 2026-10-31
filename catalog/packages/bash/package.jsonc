@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "bash",
   "version": "5.3",
   "source": {
@@ -7,12 +7,15 @@
     "url": "https://git.savannah.gnu.org/git/bash.git",
     "revision": "b8c60bc9ca365f8261fa97900b6fa939f6ebc303"
   },
+  // /bin/sh belongs to the "sh" capability: the link is installed only when
+  // bash is the system's sh, so bash and BusyBox can share a system
+  "provides": {
+    "sh": { "symlinks": { "/bin/sh": "bash" } }
+  },
   "builder": "configure",
-  "patches": [],
   "dependencies": {
-    "build": [],
-    "link": [],
-    "run": []
+    "link": ["libc"],
+    "run": ["libc"]
   },
   "arguments": {
     "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]

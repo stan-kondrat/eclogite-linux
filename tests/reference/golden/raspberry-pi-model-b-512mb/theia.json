@@ -1,0 +1,5 @@
+{
+  "machine": "raspberry-pi-model-b-512mb",
+  "software": "theia",
+  "error": "theia fails its target {\"arch\":{\"in\":[\"aarch64\",\"x86_64\"]}} (software -> ide)"
+}

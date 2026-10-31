@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NpmWorkspaceArguments",
+  "description": "An npm workspace built offline from the package's fetch output.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/common"
+    }
+  ],
+  "properties": {
+    "application": {
+      "description": "The workspace member that is the application.",
+      "$ref": "../common.schema.json#/$defs/relativePath"
+    },
+    "install_prefix": {
+      "$ref": "../common.schema.json#/$defs/absoluteGuestPath"
+    },
+    "native_addons": {
+      "description": "Per npm package that has a native addon.",
+      "type": "object",
+      "additionalProperties": {
+        "enum": [
+          "build",
+          "stub",
+          "skip"
+        ]
+      }
+    }
+  },
+  "unevaluatedProperties": false
+}

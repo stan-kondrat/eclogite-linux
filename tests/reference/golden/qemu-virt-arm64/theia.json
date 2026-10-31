@@ -1,0 +1,5 @@
+{
+  "machine": "qemu-virt-arm64",
+  "software": "theia",
+  "error": "theia fails its machine {\"all\":[{\"memory_mib\":{\"ge\":2048}},{\"devices\":{\"has\":\"network\"}},{\"devices\":{\"has\":\"shared-directory\"}}]} (software -> ide)"
+}

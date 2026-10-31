@@ -1,9 +1,17 @@
 {
-  "schema": "eclogite.platform/v1",
+  "schema": "eclogite.platform/v0.1",
   "name": "armv6-bcm2835",
   "architecture": "arm",
-  "abi": "linux-gnueabihf",
-  "libc": "glibc",
-  "isa": "armv6zk-vfp",
+  // CPU part of the target triplet; the ABI document adds the rest
+  "triplet_cpu": "armv6",
+  // ARM1176JZF-S core: ARMv6ZK with VFPv2, hard-float ABI.
+  // Source of the target-scope facts (catalog/facts.jsonc)
+  "cpu": {
+    "isa": "armv6zk",
+    "bits": 32,
+    "endian": "little",
+    "features": ["vfpv2", "hard-float", "thumb"],
+    "mmu": true
+  },
   "kernel_architecture": "arm"
 }

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Abi",
+  "description": "Operating system and C library, fixed at compile time.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.abi/v0.1"
+    },
+    "name": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "os": {
+      "description": "Fact `os`, such as `linux`.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*$"
+    },
+    "libc": {
+      "description": "Fact `libc`, such as `glibc` or `musl`.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*$"
+    },
+    "triplet": {
+      "description": "Triplet suffix per architecture. The triplet is\n`<platform.triplet_cpu>-<suffix>`.\n@example { \"aarch64\": \"linux-gnu\", \"arm\": \"linux-gnueabihf\" }",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+(-[a-z0-9_]+)+$"
+      },
+      "minProperties": 1
+    },
+    "toolchain": {
+      "description": "Must list every triplet this ABI produces.",
+      "$ref": "common.schema.json#/$defs/name"
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "os",
+    "libc",
+    "triplet",
+    "toolchain"
+  ],
+  "additionalProperties": false
+}

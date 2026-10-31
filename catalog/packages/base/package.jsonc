@@ -1,0 +1,22 @@
+{
+  "schema": "eclogite.package/v0.1",
+  // Meta-package: the smallest system that boots to a root shell on the
+  // console. Everything here is used by boot itself: the init's stage
+  // scripts need sh, mount, mkdir, touch, chmod and cat; console-login needs
+  // a getty and a shell. Every entry but base-files and console-login is a
+  // capability: the defaults (catalog/defaults.jsonc) unless the system
+  // selects another provider, such as busybox. The kernel needs no entry:
+  // every bootable system gets one.
+  "name": "base",
+  "dependencies": {
+    "run": [
+      "base-files",
+      "libc",
+      "init",
+      "sh",
+      "core-utils",
+      "system-utils",
+      "console-login"
+    ]
+  }
+}

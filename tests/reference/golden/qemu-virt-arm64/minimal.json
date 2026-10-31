@@ -1,0 +1,140 @@
+{
+  "machine": "qemu-virt-arm64",
+  "software": "minimal",
+  "abi": "linux-gnu",
+  "triplet": "aarch64-linux-gnu",
+  "closure": [
+    "base",
+    "base-files",
+    "linux-libre",
+    "glibc",
+    "gcc-runtime",
+    "runit",
+    "bash",
+    "coreutils",
+    "util-linux",
+    "console-login"
+  ],
+  "choices": {
+    "c++-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "already chosen"
+    },
+    "cc-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "default"
+    },
+    "core-utils": {
+      "provider": "coreutils",
+      "reason": "default"
+    },
+    "init": {
+      "provider": "runit",
+      "reason": "default"
+    },
+    "kernel": {
+      "provider": "linux-libre",
+      "reason": "default"
+    },
+    "libc": {
+      "provider": "glibc",
+      "reason": "default"
+    },
+    "linux": {
+      "provider": "linux-libre",
+      "reason": "already chosen"
+    },
+    "sh": {
+      "provider": "bash",
+      "reason": "default"
+    },
+    "system-utils": {
+      "provider": "util-linux",
+      "reason": "default"
+    }
+  },
+  "compilers": {
+    "bash": "gcc",
+    "coreutils": "gcc",
+    "gcc-runtime": "gcc",
+    "glibc": "gcc",
+    "linux-libre": "gcc",
+    "runit": "gcc",
+    "util-linux": "gcc"
+  },
+  "config": {
+    "linux-libre": {
+      "CONFIG_DEVTMPFS": {
+        "value": "y",
+        "source": "base-files"
+      },
+      "CONFIG_NET_9P": {
+        "value": "y",
+        "source": "device virtio-9p-device"
+      },
+      "CONFIG_NET_9P_VIRTIO": {
+        "value": "y",
+        "source": "device virtio-9p-device"
+      },
+      "CONFIG_PROC_FS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_RTC_CLASS": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_RTC_DRV_PL031": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_RTC_HCTOSYS": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_SERIAL_AMBA_PL011": {
+        "value": "y",
+        "source": "device pl011"
+      },
+      "CONFIG_SERIAL_AMBA_PL011_CONSOLE": {
+        "value": "y",
+        "source": "device pl011"
+      },
+      "CONFIG_SYSFS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_TMPFS": {
+        "value": "y",
+        "source": "base-files"
+      },
+      "CONFIG_UNIX98_PTYS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_VIRTIO": {
+        "value": "y",
+        "source": "implied by CONFIG_VIRTIO_MMIO"
+      },
+      "CONFIG_VIRTIO_BLK": {
+        "value": "y",
+        "source": "device virtio-blk-device"
+      },
+      "CONFIG_VIRTIO_MMIO": {
+        "value": "y",
+        "source": "device virtio-blk-device"
+      },
+      "CONFIG_VIRTIO_NET": {
+        "value": "y",
+        "source": "device virtio-net-device"
+      }
+    }
+  },
+  "owned_files": {
+    "/bin/getty": "util-linux:system-utils",
+    "/bin/sh": "bash:sh"
+  },
+  "tests": [
+    "linux-libre:clock"
+  ]
+}

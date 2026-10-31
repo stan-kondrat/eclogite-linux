@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.system/v0.1",
+  "name": "utm-arm64-theia",
+  // The workspace is the VM bundle's share/ directory (docs/vm-bundle.md),
+  // mounted in the guest at /mnt/shared
+  "machine": "utm-virt-arm64-8g",
+  "software": "theia"
+}

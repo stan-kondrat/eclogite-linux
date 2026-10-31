@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "vim",
   "version": "9.2.0725",
   "source": {
@@ -8,12 +8,15 @@
     "revision": "d22ff1c955ff87e8273210eae125aab0e85b6c30"
   },
   // The reference cross build creates a termcap stub; model it as a hook later.
-  "builder": "vim",
-  "patches": [],
+  "provides": {
+    "vi": { "symlinks": { "/bin/vi": "vim" } }
+  },
+  "builder": "configure",
+  // Runs wherever a C library does: "libc" is a capability, so the platform's
+  // provider is used (glibc on Linux)
   "dependencies": {
-    "build": [],
-    "link": [],
-    "run": []
+    "link": ["libc"],
+    "run": ["libc"]
   },
   "arguments": {
     "configure": [

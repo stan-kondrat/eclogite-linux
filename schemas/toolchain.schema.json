@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Toolchain",
+  "description": "The builder image. Eclogite never builds a toolchain.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.toolchain/v0.1"
+    },
+    "name": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "provider": {
+      "description": "OPEN(13): a constant.",
+      "const": "linux-libre-vm"
+    },
+    "release": {
+      "description": "Release of the builder image. OPEN(13): or `\"unreleased\"`.",
+      "type": "string",
+      "minLength": 1
+    },
+    "builder": {
+      "type": "object",
+      "properties": {
+        "hosts": {
+          "description": "Build host architectures the builder image exists for.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "resources": {
+          "description": "Default builder VM size; `compatible.build` may raise it.",
+          "$ref": "common.schema.json#/$defs/resources"
+        }
+      },
+      "required": [
+        "hosts",
+        "resources"
+      ],
+      "additionalProperties": false
+    },
+    "targets": {
+      "description": "Target triplet → its cross toolchain and sysroot. OPEN(9)",
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+(-[a-z0-9_]+){2,3}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/planned"
+      },
+      "minProperties": 1
+    },
+    "compilers": {
+      "description": "In fallback order, each mapped to the manifest tools it needs.\nOPEN(11): the order is the order of the keys in the object.",
+      "type": "object",
+      "properties": {
+        "gcc": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._+-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "clang": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._+-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "tools": {
+      "description": "The tool manifest snapshot: what packages may name as `builder:<tool>`.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._+-]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/tool"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "provider",
+    "release",
+    "builder",
+    "targets",
+    "compilers",
+    "tools"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "status": {
+      "enum": [
+        "planned"
+      ]
+    },
+    "planned": {
+      "title": "Planned",
+      "description": "Something the builder image does not ship yet; a system that needs it fails.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/status"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tool": {
+      "title": "Tool",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "description": "A Git URL. OPEN(13): or `\"tarball\"`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "$ref": "common.schema.json#/$defs/gitRevision"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

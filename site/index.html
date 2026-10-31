@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Eclogite turns reviewed JSON configuration into reproducible virtual-machine bundles and physical-machine images.">
   <title>Eclogite Linux — machines from intent</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20261006-4">
-  <script src="assets/catalog-data.js?v=20261006-4" defer></script>
-  <script src="assets/site.js?v=20261006-4" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=20261015-7">
+  <script src="assets/catalog-data.js?v=20261015-7" defer></script>
+  <script src="assets/site.js?v=20261015-7" defer></script>
 </head>
 <body data-page="home">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -66,7 +66,7 @@
 
     <section class="stat-band" aria-label="Current catalog statistics">
       <div><strong data-stat="packages">18</strong><span>buildable software units</span></div>
-      <div><strong data-stat="metapackages">4</strong><span>reusable software groups</span></div>
+      <div><strong data-stat="metapackages">6</strong><span>reusable software groups</span></div>
       <div><strong data-stat="machines">6</strong><span>machine profiles</span></div>
       <div><strong data-stat="software">2</strong><span>software profiles</span></div>
       <div><strong data-stat="systems">3</strong><span>ready machine + software pairs</span></div>
@@ -87,10 +87,10 @@
           <h3>Write one system file.</h3>
           <p>Machine and software stay reusable, but one reviewed JSON file links the exact pair you want to build.</p>
           <pre><code>{
-  "schema": "eclogite.system/v1",
+  "schema": "eclogite.system/v0.1",
   "name": "utm-arm64",
   "machine": "utm-arm64",
-  "software": "minimal-arm64"
+  "software": "minimal"
 }</code></pre>
           <a href="machines.html">Browse machine profiles <span aria-hidden="true">→</span></a>
         </article>
@@ -100,7 +100,7 @@
           <h3>Use aliases or file links.</h3>
           <p>Bare names resolve predefined catalog objects. Relative paths resolve from the system file, so the same definition works from any directory.</p>
           <pre><code>"machine": "utm-arm64"
-"software": "minimal-arm64"
+"software": "minimal"
 
 or
 
@@ -153,7 +153,7 @@ eclogite create \
           <span class="composition-type">machine.json</span>
           <h3>Machine profile</h3>
           <ul>
-            <li>architecture and CPU model</li>
+            <li>platform and CPU model</li>
             <li>vCPU count and memory</li>
             <li>boot method and firmware</li>
             <li>storage, network, console</li>
@@ -165,11 +165,11 @@ eclogite create \
           <span class="composition-type">software.json</span>
           <h3>Software profile</h3>
           <ul>
-            <li>target platform and stages</li>
+            <li>package selection</li>
             <li>kernel or operating-system selection</li>
-            <li>packages, services, init</li>
-            <li>read-only root filesystem</li>
-            <li>image policy and tests</li>
+            <li>init and read-only root filesystem</li>
+            <li>image and volumes</li>
+            <li>services and tests from packages</li>
           </ul>
         </article>
         <div class="composition-operator" aria-hidden="true">=</div>
@@ -189,7 +189,7 @@ eclogite create \
         <h2>The catalog describes.<br>The plan proves.</h2>
       </div>
       <div class="prose-large">
-        <p>Package JSON stays declarative: immutable source revisions, typed dependencies, builder selection, and package-owned resources. <code>eclogite</code> validates that intent and emits a deterministic Make plan.</p>
+        <p>Package JSON stays declarative: immutable source revisions, typed dependencies, builder selection, and package-owned resources. <code>eclogite</code> validates that intent, writes a deterministic lock, and runs the builds.</p>
         <p>Build output never leaks back into the catalog. Locks, source trees, and immutable layers can be inspected, compared, discarded, and reconstructed.</p>
       </div>
     </section>
@@ -221,7 +221,7 @@ eclogite create \
           <p class="eyebrow">Reproducible build room</p>
           <h2 id="runtime-title">The host coordinates.<br>The VM builds.</h2>
         </div>
-        <p>The host compiler is never part of a package build. Eclogite boots one pinned development image, mounts one exact target toolchain read-only, and runs the emitted Make plan offline inside that boundary.</p>
+        <p>The host compiler is never part of a package build. Eclogite boots one pinned development image, mounts one exact target toolchain read-only, and runs each package's builder offline inside that boundary.</p>
       </div>
 
       <div class="runtime-layout">
@@ -234,7 +234,7 @@ eclogite create \
             <li><span>01</span><div><b>Host intent</b><code>system.json + catalog commit</code></div><small>validated</small></li>
             <li><span>02</span><div><b>Development image</b><code>linux-libre-vm / arm64</code></div><small>sha256 pinned</small></li>
             <li><span>03</span><div><b>Target toolchain</b><code>/opt/eclogite/toolchains/aarch64-linux-gnu</code></div><small>read-only mount</small></li>
-            <li><span>04</span><div><b>Execution</b><code>make --file state/plan.mk</code></div><small>network off</small></li>
+            <li><span>04</span><div><b>Execution</b><code>builders/configure/build.sh</code></div><small>network off</small></li>
             <li><span>05</span><div><b>Layer result</b><code>manifest + hashes + provenance</code></div><small>compared</small></li>
           </ol>
         </article>
@@ -306,9 +306,9 @@ eclogite create \
         <p>Human input remains readable. Machine state becomes exact.</p>
       </div>
       <ol class="pipeline">
-        <li><span>JSON</span><b>Intent</b><small>systems, packages, stages</small></li>
+        <li><span>JSON</span><b>Intent</b><small>systems, packages, profiles</small></li>
         <li><span>LOCK</span><b>Resolution</b><small>commits, graph, input keys</small></li>
-        <li><span>MAKE</span><b>Execution</b><small>inside the pinned build VM</small></li>
+        <li><span>BUILD</span><b>Execution</b><small>inside the pinned build VM</small></li>
         <li><span>STORE</span><b>Layers</b><small>hashes and signed provenance</small></li>
         <li><span>OUTPUT</span><b>Deployment</b><small>VM bundle or hardware image</small></li>
       </ol>

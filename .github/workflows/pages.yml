@@ -125,6 +125,7 @@ jobs:
           mkdir -p _site
           cp -R site/. _site/
           find _site -maxdepth 1 -name README.md -delete
+          rm -rf _site/types
           find _site -name .DS_Store -delete
 
       - name: Upload GitHub Pages artifact

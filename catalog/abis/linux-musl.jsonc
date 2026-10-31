@@ -1,0 +1,14 @@
+{
+  "schema": "eclogite.abi/v0.1",
+  "name": "linux-musl",
+  // Linux with musl: smaller, and suited to static binaries such as BusyBox.
+  // Selected with "abi": "linux-musl" in a software profile or system file.
+  "os": "linux",
+  "libc": "musl",
+  "triplet": {
+    "aarch64": "linux-musl",
+    "x86_64": "linux-musl",
+    "arm": "linux-musleabihf"
+  },
+  "toolchain": "linux-libre-vm"
+}

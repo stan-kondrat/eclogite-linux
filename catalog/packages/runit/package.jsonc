@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "runit",
   "version": "2.3.1",
   "source": {
@@ -7,12 +7,46 @@
     "url": "https://github.com/g-pape/runit.git",
     "revision": "0e52a89654d375a8d634c5d9d18ab29fdb666976"
   },
-  "builder": "runit",
-  "patches": [],
-  "dependencies": {
-    "build": [],
-    "link": [],
-    "run": []
+  // The init system: runs the stage scripts and supervises every package's
+  // generated services
+  "provides": ["init"],
+  "compatible": {
+    "target": { "os": { "eq": "linux" } }
   },
-  "arguments": {}
+  "builder": "make",
+  // runit-init runs a hard-coded /sbin/runit; there is no /sbin
+  "patches": ["patches/0001-runit-in-bin.patch"],
+  "dependencies": {
+    // the stage scripts use sh, mount, mkdir, touch, chmod and cat
+    "run": [
+      "libc", "sh", "core-utils", "system-utils",
+      // stage 1 mounts proc, sysfs and devpts
+      { "package": "linux",
+        "config": { "CONFIG_PROC_FS": "y", "CONFIG_SYSFS": "y", "CONFIG_UNIX98_PTYS": "y" } }
+    ]
+  },
+  "arguments": {
+    "directory": "src",
+    "hooks": {
+      // runit's Makefile reads the compiler from conf-cc and conf-ld
+      "configure": ["conf-cc"],
+      // there is no install target
+      "install": ["install"]
+    },
+    // Stage scripts: 1 mounts /etc/fstab, which the image step generates
+    // from the software profile and every package's "mounts"
+    "files": {
+      "files/etc/runit/1": "/etc/runit/1",
+      "files/etc/runit/2": "/etc/runit/2",
+      "files/etc/runit/3": "/etc/runit/3",
+      "files/etc/runit/ctrlaltdel": "/etc/runit/ctrlaltdel"
+    },
+    "symlinks": {
+      // the kernel tries /sbin/init, /etc/init, then /bin/init
+      "/bin/init": "runit-init",
+      // the root is read-only: runit's control files live in /run
+      "/etc/runit/stopit": "/run/runit/stopit",
+      "/etc/runit/reboot": "/run/runit/reboot"
+    }
+  }
 }

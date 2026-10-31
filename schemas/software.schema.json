@@ -1,0 +1,475 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Software",
+  "description": "Everything inside the guest. Never declares hardware.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.software/v0.1"
+    },
+    "name": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "aliases": {
+      "$ref": "common.schema.json#/$defs/aliases"
+    },
+    "abi": {
+      "description": "Default: the defaults document's.",
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "compiler": {
+      "description": "Default: the defaults document's.",
+      "$ref": "common.schema.json#/$defs/compiler"
+    },
+    "packages": {
+      "description": "The roots of the closure. A provider named here is the system's choice\nfor its capabilities. At least one entry.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "common.schema.json#/$defs/reference"
+          },
+          {
+            "$ref": "common.schema.json#/$defs/configuredReference"
+          }
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "providers": {
+      "description": "Capability → provider. Overrides the defaults.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/packageName"
+      }
+    },
+    "settings": {
+      "description": "What the person running the machine may change without a rebuild, such\nas a user name, a password or a port. Packages read them with\n`{ \"setting\": NAME }`.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/variableName"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/setting"
+      }
+    },
+    "parameters": {
+      "description": "Values exposed as `${NAME}` in this profile's strings, like a package's.",
+      "$ref": "common.schema.json#/$defs/parameters"
+    },
+    "root": {
+      "type": "object",
+      "properties": {
+        "hostname": {
+          "description": "Such as `devbox`, or `${HOSTNAME}` from a start-time parameter.",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$"
+            },
+            {
+              "$ref": "common.schema.json#/$defs/parameterReference"
+            }
+          ],
+          "tsType": "string"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "tmpfs": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "hostname",
+        "readonly",
+        "tmpfs"
+      ],
+      "additionalProperties": false
+    },
+    "image": {
+      "$ref": "#/$defs/rootImage"
+    },
+    "volumes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/volume"
+      }
+    },
+    "state": {
+      "description": "Writable disks that survive restarts and image replacements.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stateVolume"
+      }
+    },
+    "users": {
+      "description": "People's accounts; packages declare their own service accounts.",
+      "type": "array",
+      "items": {
+        "$ref": "package.schema.json#/$defs/user"
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "package.schema.json#/$defs/group"
+      }
+    },
+    "service_overrides": {
+      "description": "Policy over a package's service, keyed by service name: the fields given\nhere replace the package's, and `environment` is merged into it.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/serviceOverride"
+      }
+    },
+    "endpoints": {
+      "description": "Network services the runner reports and connects to.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/endpoint"
+      }
+    },
+    "commands": {
+      "description": "Commands the bundle's runner offers beyond its fixed set, as `vm.sh <name>`.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/runnerCommand"
+      }
+    },
+    "evidence": {
+      "description": "OPEN(4): the evidence store comes after v0.1.",
+      "type": "object",
+      "properties": {
+        "default": {
+          "enum": [
+            "warn-untested",
+            "require-passed",
+            "ignore"
+          ]
+        },
+        "require-passed": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/packageName"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "default"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "packages",
+    "root",
+    "image"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "filesystem": {
+      "title": "Filesystem",
+      "const": "ext4"
+    },
+    "rootImage": {
+      "title": "RootImage",
+      "description": "`strip` and `exclude` are applied while the image is composed, so package\nkeys do not change.",
+      "type": "object",
+      "properties": {
+        "format": {
+          "$ref": "#/$defs/filesystem"
+        },
+        "strip": {
+          "description": "Default: false.",
+          "type": "boolean"
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/guestPathPattern"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "format"
+      ],
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/imageSize"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "volume": {
+      "title": "Volume",
+      "description": "A separate image mounted at `mount`. The listed packages' files below\n`mount` go to the volume, and their other files to the root image.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "mount": {
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/packageName"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "format": {
+          "$ref": "#/$defs/filesystem"
+        },
+        "readonly": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "mount",
+        "packages",
+        "format",
+        "readonly"
+      ],
+      "allOf": [
+        {
+          "$ref": "common.schema.json#/$defs/imageSize"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "setting": {
+      "title": "Setting",
+      "description": "A setting the person running the machine may change.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "string",
+            "integer",
+            "boolean"
+          ]
+        },
+        "default": {
+          "description": "Absent: the runner asks for a value at the first start.",
+          "$ref": "common.schema.json#/$defs/scalar"
+        },
+        "secret": {
+          "description": "Kept only in the bundle's settings file, mode 0600. Never written to the\ncompiled system, an image, a log or command output.",
+          "type": "boolean"
+        },
+        "pattern": {
+          "description": "For strings.",
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum": {
+          "description": "For integers.",
+          "type": "integer"
+        },
+        "maximum": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "description",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "stateVolume": {
+      "title": "StateVolume",
+      "description": "A writable disk the runner creates empty at the first start and keeps until\nthe machine is deleted, also across image replacements. It is not built,\nso nothing in it enters a key.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "mount": {
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "size_mib": {
+          "$ref": "common.schema.json#/$defs/mebibytes"
+        },
+        "format": {
+          "$ref": "#/$defs/filesystem"
+        }
+      },
+      "required": [
+        "name",
+        "mount",
+        "size_mib",
+        "format"
+      ],
+      "additionalProperties": false
+    },
+    "serviceOverride": {
+      "title": "ServiceOverride",
+      "description": "The service fields a software profile may override.",
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "package.schema.json#/$defs/service/properties/user"
+        },
+        "group": {
+          "$ref": "package.schema.json#/$defs/service/properties/group"
+        },
+        "environment": {
+          "$ref": "package.schema.json#/$defs/service/properties/environment"
+        },
+        "create_directories": {
+          "$ref": "package.schema.json#/$defs/service/properties/create_directories"
+        }
+      },
+      "additionalProperties": false
+    },
+    "endpoint": {
+      "title": "Endpoint",
+      "description": "A network service in the guest, reported by `vm.sh status`.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "protocol": {
+          "enum": [
+            "http",
+            "https",
+            "ssh",
+            "tcp"
+          ]
+        },
+        "port": {
+          "description": "A number, or a parameter such as `${PORT}`.",
+          "anyOf": [
+            {
+              "$ref": "common.schema.json#/$defs/positiveInteger"
+            },
+            {
+              "$ref": "common.schema.json#/$defs/parameterReference"
+            }
+          ]
+        },
+        "path": {
+          "description": "For http and https. Default: `/`.",
+          "type": "string",
+          "pattern": "^/"
+        },
+        "user": {
+          "description": "For ssh: the login user, such as `${USER}`.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "description",
+        "protocol",
+        "port"
+      ],
+      "additionalProperties": false
+    },
+    "runnerCommand": {
+      "title": "RunnerCommand",
+      "description": "A runner command; `description` is its line in `vm.sh help`.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "oneOf": [
+        {
+          "description": "Connect to an ssh endpoint; extra arguments are passed to ssh.",
+          "type": "object",
+          "properties": {
+            "ssh": {
+              "$ref": "common.schema.json#/$defs/name"
+            }
+          },
+          "required": [
+            "ssh"
+          ]
+        },
+        {
+          "description": "Open an http or https endpoint in the host's browser.",
+          "type": "object",
+          "properties": {
+            "open": {
+              "$ref": "common.schema.json#/$defs/name"
+            }
+          },
+          "required": [
+            "open"
+          ]
+        },
+        {
+          "description": "Run a program in the guest as root over the serial console.",
+          "type": "object",
+          "properties": {
+            "guest": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "guest"
+          ]
+        },
+        {
+          "description": "Follow guest files, such as service logs, over the serial console.",
+          "type": "object",
+          "properties": {
+            "follow": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "follow"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

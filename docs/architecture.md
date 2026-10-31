@@ -1,32 +1,37 @@
 # Architecture
 
-## Boundary between C and Make
+## Boundary between `eclogite` and builders
 
-The C program is a configuration compiler. GNU Make is an execution engine.
-Neither should take over the other's job.
+`eclogite` is both the configuration compiler and the build executor. Builders
+are small shell programs that know how to build one style of package and
+nothing about the graph.
 
 `eclogite` owns:
 
 - strict parsing of catalog and system JSONC;
 - type, name, and schema validation;
-- meta-package expansion and dependency closure;
-- stage and step validation;
-- cycle detection and topological order;
-- feature resolution;
+- [resolution](resolution.md): target, capability choices, dependency
+  closure, conditional dependencies, compilers and config;
+- compatibility checks, variants and parameters;
+- cycle detection over build and link edges, and topological order;
 - input hashing and lock generation;
-- explanations and deterministic Make-plan emission.
+- scheduling: starting the builder VM, running ready packages, checking the
+  store before each one, and publishing outputs;
+- image composition, generated services, `/etc/fstab` and `/etc/hostname`,
+  config merged into configurable dependencies (kernel options from packages
+  and machine devices), and boot tests;
+- explanations of what will be built and why.
 
-Make owns:
+A builder (`builders/<name>/build.sh`) owns one build style: it runs the
+`configure`, `build` and `install` steps for one package, calls the package's
+hooks, and writes a package tree. It never reads the catalog or another
+package's metadata.
 
-- parallel scheduling of the already-resolved graph;
-- incremental execution using plan targets;
-- invoking generic builder entry points;
-- log routing and user-facing convenience targets.
-
-Make must not parse the catalog. The C tool emits `state/<system>/plan.mk`, and
-the root Makefile includes that generated file for build targets. This keeps GNU
-Make metaprogramming out of package metadata and makes `eclogite validate` useful
-on any host with a C compiler.
+GNU Make is not an execution layer. Its model is "rebuild when a file is newer";
+Eclogite's is "the input key is a hash; reuse it if it is in the store". With
+builds running one at a time in a VM and the graph, keys and order already in
+the lock, a generated `plan.mk` would only add a second language to debug.
+Packages may still use Make inside their own builds.
 
 The tool will be isolated under `tools/eclogite/` as a standalone C17 project.
 It will be built and tested with `make -C tools/eclogite check` without guest
@@ -44,40 +49,53 @@ They are not embedded in the executable and are not duplicated per project.
 The following nouns are intentionally different:
 
 - **Package**: a versioned buildable unit with sources, typed dependencies,
-  builder data, owned patches/files/config, and one or more outputs. Linux-libre
-  and `base-files` are packages too.
-- **Meta-package**: a named set of packages or other meta-packages. It never has
-  source or build steps.
-- **Step**: an operation within one package build, such as `prepare`, `patch`,
-  `configure`, `compile`, `install`, or `package`.
-- **Stage**: a graph context in the system pipeline: target userland, target
-  kernel, and image assembly. Stages never build toolchains; see below.
-- **Platform**: target architecture, ABI, libc, and ISA policy.
-- **Machine profile**: hardware and runtime contract: platform compatibility,
-  CPU count, memory, boot method, firmware, devices, console, and VM backend.
+  builder data, owned patches/hooks/files/config, services, tests and kernel
+  option requirements, and one output. Linux-libre, runit and `base-files`
+  are packages too.
+- **Capability**: a name such as `kernel`, `init`, `libc`, `sh` or
+  `core-utils` that packages declare in `provides`, optionally with the files
+  they own for it. Dependencies may name a capability or ordered alternatives;
+  `providers` overrides, the explicit selection, the distribution defaults
+  and `compatible` constraints decide the provider, without search.
+- **Meta-package**: a package with only run dependencies, used as a named
+  selection of other packages. It never has source, build steps or output.
+- **Step**: an operation within one package build: `prepare`, `patch`,
+  `configure`, `build`, or `install`.
+- **Platform**: hardware target: architecture, triplet CPU and ISA policy.
+- **ABI**: operating system and C library, the triplet suffix, and the
+  toolchain that builds for it. Chosen by the system or software, not the
+  hardware; fixed at compile time.
+- **Defaults**: the distribution's ABI and provider per capability, used only
+  where a system selects nothing.
+- **Machine profile**: hardware and runtime contract: platform, CPU count,
+  memory, boot method, firmware, devices, console, and VM backend.
   Plain QEMU and UTM are distinct runtime contracts even when they expose the
   same QEMU machine model. A profile never selects guest packages.
-- **Software profile**: target contents and construction policy: stages,
-  packages, kernel or operating-system family, services, root filesystem,
-  image format, and tests. It never sets CPU count, memory, or hypervisor
-  devices.
-- **Toolchain**: a compiler/binutils/libc/sysroot for one target, native or
-  cross. Eclogite never builds a toolchain; toolchains are release artifacts of
-  `linux-libre-vm`, pinned by hash, and that identity is part of every
-  dependent key.
+- **Software profile**: target contents and construction policy: packages,
+  root filesystem, image, and volumes. It never sets a platform, kernel, CPU
+  count, memory, or hypervisor devices, so one profile serves every
+  compatible machine.
+- **Toolchain**: the `linux-libre-vm` builder image: cross toolchains and
+  sysroots per target triplet, the compilers (gcc, and clang once shipped),
+  and the tool manifest. Eclogite never builds a toolchain; it is a release
+  artifact of `linux-libre-vm`, pinned by hash, and that identity, with each
+  package's compiler, is part of every dependent key.
+- **Target package**: every file in a guest comes from an Eclogite package
+  built from source, including glibc, the GCC runtime libraries and language
+  runtimes such as Python and Node.js. Nothing is copied from the builder
+  image or a toolchain sysroot into a guest; see [Build model](build-model.md).
 - **Build runtime**: where builders execute. There is exactly one: a VM booted
   from the `linux-libre-vm` dev image for the host's architecture. It is not a
-  package.
+  package. `linux-libre-vm` publishes a tool manifest with it, and packages
+  declare the builder tools they use as `builder:<tool>`.
 - **System**: the graph root that composes exactly one machine profile and one
   software profile.
-
-Keeping stages separate from steps prevents build and image contexts from being
-encoded as fake package phases.
 
 Self-hosting — building the compiler, binutils and libc from source and then
 rebuilding the system with them — is out of scope. `linux-libre-vm` provides
 that capability, including cross toolchains for every Eclogite target; Eclogite
-consumes them as inputs.
+consumes them as inputs, as the builder only. Everything installed in a guest
+is built by Eclogite from source ([Build model](build-model.md)).
 
 ## Planned data flow
 
@@ -87,10 +105,9 @@ catalog/**/* + builders
                     | eclogite validate / lock / plan
                     v
        state/<system>/system.lock.json
-       state/<system>/plan.mk
        state/<system>/explain/*
                     |
-                    | make -f Makefile -f plan.mk
+                    | eclogite build (builders/<name>/build.sh in the builder VM)
                     v
  out/work -> out/store/<input-key> -> out/roots -> out/images
 ```
@@ -103,27 +120,31 @@ been locked cause a hard error rather than silently changing a build.
 ```text
 catalog/
   packages/<name>/
-    package.jsonc  one buildable unit
+    package.jsonc  one buildable unit or meta-package
     patches/       package-owned source changes
     hooks/         package-specific step implementations
+    tests/         checks run in the booted guest
     files/         package-owned installed files
     config/        structured fragments, including kernel configuration
-  metapackages/   named selections such as base, network, and development
   machines/       CPU, memory, boot, device, and runtime profiles
-  software/       kernel, package, rootfs, image, and test profiles
-  stages/         build and image graph contexts
-  platforms/      x86_64 and arm64 target properties
-  toolchains/     external toolchain descriptions and fingerprint rules
+  software/       package, kernel, rootfs, image, and volume profiles
+  platforms/      hardware: architecture, triplet CPU, ISA
+  abis/           operating system, libc, triplet suffix, toolchain
+  toolchains/     the linux-libre-vm builder image and tool manifest
   systems/        machine + software compositions
-  schemas/        JSON Schema documents for editors and documentation
+  facts.jsonc     fact vocabulary for compatible and variants
+  defaults.jsonc  default ABI and provider per capability
+  devices.jsonc   device models and the kernel options their drivers require
+schemas/          root config schema, per-kind and per-builder schemas
 builders/
-  common.mk       hermetic environment and standard step contract
-  autotools.mk    generic configure/build/install implementation
-  configure.mk    non-autoconf configure implementation
-  make.mk         direct Make implementation
-  kernel.mk       config merge, verification, and kernel output
-  image.mk        root composition and filesystem image
-  script.mk       constrained hook runner for tracked package hooks
+  lib.sh          hermetic environment and standard step contract
+  configure/      ./configure, make, make install
+  make/           make, make install
+  cmake/          cmake and ninja
+  linux-kernel/   config merge, verification, and kernel output
+  files/          files, symlinks and generated services only
+  source-tree/    prepared source as a build input
+  npm-workspace/  offline npm workspace build
 tools/eclogite/
   Makefile         standalone build and install entry point
   include/         public C interfaces
@@ -131,8 +152,9 @@ tools/eclogite/
     cli/           command dispatch and presentation
     json/          JSONC lexer, parser, source locations, AST
     model/         typed catalog objects and validation
-    resolve/       meta-package, dependency, feature, and stage resolution
-    plan/          keys, lock writer, Make emitter, explanations
+    resolve/       closure, compatibility, variants, parameters
+    plan/          keys, lock writer, explanations
+    build/         scheduler, builder VM, store, image, tests
   tests/           unit tests and parser fixtures
 tools/vm.sh/
   vm.sh            portable template copied into every generated VM
@@ -146,8 +168,8 @@ than placeholder files, is the structure contract.
 
 ## Builder contract
 
-Every builder receives explicit paths and identity through generated Make
-variables:
+Every builder receives explicit paths and identity through a generated
+environment:
 
 - immutable unpacked source directory;
 - writable work directory;
@@ -170,16 +192,16 @@ shell inside JSONC is not allowed.
 For every resolved graph node, `eclogite` prepares a private intermediate unit
 directory rather than constructing an opaque shell command. It contains:
 
-- `unit.json`, the strict-JSON resolved package, stage, platform, source, and
-  expected-output description;
+- `unit.json`, the strict-JSON resolved package, platform, source, arguments,
+  parameters, and expected-output description;
 - `build.env`, a generated and safely quoted environment for the selected
   generic builder;
 - `dependencies.list`, immutable store paths in deterministic order;
 - `result.json`, `build.log`, and an output manifest after execution.
 
-The plan selects a generic adapter such as `make`, `cmake`, `autotools`,
-`kernel`, or a constrained package-owned hook. Make schedules units and calls
-the adapters. A successful unit is published as an immutable cache layer only
+The package selects one of the generic builders (`configure`, `make`, `cmake`,
+`linux-kernel`, `files`, `source-tree`, `npm-workspace`), which calls the package's
+hooks at the named steps. `eclogite` schedules units and calls the builders. A successful unit is published as an immutable cache layer only
 after declared outputs and manifests match. Cache hits revalidate their key and
 manifest; repeated builds compare output hashes so nondeterminism is reported
 rather than silently cached.
@@ -187,10 +209,12 @@ rather than silently cached.
 ## System graph root
 
 A resolved build is the graph root and has two explicit inputs. The machine
-branch resolves resources, boot, devices, and runtime. The software branch
-resolves the build stages, kernel package, and root filesystem package closure.
-Both branches must resolve to the same platform compatibility key before a plan
-can be emitted.
+branch resolves the platform, resources, boot, devices, and runtime. The
+software branch, or the system file, selects the ABI; platform and ABI make the
+target triplet and select the toolchain. The software branch then resolves the
+package closure for that target, including one `kernel` and one `init`
+provider, and every package's `compatible`
+constraints must hold before a plan can be emitted.
 
 Runtime is locked rather than auto-switched after publication. The
 `qemu-virt-arm64` and `utm-virt-arm64` profiles expose compatible ARM64 guest
@@ -206,24 +230,25 @@ system
   |   |-- vCPU + memory
   |   `-- boot + devices + runtime
   `-- software profile
-      |-- platform
-      `-- image
-          |-- linux-libre:kernel
-          `-- rootfs
-              `-- @base + @network + explicit packages
+      |-- abi (or the system's, or the default)  -> triplet, toolchain
+      `-- package closure for platform x abi
+          |-- kernel provider  -> boot kernel     (linux-libre: default)
+          |-- init provider    -> rootfs          (runit: default)
+          `-- reference-system, capabilities resolved to providers -> rootfs
 ```
 
-This diagram shows the current imported Linux-libre fixture. Linux-libre,
-mainline Linux, and PREEMPT_RT kernels participate as ordinary selectable
-package nodes in dependency closure, ordering, hashing, provenance, and rebuild
-explanations. Their builders are specialized, but their graph status is not.
-A future BSD family will compose a different kernel/userland software graph
-rather than masquerading as a Linux kernel variant.
+Linux-libre, mainline Linux, PREEMPT_RT and custom kernels participate as
+ordinary package nodes that provide `kernel`, in dependency closure,
+ordering, hashing, provenance, and rebuild explanations. Their builder is
+specialized, but their graph status is not. A BSD target is an ABI with
+`"os": "freebsd"`: its own toolchain, and default alternatives that include
+BSD kernel, libc and init packages. The same software profile resolves
+against it because packages name capabilities, not providers.
 
 This boundary also controls reuse. Changing only memory produces a different
-system lock and runtime bundle, but does not change package layer keys. Changing
-the software platform, kernel, or package closure changes the corresponding
-build keys. Hidden CLI or `vm.sh` overrides may not cross this boundary.
+system lock and runtime bundle, but does not change package layer keys, unless
+a package reads that value through a parameter. Changing the platform, kernel,
+or package closure changes the corresponding build keys. Hidden CLI or `vm.sh` overrides may not cross this boundary.
 
 ## Immutable guest
 
@@ -274,7 +299,9 @@ make, bison, flex, perl, …) and one toolchain artifact per target (binutils,
 GCC and the target glibc sysroot). Eclogite mounts the selected artifact
 read-only at `/opt/eclogite/toolchains/<triplet>` and constructs the builder
 `PATH` from that location. Any convenience copies in the dev image's
-`/opt/cross` are ignored. The dev image and mounted artifact are pinned by
+`/opt/cross` are ignored. Builder tools such as Python and Node.js run only
+during builds; the guest gets its own copies from target packages built from
+the same revisions ([Build model](build-model.md)). The dev image and mounted artifact are pinned by
 SHA-256, and their identities enter the keys:
 
 ```text
@@ -303,6 +330,10 @@ lifecycle operations. It may create and register a `.utm` instance beneath
 The public `vm.sh` interface remains the same as for QEMU.
 
 ## Website output
+
+Generating the site from the catalog is after version 1
+([Migration](migration.md#after-version-1)); until then `site/` is a static
+prototype with its own data file.
 
 `site/` contains only maintained HTML, CSS, and dependency-free browser
 JavaScript. Canonical engineering documentation remains in `docs/`.

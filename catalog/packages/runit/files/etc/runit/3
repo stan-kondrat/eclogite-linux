@@ -1,0 +1,20 @@
+#!/bin/sh
+# runit stage 3: system shutdown.
+
+PATH=/bin
+
+echo "Shutting down services..."
+sv -w196 force-stop /etc/service/* 2>/dev/null || true
+sv exit /etc/service/* 2>/dev/null || true
+
+echo "Unmounting filesystems..."
+umount -a -r 2>/dev/null || true
+
+# runit-init 6 makes the reboot file executable (a link into /run)
+if [ -x /etc/runit/reboot ]; then
+	echo "Rebooting..."
+	reboot
+else
+	echo "Powering off..."
+	poweroff
+fi

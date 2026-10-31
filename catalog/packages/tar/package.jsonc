@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "tar",
   "version": "1.35",
   "source": {
@@ -8,14 +8,12 @@
     "revision": "e545d446dfe6564265cdf4186641ee76f4acc7fa"
   },
   // The pinned paxutils nested submodule must be represented before fetching.
-  "builder": "tar-gnulib-autotools",
-  "patches": [],
+  "builder": "configure",
   "dependencies": {
-    "build": ["gnulib"],
-    "link": [],
-    "run": []
+    "build": ["gnulib"]
   },
   "arguments": {
+    "bootstrap": "gnulib",
     "configure": ["--prefix=/usr", "--disable-nls", "--disable-silent-rules"]
   }
 }

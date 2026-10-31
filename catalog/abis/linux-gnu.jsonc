@@ -1,0 +1,15 @@
+{
+  "schema": "eclogite.abi/v0.1",
+  "name": "linux-gnu",
+  // Linux with glibc. The ABI is fixed at compile time: it selects the
+  // triplet, the toolchain and sysroot, and therefore every package key.
+  "os": "linux",
+  "libc": "glibc",
+  // Triplet suffix per architecture family: <platform triplet_cpu>-<suffix>
+  "triplet": {
+    "aarch64": "linux-gnu",
+    "x86_64": "linux-gnu",
+    "arm": "linux-gnueabihf"
+  },
+  "toolchain": "linux-libre-vm"
+}

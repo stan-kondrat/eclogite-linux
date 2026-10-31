@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Eclogite Linux documentation for system JSON, catalog references, CLI workflows, architecture, VM bundles, storage, and CI.">
   <title>Documentation — Eclogite Linux</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20261006-4">
-  <script src="assets/catalog-data.js?v=20261006-4" defer></script>
-  <script src="assets/site.js?v=20261006-4" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=20261015-7">
+  <script src="assets/catalog-data.js?v=20261015-7" defer></script>
+  <script src="assets/site.js?v=20261015-7" defer></script>
 </head>
 <body data-page="docs">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -79,10 +79,10 @@
         <h2>The system file</h2>
         <p>The preferred interface is one strict JSON or JSONC system definition passed with <code>--config</code>. The checked-in UTM example uses aliases for predefined catalog objects:</p>
         <pre><code>{
-  "schema": "eclogite.system/v1",
+  "schema": "eclogite.system/v0.1",
   "name": "utm-arm64",
   "machine": "utm-arm64",
-  "software": "minimal-arm64"
+  "software": "minimal"
 }</code></pre>
         <p>Keep the configuration outside the empty output directory, then run:</p>
         <pre><code>mkdir machine &amp;&amp; cd machine
@@ -126,10 +126,10 @@ eclogite create --config system.json --fetch</code></pre>
         <p class="docs-kicker">04 · Data model</p>
         <h2>Machine and software stay separate</h2>
         <div class="docs-columns">
-          <div><h3>Machine profile</h3><ul><li>Architecture and exact CPU model</li><li>vCPU count and memory</li><li>Boot method and firmware</li><li>Storage, network, and console</li><li>QEMU, UTM, or physical runtime contract</li></ul></div>
-          <div><h3>Software profile</h3><ul><li>Platform and build stages</li><li>Kernel or operating-system family</li><li>Packages, services, and init</li><li>Read-only root policy</li><li>Image format and tests</li></ul></div>
+          <div><h3>Machine profile</h3><ul><li>Platform and exact CPU model</li><li>vCPU count and memory</li><li>Boot method and firmware</li><li>Storage, network, and console</li><li>QEMU, UTM, or physical runtime contract</li></ul></div>
+          <div><h3>Software profile</h3><ul><li>Package selection</li><li>Kernel or operating-system family</li><li>Init and read-only root policy</li><li>Image and volumes</li><li>Services and tests come from packages</li></ul></div>
         </div>
-        <p>Compatibility validation requires both profiles to resolve to the same platform and checks that the machine provides every device capability required by the software.</p>
+        <p>The machine selects the platform, so one software profile serves every compatible machine. Validation checks every package's constraints against that platform and machine.</p>
         <p class="docs-source">Detailed source document: <code>docs/configuration.md</code></p>
       </section>
 
@@ -145,7 +145,7 @@ state/plan.mk
 immutable layers
     ↓ compose + test
 VM bundle or hardware image</code></pre>
-        <p>The standalone C host tool owns parsing, schemas, graph resolution, locks, cache keys, and plan generation. GNU Make schedules generic builders. Package JSON is data and never becomes an embedded scripting language.</p>
+        <p>The standalone C host tool owns parsing, schemas, graph resolution, locks, cache keys, and scheduling. Seven generic shell builders each know one build style. Package JSON is data and never becomes an embedded scripting language.</p>
         <p class="docs-source">Detailed source document: <code>docs/architecture.md</code></p>
       </section>
 
@@ -175,7 +175,7 @@ VM bundle or hardware image</code></pre>
         <p class="docs-kicker">08 · Project status</p>
         <h2>Design first, then migrate package by package</h2>
         <p>GitHub CI will validate the C tool, schemas, catalog, plans, shell contracts, and generated site on Linux and macOS. Dedicated KVM-capable runners will build and publish signed layers. UTM receives a separate Apple Silicon smoke-test environment.</p>
-        <p>The current repository remains at the research and layout milestone. No C builder, generic Make builders, operational <code>vm.sh</code>, or GitHub workflows have been implemented yet.</p>
+        <p>The current repository remains at the research and layout milestone. No C host tool, generic builders, operational <code>vm.sh</code>, or GitHub workflows have been implemented yet.</p>
         <div class="docs-callout"><strong>Reference implementation</strong><p><code>linux-libre-vm</code> remains independent and buildable throughout migration. Its images, kernel settings, runners, and boot tests are the compatibility oracle.</p></div>
         <p class="docs-source">Detailed source documents: <code>docs/ci.md</code> and <code>docs/migration.md</code></p>
       </section>

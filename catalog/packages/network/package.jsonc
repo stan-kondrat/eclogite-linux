@@ -1,0 +1,7 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "network",
+  "dependencies": {
+    "run": ["ip", "dhcp-client"]
+  }
+}

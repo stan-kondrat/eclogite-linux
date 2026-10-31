@@ -1,0 +1,9 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "ide",
+  // Browser IDE served from the guest; nodejs, the libc and the C++ runtime come in
+  // through theia's run dependencies
+  "dependencies": {
+    "run": ["theia"]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SourceTreeArguments",
+  "description": "The prepared source itself is the output: a read-only build input for other packages, never installed in a guest.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/common"
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,6 @@
+#!/bin/sh
+# runit stage 2: supervise the services generated from package "services".
+
+PATH=/bin
+
+exec runsvdir -P /etc/service

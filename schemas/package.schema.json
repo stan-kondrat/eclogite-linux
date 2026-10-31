@@ -1,0 +1,989 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Package",
+  "description": "One package graph node, in one of two forms. A buildable package has a source, a builder and optional dependencies, services, tests and builder arguments. A meta-package has only run dependencies: selecting it selects them. Resources such as patches, hooks and files are relative to the package's directory.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/buildablePackage"
+    },
+    {
+      "$ref": "#/$defs/metaPackage"
+    }
+  ],
+  "$defs": {
+    "metaPackage": {
+      "title": "MetaPackage",
+      "description": "A named selection: only run dependencies, no source, builder or output.",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "eclogite.package/v0.1"
+        },
+        "name": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "provides": {
+          "description": "Capabilities provided as a whole, such as `utils` for gnu-utils.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/capability"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "run": {
+              "$ref": "#/$defs/runDependencies",
+              "minItems": 1
+            }
+          },
+          "required": [
+            "run"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema",
+        "name",
+        "dependencies"
+      ],
+      "additionalProperties": false
+    },
+    "buildablePackage": {
+      "title": "BuildablePackage",
+      "description": "The builder fixes the shape of `arguments` and of every variant's\narguments (schemas/builders/<builder>.schema.json).",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/buildablePackageBase"
+        },
+        {
+          "$ref": "#/$defs/builderSelection"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "buildablePackageBase": {
+      "description": "The fields every buildable package has, whatever its builder.",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "eclogite.package/v0.1"
+        },
+        "name": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "version": {
+          "description": "Upstream version label for people; identity comes from the source revision.",
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "fetch": {
+          "description": "Fixed-output phase with network access, run before the offline build.",
+          "$ref": "#/$defs/fetch"
+        },
+        "matches_builder_tool": {
+          "description": "Builder tool that must have been built from this package's source revision.",
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "compatible": {
+          "description": "Absent: no restriction.",
+          "$ref": "#/$defs/compatible"
+        },
+        "provides": {
+          "$ref": "#/$defs/provides"
+        },
+        "configurable": {
+          "$ref": "#/$defs/configurable"
+        },
+        "patches": {
+          "description": "Applied in order, relative to the package directory.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/relativePath"
+          },
+          "uniqueItems": true
+        },
+        "parameters": {
+          "description": "Values exposed as `${NAME}` in this package's strings, keyed by\nupper-case names such as `CONSOLE`. Build-time values are exposed to the\nbuilder, hooks and services and enter the package key. Start-time values\nare exposed only to services and accounts and never enter the key.",
+          "$ref": "common.schema.json#/$defs/parameters"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/dependencies"
+        },
+        "services": {
+          "description": "Generated for the system's init system.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/service"
+          }
+        },
+        "users": {
+          "description": "Accounts the package needs, such as a privilege-separation user.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/user"
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/group"
+          }
+        },
+        "mounts": {
+          "description": "Written to /etc/fstab, keyed by guest mount point.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/mount"
+          }
+        },
+        "tests": {
+          "description": "`tests/<name>.sh`, run in the booted guest over the serial console.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/test"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "name",
+        "version",
+        "source",
+        "builder"
+      ]
+    },
+    "builderSelection": {
+      "title": "BuilderSelection",
+      "description": "The builder, with the arguments it accepts.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/withConfigure"
+        },
+        {
+          "$ref": "#/$defs/withMake"
+        },
+        {
+          "$ref": "#/$defs/withCmake"
+        },
+        {
+          "$ref": "#/$defs/withLinuxKernel"
+        },
+        {
+          "$ref": "#/$defs/withFiles"
+        },
+        {
+          "$ref": "#/$defs/withSourceTree"
+        },
+        {
+          "$ref": "#/$defs/withNpmWorkspace"
+        }
+      ]
+    },
+    "withConfigure": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "configure"
+        },
+        "arguments": {
+          "$ref": "builders/configure.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/configure.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "withMake": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "make"
+        },
+        "arguments": {
+          "$ref": "builders/make.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/make.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "withCmake": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "cmake"
+        },
+        "arguments": {
+          "$ref": "builders/cmake.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/cmake.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "withLinuxKernel": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "linux-kernel"
+        },
+        "arguments": {
+          "$ref": "builders/linux-kernel.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/linux-kernel.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "withFiles": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "files"
+        },
+        "arguments": {
+          "$ref": "builders/files.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/files.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "withSourceTree": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "source-tree"
+        },
+        "arguments": {
+          "$ref": "builders/source-tree.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/source-tree.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "withNpmWorkspace": {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "npm-workspace"
+        },
+        "arguments": {
+          "$ref": "builders/npm-workspace.schema.json"
+        },
+        "variants": {
+          "description": "Merged into `arguments` when `when` holds on the target facts: lists\nappended, maps merged, scalars replaced.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "$ref": "common.schema.json#/$defs/predicate"
+              },
+              "arguments": {
+                "$ref": "builders/npm-workspace.schema.json"
+              }
+            },
+            "required": [
+              "when",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "builder"
+      ]
+    },
+    "builderName": {
+      "title": "BuilderName",
+      "enum": [
+        "configure",
+        "make",
+        "cmake",
+        "linux-kernel",
+        "files",
+        "source-tree",
+        "npm-workspace"
+      ]
+    },
+    "source": {
+      "title": "Source",
+      "description": "OPEN(14): only git and none in v0.1. `url` matches `^(https|git)://`.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "git"
+            },
+            "url": {
+              "type": "string",
+              "pattern": "^(https|git)://"
+            },
+            "revision": {
+              "$ref": "common.schema.json#/$defs/gitRevision"
+            }
+          },
+          "required": [
+            "type",
+            "url",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "none"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "fetch": {
+      "title": "Fetch",
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "description": "Parts of the source that decide what is downloaded: paths, optionally `path#key`.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "hook": {
+          "description": "`hooks/<hook>.sh`",
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "output_sha256": {
+          "description": "Hash of the normalized output: one value, or one per platform name.\nOPEN(13): `\"pending\"` until the first `eclogite lock --update-fetch`.\nOPEN(15): keyed by platform name.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256OrPending"
+            },
+            {
+              "type": "object",
+              "propertyNames": {
+                "$ref": "common.schema.json#/$defs/name"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/sha256OrPending"
+              },
+              "minProperties": 1
+            }
+          ]
+        }
+      },
+      "required": [
+        "inputs",
+        "hook",
+        "output_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "sha256OrPending": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        {
+          "const": "pending"
+        }
+      ]
+    },
+    "compatible": {
+      "title": "Compatible",
+      "description": "Predicates per scope (build host, target, machine).",
+      "type": "object",
+      "properties": {
+        "build": {
+          "$ref": "common.schema.json#/$defs/predicate"
+        },
+        "target": {
+          "$ref": "common.schema.json#/$defs/predicate"
+        },
+        "machine": {
+          "$ref": "common.schema.json#/$defs/predicate"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "provides": {
+      "title": "Provides",
+      "description": "Either a plain list of capabilities, or a map from capability to the files\nthe package owns for it. Owned files are installed only when this package\nis the system's chosen provider of that capability.",
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/capability"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/ownedFiles"
+          },
+          "minProperties": 1
+        }
+      ]
+    },
+    "ownedFiles": {
+      "title": "OwnedFiles",
+      "type": "object",
+      "properties": {
+        "symlinks": {
+          "description": "Link path → target.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "files": {
+          "description": "Package file → guest path.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/relativePath"
+          },
+          "additionalProperties": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          }
+        },
+        "services": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/service"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "configurable": {
+      "title": "Configurable",
+      "description": "The closed set of settings dependents and devices may require.",
+      "type": "object",
+      "properties": {
+        "format": {
+          "description": "`kconfig`: options are `CONFIG_*` names.",
+          "const": "kconfig"
+        },
+        "options": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]+$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/configOption"
+          },
+          "minProperties": 1
+        }
+      },
+      "required": [
+        "format",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "configOption": {
+      "title": "ConfigOption",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "values": {
+          "description": "Such as `[\"y\", \"n\"]` for a bool or `[\"y\", \"m\", \"n\"]` for a tristate.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "default": {
+          "description": "Used when no dependent, device or software profile requires a value.",
+          "type": "string",
+          "minLength": 1
+        },
+        "requires": {
+          "description": "Implied whenever this option is not `n`.\nOPEN(16): that rule is Kconfig semantics.",
+          "$ref": "common.schema.json#/$defs/config"
+        }
+      },
+      "required": [
+        "values",
+        "default"
+      ],
+      "additionalProperties": false
+    },
+    "dependencies": {
+      "title": "Dependencies",
+      "type": "object",
+      "properties": {
+        "build": {
+          "description": "Needed while building; never installed. Builder tools are allowed only here.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "common.schema.json#/$defs/reference"
+              },
+              {
+                "$ref": "common.schema.json#/$defs/builderTool"
+              },
+              {
+                "$ref": "common.schema.json#/$defs/configuredReference"
+              }
+            ]
+          },
+          "uniqueItems": true
+        },
+        "link": {
+          "description": "Linked against; never installed.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "common.schema.json#/$defs/reference"
+              },
+              {
+                "$ref": "common.schema.json#/$defs/configuredReference"
+              }
+            ]
+          },
+          "uniqueItems": true
+        },
+        "run": {
+          "description": "Installed with the package. Only here may an entry be conditional, and\nthese dependencies may form cycles.",
+          "$ref": "#/$defs/runDependencies"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "runDependencies": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "common.schema.json#/$defs/reference"
+          },
+          {
+            "$ref": "common.schema.json#/$defs/conditionalReference"
+          }
+        ]
+      }
+    },
+    "accountName": {
+      "description": "An account or group name such as `sshd`, or a parameter such as `${USER}`.",
+      "type": "string",
+      "pattern": "^([a-z_][a-z0-9_-]*|\\$\\{[A-Z][A-Z0-9_]*\\})$"
+    },
+    "accountId": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "$ref": "common.schema.json#/$defs/parameterReference"
+        }
+      ]
+    },
+    "service": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "run": {
+          "description": "Program and arguments, executed with PATH=/bin.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "directory": {
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "environment": {
+          "$ref": "common.schema.json#/$defs/environment"
+        },
+        "stdin": {
+          "description": "Such as a console device.",
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "requires_mounts": {
+          "description": "Until these are mounted the service exits and is retried.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "uniqueItems": true
+        },
+        "create_directories": {
+          "description": "Created before each start, after the required mounts, as root.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+              },
+              {
+                "$ref": "#/$defs/directory"
+              }
+            ]
+          }
+        },
+        "user": {
+          "description": "The account the program runs as, such as `${USER}`. Default: root.",
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "group": {
+          "description": "Default: the user's primary group.",
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "log": {
+          "description": "Default: true.",
+          "type": "boolean"
+        },
+        "restart_delay_seconds": {
+          "$ref": "common.schema.json#/$defs/positiveInteger"
+        }
+      },
+      "required": [
+        "run"
+      ],
+      "additionalProperties": false
+    },
+    "directory": {
+      "title": "Directory",
+      "description": "A directory with its owner and mode.",
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "owner": {
+          "description": "A user name, such as `${USER}`. Default: root.",
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "group": {
+          "description": "Default: the owner's primary group.",
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "mode": {
+          "description": "Octal, such as `0700`. Default: `0755`.",
+          "type": "string",
+          "pattern": "^0[0-7]{3}$"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "user": {
+      "title": "User",
+      "description": "An account in /etc/passwd and /etc/shadow. When every field is known at\nbuild time, the image step writes the account files. When a field is a\nstart-time value, those files are links into /run, completed at each start\nbefore any service runs.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Such as `sshd`, or `${USER}`.",
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "uid": {
+          "description": "A number, or a parameter such as `${UID}`. Absent: allocated in the\nrange 100 to 999, in name order, so the same accounts get the same ids.",
+          "$ref": "#/$defs/accountId"
+        },
+        "group": {
+          "description": "Primary group name. Default: a group with the user's name and uid.",
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "gid": {
+          "description": "Required when `group` names a group that no package declares.",
+          "$ref": "#/$defs/accountId"
+        },
+        "groups": {
+          "description": "Supplementary groups.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/accountName",
+            "tsType": "string"
+          },
+          "uniqueItems": true
+        },
+        "home": {
+          "description": "Default: `/`. Created with the user as owner if it does not exist.",
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "shell": {
+          "description": "Default: `/bin/false`, no login.",
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "password": {
+          "description": "A crypt(3) hash such as `${PASSWORD_HASH}`, or `locked` (the default).",
+          "anyOf": [
+            {
+              "const": "locked"
+            },
+            {
+              "$ref": "common.schema.json#/$defs/parameterReference"
+            }
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "group": {
+      "title": "Group",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/accountName",
+          "tsType": "string"
+        },
+        "gid": {
+          "description": "Absent: allocated like a user's uid.",
+          "$ref": "#/$defs/accountId"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "mount": {
+      "title": "Mount",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "As for `mount -t`.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "source": {
+          "description": "Device, tag or `none`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "description": "No commas or whitespace inside an option.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[^,\\s]+$"
+          },
+          "uniqueItems": true
+        },
+        "optional": {
+          "description": "fstab `nofail`. Default: false.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "test": {
+      "title": "Test",
+      "type": "object",
+      "properties": {
+        "when": {
+          "description": "Run only where this predicate over target and machine facts holds.",
+          "$ref": "common.schema.json#/$defs/predicate"
+        },
+        "needs": {
+          "description": "Packages the script uses; they must be in the closure.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/packageName"
+          },
+          "uniqueItems": true
+        },
+        "timeout_seconds": {
+          "$ref": "common.schema.json#/$defs/positiveInteger"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

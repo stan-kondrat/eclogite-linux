@@ -18,6 +18,34 @@ site/
   assets/graph.js            SVG graph interaction and package inspector
   assets/machines.js         machine filters, profile cards, and JSON builder
   assets/catalog-data.js     temporary generated-data snapshot
+  types/                     TypeScript types of every document format
+```
+
+`types/` is development tooling, not part of the published site. It is the
+only place that uses Node: its own `package.json` pins Ajv and TypeScript,
+and `generate.mjs` writes everything in `types/generated/`, never edited by
+hand:
+
+```text
+types/generated/
+  schema/input.ts       types of the documents the CLI reads, from ../schemas/
+  schema/compiled.ts    types of the compiled lock, from ../schemas/lock.schema.json
+  catalog/index.ts      every ../catalog/ document as a typed constant:
+                        packages.theia, machines.utmVirtArm64, facts, ...
+  catalog/<kind>.ts     one module per kind, each with `all` of its documents
+  examples.ts           the system files in ../examples/
+```
+
+Generating validates every catalog document against the schemas first.
+`types/examples/` is hand-written: a complete system on top of the generated
+catalog, and its compiled form, which only the C tool's `eclogite lock` will
+be able to produce. The Pages workflow leaves `types/` out of the staged site.
+
+```sh
+cd site/types
+npm install
+npm run types   # regenerate after a schema or catalog change
+npm run check   # stale or invalid input, strict schema compile, everything type-checks, examples validate
 ```
 
 The checked-in `catalog-data.js` is a temporary snapshot for this design phase;
@@ -42,7 +70,6 @@ _site/
   data/graph.json
   data/search-index.json
   packages/<name>/index.html
-  metapackages/<name>/index.html
   machines/<name>/index.html
   systems/<name>/index.html
   docs/

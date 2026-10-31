@@ -1,0 +1,31 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "musl",
+  "version": "1.2.6",
+  // The C library of the linux-musl ABI. Built from the same revision as the
+  // musl toolchain's sysroot, like glibc for linux-gnu.
+  "source": {
+    "type": "git",
+    "url": "https://git.musl-libc.org/git/musl",
+    "revision": "9fa28ece75d8a2191de7c5bb53bed224c5947417"
+  },
+  "matches_builder_tool": "musl",
+  "provides": ["libc"],
+  "compatible": {
+    "target": {
+      "all": [
+        { "os": { "eq": "linux" } },
+        { "libc": { "eq": "musl" } }
+      ]
+    }
+  },
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"]
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--syslibdir=/lib"],
+    // runtime only: the dynamic loader and libc.so
+    "remove": ["/usr/include", "**/*.a", "**/*.o"]
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schema": "eclogite.devices/v0.1",
+  // Device models that machine profiles name in "devices". Each model states
+  // its kind and, in "requires", the config its driver needs from a
+  // capability: from "linux", the kernel options. A requirement applies only
+  // when the system has that capability, so the same machine can run another
+  // kernel family. Hardware support follows the machine and never appears in
+  // a software profile. A model without requirements needs nothing beyond
+  // the defaults, or has not been mapped yet (Raspberry Pi peripherals).
+  "devices": {
+    // virtio over MMIO: QEMU and UTM "virt" machines
+    "virtio-blk-device": {
+      "kind": "block",
+      "requires": { "linux": { "CONFIG_VIRTIO_MMIO": "y", "CONFIG_VIRTIO_BLK": "y" } }
+    },
+    "virtio-net-device": {
+      "kind": "network",
+      "requires": { "linux": { "CONFIG_VIRTIO_MMIO": "y", "CONFIG_VIRTIO_NET": "y" } }
+    },
+    "virtio-9p-device": {
+      "kind": "shared-directory",
+      "requires": { "linux": { "CONFIG_VIRTIO_MMIO": "y", "CONFIG_NET_9P": "y", "CONFIG_NET_9P_VIRTIO": "y" } }
+    },
+    // virtio over PCI: QEMU q35
+    "virtio-blk-pci": {
+      "kind": "block",
+      "requires": { "linux": { "CONFIG_VIRTIO_PCI": "y", "CONFIG_VIRTIO_BLK": "y" } }
+    },
+    "virtio-net-pci": {
+      "kind": "network",
+      "requires": { "linux": { "CONFIG_VIRTIO_PCI": "y", "CONFIG_VIRTIO_NET": "y" } }
+    },
+    "virtio-9p-pci": {
+      "kind": "shared-directory",
+      "requires": { "linux": { "CONFIG_VIRTIO_PCI": "y", "CONFIG_NET_9P": "y", "CONFIG_NET_9P_VIRTIO": "y" } }
+    },
+    // serial consoles
+    "pl011": {
+      "kind": "serial",
+      "requires": { "linux": { "CONFIG_SERIAL_AMBA_PL011": "y", "CONFIG_SERIAL_AMBA_PL011_CONSOLE": "y" } }
+    },
+    "16550a": {
+      "kind": "serial",
+      "requires": { "linux": { "CONFIG_SERIAL_8250": "y", "CONFIG_SERIAL_8250_CONSOLE": "y" } }
+    },
+    "bcm2835-aux": {
+      "kind": "serial",
+      "requires": { "linux": { "CONFIG_SERIAL_8250": "y", "CONFIG_SERIAL_8250_BCM2835AUX": "y" } }
+    },
+    // real-time clocks: the guest clock does not start at 1970
+    "pl031": {
+      "kind": "rtc",
+      "requires": { "linux": { "CONFIG_RTC_CLASS": "y", "CONFIG_RTC_HCTOSYS": "y", "CONFIG_RTC_DRV_PL031": "y" } }
+    },
+    "cmos-rtc": {
+      "kind": "rtc",
+      "requires": { "linux": { "CONFIG_RTC_CLASS": "y", "CONFIG_RTC_HCTOSYS": "y", "CONFIG_RTC_DRV_CMOS": "y" } }
+    },
+    // BCM2835 (Raspberry Pi 1)
+    "bcm2835-gpio": {
+      "kind": "gpio",
+      "requires": { "linux": { "CONFIG_PINCTRL_BCM2835": "y" } }
+    },
+    "bcm2835-spi": {
+      "kind": "spi",
+      "requires": { "linux": { "CONFIG_SPI_BCM2835": "y" } }
+    },
+    "bcm2835-i2c": {
+      "kind": "i2c",
+      "requires": { "linux": { "CONFIG_I2C_BCM2835": "y" } }
+    },
+    "sd-mmc": {
+      "kind": "block",
+      "requires": { "linux": { "CONFIG_MMC": "y", "CONFIG_MMC_BCM2835": "y" } }
+    },
+    "sd-card": {
+      "kind": "block",
+      "requires": { "linux": { "CONFIG_MMC": "y", "CONFIG_MMC_BCM2835": "y" } }
+    },
+    "usb-host": {
+      "kind": "usb",
+      "requires": { "linux": { "CONFIG_USB": "y", "CONFIG_USB_DWC2": "y" } }
+    },
+    "usb-2.0": {
+      "kind": "usb",
+      "requires": { "linux": { "CONFIG_USB": "y", "CONFIG_USB_DWC2": "y" } }
+    },
+    // the Model B's LAN9512 USB hub and Ethernet controller
+    "ethernet": {
+      "kind": "network",
+      "requires": { "linux": { "CONFIG_USB_USBNET": "y", "CONFIG_USB_NET_SMSC95XX": "y" } }
+    },
+    "framebuffer": { "kind": "display" },
+    "hdmi": { "kind": "display" },
+    "dsi": { "kind": "display" },
+    "csi": { "kind": "camera" },
+    "3.5mm-analog": { "kind": "audio" },
+    "rca-composite": { "kind": "video" },
+    "micro-usb": { "kind": "power" }
+  }
+}

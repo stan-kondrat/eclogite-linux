@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.machine/v1",
+  "schema": "eclogite.machine/v0.1",
   "name": "qemu-virt-arm64",
   "aliases": ["qemu-arm64", "arm64-vm"],
   "platform": "arm64",
@@ -19,6 +19,8 @@
     "kernel_arguments": ["root=/dev/vda", "ro", "console=ttyAMA0"]
   },
   "devices": [
+    { "kind": "serial", "model": "pl011" },
+    { "kind": "rtc", "model": "pl031" },
     { "kind": "block", "model": "virtio-blk-device" },
     { "kind": "network", "model": "virtio-net-device" },
     { "kind": "shared-directory", "model": "virtio-9p-device", "optional": true }

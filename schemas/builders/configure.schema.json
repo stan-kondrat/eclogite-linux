@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ConfigureArguments",
+  "description": "A ./configure script (autoconf or hand-written), then make and make install with DESTDIR. The builder sets CC, CXX, LD and AR for the compiler chosen for the package.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/common"
+    }
+  ],
+  "properties": {
+    "bootstrap": {
+      "description": "Default: none.",
+      "enum": [
+        "none",
+        "autoreconf",
+        "gnulib"
+      ]
+    },
+    "configure": {
+      "description": "The builder adds --host, --build and the toolchain.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "out_of_tree": {
+      "type": "boolean"
+    },
+    "make_targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "install_targets": {
+      "description": "Default: install.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "unevaluatedProperties": false
+}

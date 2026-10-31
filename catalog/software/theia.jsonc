@@ -1,0 +1,30 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "theia",
+  "aliases": ["ide"],
+  // The reference system plus the Theia browser IDE. Theia's own "compatible"
+  // constraints limit it to aarch64 and x86_64 machines with enough memory.
+  "packages": ["reference-system", "ide"],
+  "root": {
+    "hostname": "theia",
+    "readonly": true,
+    // /dev/shm is mounted by base-files' fstab
+    "tmpfs": ["/run", "/tmp"]
+  },
+  "image": {
+    "format": "ext4"
+  },
+  "volumes": [
+    {
+      "name": "theia",
+      "mount": "/opt/theia",
+      "packages": ["theia"],
+      "format": "ext4",
+      "readonly": true
+    }
+  ],
+  "evidence": {
+    "default": "warn-untested",
+    "require-passed": ["glibc", "gcc-runtime", "nodejs"]
+  }
+}

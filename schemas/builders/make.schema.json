@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MakeArguments",
+  "description": "make and make install with DESTDIR, without a configure step. The builder sets CC, CXX, LD and AR for the compiler chosen for the package.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/common"
+    }
+  ],
+  "properties": {
+    "directory": {
+      "$ref": "../common.schema.json#/$defs/relativePath"
+    },
+    "variables": {
+      "description": "Passed on the make command line.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "../common.schema.json#/$defs/variableName"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "make_targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "install_targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "unevaluatedProperties": false
+}

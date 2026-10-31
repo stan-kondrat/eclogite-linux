@@ -1,0 +1,30 @@
+{
+  "schema": "eclogite.defaults/v0.1",
+  // The distribution's choices: used only where a system selects nothing.
+  // Every entry can be overridden by naming another package in a software
+  // profile's "packages", or by "abi" in a software profile or system file.
+  "abi": "linux-gnu",
+  // Compiler for every package that can be built with it; software profiles
+  // and system files may choose "clang"
+  "compiler": "gcc",
+  // Provider per capability. An ordered list takes the first provider that is
+  // compatible with the system, so one entry serves every ABI: glibc on
+  // linux-gnu, musl on linux-musl.
+  "providers": {
+    "kernel": "linux-libre",
+    // a Linux-family kernel; the kernel already chosen wins when it provides it
+    "linux": "linux-libre",
+    "init": "runit",
+    "libc": { "first": ["glibc", "musl"] },
+    // compiler runtime and unwinder; C++ standard library
+    "cc-runtime": "gcc-runtime",
+    "c++-runtime": "gcc-runtime",
+    "sh": "bash",
+    "core-utils": "coreutils",
+    "system-utils": "util-linux",
+    "utils": "gnu-utils",
+    "dhcp-client": "dhcpcd",
+    "ip": "iproute2",
+    "vi": "vim"
+  }
+}

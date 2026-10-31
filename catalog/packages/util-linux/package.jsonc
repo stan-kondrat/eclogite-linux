@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "util-linux",
   "version": "2.40.4",
   "source": {
@@ -7,14 +7,18 @@
     "url": "https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git",
     "revision": "dbcc687f6ab1568982cdf3fe391c0beb818b7e28"
   },
-  "builder": "autoreconf",
-  "patches": [],
+  // system-utils promises a getty with agetty's options; util-linux names it
+  // agetty, so the capability's link supplies the common name
+  "provides": {
+    "system-utils": { "symlinks": { "/bin/getty": "agetty" } }
+  },
+  "builder": "configure",
   "dependencies": {
-    "build": [],
-    "link": [],
-    "run": []
+    "link": ["libc"],
+    "run": ["libc"]
   },
   "arguments": {
+    "bootstrap": "autoreconf",
     "configure": [
       "--prefix=/usr",
       "--disable-nls",
@@ -22,8 +26,11 @@
       "--disable-liblastlog2",
       "--disable-makeinstall-chown",
       "--disable-makeinstall-setuid",
-      "--without-python"
-    ],
-    "cross": ["--without-ncursesw", "--without-ncurses", "--without-tinfo"]
+      "--without-python",
+      // ncurses is not packaged: nothing in the guest is copied from the builder
+      "--without-ncursesw",
+      "--without-ncurses",
+      "--without-tinfo"
+    ]
   }
 }

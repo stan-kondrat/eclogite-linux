@@ -1,0 +1,96 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "busybox",
+  "version": "1.38.0",
+  "source": {
+    "type": "git",
+    "url": "https://git.busybox.net/busybox",
+    "revision": "fc71374dfccd46448c62947269a35f1420d7ee28"
+  },
+  // One static binary that can stand in for several packages. It is built
+  // once with every applet; the applet links of a capability are installed
+  // only when busybox is the system's provider for it, so selecting busybox
+  // with a full bash gives /bin/bash from bash and /bin/sh from ash.
+  "provides": {
+    "sh": {
+      "symlinks": {
+        "/bin/sh": "busybox", "/bin/ash": "busybox"
+      }
+    },
+    "core-utils": {
+      "symlinks": {
+        "/bin/[": "busybox", "/bin/basename": "busybox", "/bin/cat": "busybox",
+        "/bin/chgrp": "busybox", "/bin/chmod": "busybox", "/bin/chown": "busybox",
+        "/bin/cp": "busybox", "/bin/cut": "busybox", "/bin/date": "busybox",
+        "/bin/dd": "busybox", "/bin/df": "busybox", "/bin/dirname": "busybox",
+        "/bin/du": "busybox", "/bin/echo": "busybox", "/bin/env": "busybox",
+        "/bin/expr": "busybox", "/bin/false": "busybox", "/bin/head": "busybox",
+        "/bin/id": "busybox", "/bin/install": "busybox", "/bin/ln": "busybox",
+        "/bin/ls": "busybox", "/bin/md5sum": "busybox", "/bin/mkdir": "busybox",
+        "/bin/mknod": "busybox", "/bin/mktemp": "busybox", "/bin/mv": "busybox",
+        "/bin/nice": "busybox", "/bin/nohup": "busybox", "/bin/od": "busybox",
+        "/bin/printf": "busybox", "/bin/pwd": "busybox", "/bin/readlink": "busybox",
+        "/bin/realpath": "busybox", "/bin/rm": "busybox", "/bin/rmdir": "busybox",
+        "/bin/seq": "busybox", "/bin/sha256sum": "busybox", "/bin/sleep": "busybox",
+        "/bin/sort": "busybox", "/bin/stat": "busybox", "/bin/stty": "busybox",
+        "/bin/sync": "busybox", "/bin/tail": "busybox", "/bin/tee": "busybox",
+        "/bin/test": "busybox", "/bin/touch": "busybox", "/bin/tr": "busybox",
+        "/bin/true": "busybox", "/bin/tty": "busybox", "/bin/uname": "busybox",
+        "/bin/uniq": "busybox", "/bin/wc": "busybox", "/bin/whoami": "busybox",
+        "/bin/yes": "busybox"
+      }
+    },
+    "system-utils": {
+      "symlinks": {
+        "/bin/blkid": "busybox", "/bin/dmesg": "busybox", "/bin/getty": "busybox",
+        "/bin/hwclock": "busybox", "/bin/losetup": "busybox", "/bin/mkswap": "busybox",
+        "/bin/mount": "busybox", "/bin/setsid": "busybox", "/bin/swapoff": "busybox",
+        "/bin/swapon": "busybox", "/bin/switch_root": "busybox", "/bin/umount": "busybox"
+      }
+    },
+    "utils": {
+      "symlinks": {
+        "/bin/awk": "busybox", "/bin/cmp": "busybox", "/bin/diff": "busybox",
+        "/bin/egrep": "busybox", "/bin/fgrep": "busybox", "/bin/find": "busybox",
+        "/bin/free": "busybox", "/bin/grep": "busybox", "/bin/gunzip": "busybox",
+        "/bin/gzip": "busybox", "/bin/kill": "busybox", "/bin/pgrep": "busybox",
+        "/bin/pidof": "busybox", "/bin/pkill": "busybox", "/bin/ps": "busybox",
+        "/bin/sed": "busybox", "/bin/tar": "busybox", "/bin/top": "busybox",
+        "/bin/uptime": "busybox", "/bin/watch": "busybox", "/bin/xargs": "busybox",
+        "/bin/zcat": "busybox"
+      }
+    },
+    "ip": {
+      "symlinks": {
+        "/bin/ip": "busybox"
+      }
+    },
+    "vi": {
+      "symlinks": {
+        "/bin/vi": "busybox"
+      }
+    },
+    "dhcp-client": {
+      "symlinks": {
+        "/bin/udhcpc": "busybox"
+      },
+      "files": { "files/udhcpc.script": "/usr/share/udhcpc/default.script" },
+      // one interface: eth0, the first virtio or USB Ethernet device
+      "services": { "udhcpc": { "run": ["udhcpc", "-f", "-i", "eth0"] } }
+    }
+  },
+  "builder": "make",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"],
+    // static: libc is needed to link, not at runtime (musl is the better fit)
+    "link": ["libc"]
+  },
+  "arguments": {
+    "hooks": {
+      // defconfig, static, no /usr, cross compiler
+      "configure": ["config"],
+      // only /bin/busybox: applet links come from "provides"
+      "install": ["install"]
+    }
+  }
+}

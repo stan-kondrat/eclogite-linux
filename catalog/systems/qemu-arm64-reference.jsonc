@@ -1,6 +1,6 @@
 {
-  "schema": "eclogite.system/v1",
+  "schema": "eclogite.system/v0.1",
   "name": "qemu-arm64-reference",
   "machine": "qemu-virt-arm64",
-  "software": "reference-arm64"
+  "software": "reference"
 }

@@ -1,0 +1,189 @@
+{
+  "machine": "utm-virt-arm64",
+  "software": "reference",
+  "abi": "linux-gnu",
+  "triplet": "aarch64-linux-gnu",
+  "closure": [
+    "reference-system",
+    "base",
+    "base-files",
+    "linux-libre",
+    "glibc",
+    "gcc-runtime",
+    "runit",
+    "bash",
+    "coreutils",
+    "util-linux",
+    "console-login",
+    "gnu-utils",
+    "grep",
+    "sed",
+    "gawk",
+    "findutils",
+    "diffutils",
+    "gzip",
+    "tar",
+    "procps-ng",
+    "network",
+    "iproute2",
+    "dhcpcd",
+    "editor",
+    "vim",
+    "host-share"
+  ],
+  "choices": {
+    "c++-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "already chosen"
+    },
+    "cc-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "default"
+    },
+    "core-utils": {
+      "provider": "coreutils",
+      "reason": "default"
+    },
+    "dhcp-client": {
+      "provider": "dhcpcd",
+      "reason": "default"
+    },
+    "init": {
+      "provider": "runit",
+      "reason": "default"
+    },
+    "ip": {
+      "provider": "iproute2",
+      "reason": "default"
+    },
+    "kernel": {
+      "provider": "linux-libre",
+      "reason": "default"
+    },
+    "libc": {
+      "provider": "glibc",
+      "reason": "default"
+    },
+    "linux": {
+      "provider": "linux-libre",
+      "reason": "already chosen"
+    },
+    "sh": {
+      "provider": "bash",
+      "reason": "default"
+    },
+    "system-utils": {
+      "provider": "util-linux",
+      "reason": "default"
+    },
+    "utils": {
+      "provider": "gnu-utils",
+      "reason": "default"
+    },
+    "vi": {
+      "provider": "vim",
+      "reason": "default"
+    }
+  },
+  "compilers": {
+    "bash": "gcc",
+    "coreutils": "gcc",
+    "dhcpcd": "gcc",
+    "diffutils": "gcc",
+    "findutils": "gcc",
+    "gawk": "gcc",
+    "gcc-runtime": "gcc",
+    "glibc": "gcc",
+    "grep": "gcc",
+    "gzip": "gcc",
+    "iproute2": "gcc",
+    "linux-libre": "gcc",
+    "procps-ng": "gcc",
+    "runit": "gcc",
+    "sed": "gcc",
+    "tar": "gcc",
+    "util-linux": "gcc",
+    "vim": "gcc"
+  },
+  "config": {
+    "linux-libre": {
+      "CONFIG_9P_FS": {
+        "value": "y",
+        "source": "host-share"
+      },
+      "CONFIG_DEVTMPFS": {
+        "value": "y",
+        "source": "base-files"
+      },
+      "CONFIG_NET_9P": {
+        "value": "y",
+        "source": "implied by CONFIG_9P_FS"
+      },
+      "CONFIG_NET_9P_VIRTIO": {
+        "value": "y",
+        "source": "device virtio-9p-device"
+      },
+      "CONFIG_PROC_FS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_RTC_CLASS": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_RTC_DRV_PL031": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_RTC_HCTOSYS": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_SERIAL_AMBA_PL011": {
+        "value": "y",
+        "source": "device pl011"
+      },
+      "CONFIG_SERIAL_AMBA_PL011_CONSOLE": {
+        "value": "y",
+        "source": "device pl011"
+      },
+      "CONFIG_SYSFS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_TMPFS": {
+        "value": "y",
+        "source": "base-files"
+      },
+      "CONFIG_UNIX98_PTYS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_VIRTIO": {
+        "value": "y",
+        "source": "implied by CONFIG_VIRTIO_MMIO"
+      },
+      "CONFIG_VIRTIO_BLK": {
+        "value": "y",
+        "source": "device virtio-blk-device"
+      },
+      "CONFIG_VIRTIO_MMIO": {
+        "value": "y",
+        "source": "device virtio-blk-device"
+      },
+      "CONFIG_VIRTIO_NET": {
+        "value": "y",
+        "source": "device virtio-net-device"
+      }
+    }
+  },
+  "owned_files": {
+    "/bin/getty": "util-linux:system-utils",
+    "/bin/sh": "bash:sh",
+    "/bin/vi": "vim:vi"
+  },
+  "tests": [
+    "linux-libre:clock",
+    "dhcpcd:dhcp"
+  ]
+}

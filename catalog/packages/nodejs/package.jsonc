@@ -1,0 +1,62 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "nodejs",
+  "version": "26.10.0",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/nodejs/node.git",
+    "revision": "151845ab90d3926ceb36eedf1eade09619c3adc9"
+  },
+  // Native addons built by builder:node must load in this node: the lock
+  // fails unless builder:node has this same revision.
+  "matches_builder_tool": "node",
+  "compatible": {
+    // V8 needs ARMv6 with VFPv2 on 32-bit ARM; upstream publishes armv6l
+    // builds only through its unofficial-builds project
+    "target": {
+      "any": [
+        { "all": [
+          { "arch": { "eq": "arm" } },
+          { "isa": { "ge": "armv6" } },
+          { "cpu_features": { "has": "vfpv2" } }
+        ] },
+        { "arch": { "in": ["aarch64", "x86_64"] } }
+      ]
+    },
+    // Some V8 compile jobs need about 2.4 GiB (linux-libre-vm mk/14-toolchain.mk)
+    "build": { "memory_mib": { "ge": 3072 } },
+    // An idle node process; applications add their own needs
+    "machine": { "memory_mib": { "ge": 64 } }
+  },
+  // Node's configure is a Python script, not autotools
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:python3", "builder:gcc", "builder:make"],
+    // V8, ICU, OpenSSL, zlib, libuv and nghttp2 are bundled in the source tree
+    "link": ["libc", "c++-runtime"],
+    "run": ["libc", "c++-runtime"]
+  },
+  "arguments": {
+    "configure": ["--prefix=/usr", "--cross-compiling", "--dest-os=linux"],
+    // Node runs some of its own programs during the build (V8's mksnapshot
+    // and torque, ICU tools): those use the native GCC, everything else the
+    // target cross GCC that the builder already sets as CC and CXX.
+    "environment": {
+      "CC_host": "gcc",
+      "CXX_host": "g++",
+      "AR_host": "ar",
+      "LINK_host": "g++",
+      "LINK": "${CXX}"
+    },
+    "strip": true,
+    "remove": ["/usr/share/man", "/usr/share/doc/node", "/usr/include/node"]
+  },
+  "variants": [
+    { "when": { "arch": { "eq": "aarch64" } },
+      "arguments": { "configure": ["--dest-cpu=arm64"] } },
+    { "when": { "arch": { "eq": "x86_64" } },
+      "arguments": { "configure": ["--dest-cpu=x64"] } },
+    { "when": { "arch": { "eq": "arm" } },
+      "arguments": { "configure": ["--dest-cpu=arm", "--with-arm-float-abi=hard", "--with-arm-fpu=vfp"] } }
+  ]
+}

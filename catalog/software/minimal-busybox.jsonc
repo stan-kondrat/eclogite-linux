@@ -1,0 +1,32 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "minimal-busybox",
+  // The minimal system with BusyBox as sh, core-utils and system-utils:
+  // selecting busybox makes it the provider of every capability it offers,
+  // so bash, coreutils and util-linux never enter the closure. With
+  // "abi": "linux-musl" the static binary is smaller still, once the musl
+  // toolchain exists.
+  "packages": ["base", "busybox"],
+  "root": {
+    "hostname": "eclogite",
+    "readonly": true,
+    "tmpfs": ["/run", "/tmp"]
+  },
+  "image": {
+    "format": "ext4",
+    "strip": true,
+    "exclude": [
+      "/usr/include",
+      "/usr/share/man",
+      "/usr/share/info",
+      "/usr/share/doc",
+      "/usr/share/locale",
+      "**/*.a",
+      "**/*.la"
+    ],
+    "free_mib": 16
+  },
+  "evidence": {
+    "default": "warn-untested"
+  }
+}

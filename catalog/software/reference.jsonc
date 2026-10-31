@@ -1,0 +1,21 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "reference",
+  // The linux-libre-vm reference system, kept complete for comparison with
+  // it. The platform comes from the machine, so the same profile builds for
+  // arm64 and x86_64.
+  "packages": ["reference-system"],
+  "root": {
+    "hostname": "linux-libre",
+    "readonly": true,
+    "tmpfs": ["/run", "/tmp"]
+  },
+  // Sized from the package outputs plus the default free space
+  "image": {
+    "format": "ext4"
+  },
+  // No CI results exist yet: report untested packages, do not fail on them
+  "evidence": {
+    "default": "warn-untested"
+  }
+}

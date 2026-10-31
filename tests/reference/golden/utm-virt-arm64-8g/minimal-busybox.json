@@ -1,0 +1,245 @@
+{
+  "machine": "utm-virt-arm64-8g",
+  "software": "minimal-busybox",
+  "abi": "linux-gnu",
+  "triplet": "aarch64-linux-gnu",
+  "closure": [
+    "base",
+    "base-files",
+    "linux-libre",
+    "glibc",
+    "gcc-runtime",
+    "runit",
+    "busybox",
+    "console-login"
+  ],
+  "choices": {
+    "c++-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "already chosen"
+    },
+    "cc-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "default"
+    },
+    "core-utils": {
+      "provider": "busybox",
+      "reason": "selected"
+    },
+    "dhcp-client": {
+      "provider": "busybox",
+      "reason": "selected"
+    },
+    "init": {
+      "provider": "runit",
+      "reason": "default"
+    },
+    "ip": {
+      "provider": "busybox",
+      "reason": "selected"
+    },
+    "kernel": {
+      "provider": "linux-libre",
+      "reason": "default"
+    },
+    "libc": {
+      "provider": "glibc",
+      "reason": "default"
+    },
+    "linux": {
+      "provider": "linux-libre",
+      "reason": "already chosen"
+    },
+    "sh": {
+      "provider": "busybox",
+      "reason": "selected"
+    },
+    "system-utils": {
+      "provider": "busybox",
+      "reason": "selected"
+    },
+    "utils": {
+      "provider": "busybox",
+      "reason": "selected"
+    },
+    "vi": {
+      "provider": "busybox",
+      "reason": "selected"
+    }
+  },
+  "compilers": {
+    "busybox": "gcc",
+    "gcc-runtime": "gcc",
+    "glibc": "gcc",
+    "linux-libre": "gcc",
+    "runit": "gcc"
+  },
+  "config": {
+    "linux-libre": {
+      "CONFIG_DEVTMPFS": {
+        "value": "y",
+        "source": "base-files"
+      },
+      "CONFIG_NET_9P": {
+        "value": "y",
+        "source": "device virtio-9p-device"
+      },
+      "CONFIG_NET_9P_VIRTIO": {
+        "value": "y",
+        "source": "device virtio-9p-device"
+      },
+      "CONFIG_PROC_FS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_RTC_CLASS": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_RTC_DRV_PL031": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_RTC_HCTOSYS": {
+        "value": "y",
+        "source": "device pl031"
+      },
+      "CONFIG_SERIAL_AMBA_PL011": {
+        "value": "y",
+        "source": "device pl011"
+      },
+      "CONFIG_SERIAL_AMBA_PL011_CONSOLE": {
+        "value": "y",
+        "source": "device pl011"
+      },
+      "CONFIG_SYSFS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_TMPFS": {
+        "value": "y",
+        "source": "base-files"
+      },
+      "CONFIG_UNIX98_PTYS": {
+        "value": "y",
+        "source": "runit"
+      },
+      "CONFIG_VIRTIO": {
+        "value": "y",
+        "source": "implied by CONFIG_VIRTIO_MMIO"
+      },
+      "CONFIG_VIRTIO_BLK": {
+        "value": "y",
+        "source": "device virtio-blk-device"
+      },
+      "CONFIG_VIRTIO_MMIO": {
+        "value": "y",
+        "source": "device virtio-blk-device"
+      },
+      "CONFIG_VIRTIO_NET": {
+        "value": "y",
+        "source": "device virtio-net-device"
+      }
+    }
+  },
+  "owned_files": {
+    "/bin/[": "busybox:core-utils",
+    "/bin/ash": "busybox:sh",
+    "/bin/awk": "busybox:utils",
+    "/bin/basename": "busybox:core-utils",
+    "/bin/blkid": "busybox:system-utils",
+    "/bin/cat": "busybox:core-utils",
+    "/bin/chgrp": "busybox:core-utils",
+    "/bin/chmod": "busybox:core-utils",
+    "/bin/chown": "busybox:core-utils",
+    "/bin/cmp": "busybox:utils",
+    "/bin/cp": "busybox:core-utils",
+    "/bin/cut": "busybox:core-utils",
+    "/bin/date": "busybox:core-utils",
+    "/bin/dd": "busybox:core-utils",
+    "/bin/df": "busybox:core-utils",
+    "/bin/diff": "busybox:utils",
+    "/bin/dirname": "busybox:core-utils",
+    "/bin/dmesg": "busybox:system-utils",
+    "/bin/du": "busybox:core-utils",
+    "/bin/echo": "busybox:core-utils",
+    "/bin/egrep": "busybox:utils",
+    "/bin/env": "busybox:core-utils",
+    "/bin/expr": "busybox:core-utils",
+    "/bin/false": "busybox:core-utils",
+    "/bin/fgrep": "busybox:utils",
+    "/bin/find": "busybox:utils",
+    "/bin/free": "busybox:utils",
+    "/bin/getty": "busybox:system-utils",
+    "/bin/grep": "busybox:utils",
+    "/bin/gunzip": "busybox:utils",
+    "/bin/gzip": "busybox:utils",
+    "/bin/head": "busybox:core-utils",
+    "/bin/hwclock": "busybox:system-utils",
+    "/bin/id": "busybox:core-utils",
+    "/bin/install": "busybox:core-utils",
+    "/bin/ip": "busybox:ip",
+    "/bin/kill": "busybox:utils",
+    "/bin/ln": "busybox:core-utils",
+    "/bin/losetup": "busybox:system-utils",
+    "/bin/ls": "busybox:core-utils",
+    "/bin/md5sum": "busybox:core-utils",
+    "/bin/mkdir": "busybox:core-utils",
+    "/bin/mknod": "busybox:core-utils",
+    "/bin/mkswap": "busybox:system-utils",
+    "/bin/mktemp": "busybox:core-utils",
+    "/bin/mount": "busybox:system-utils",
+    "/bin/mv": "busybox:core-utils",
+    "/bin/nice": "busybox:core-utils",
+    "/bin/nohup": "busybox:core-utils",
+    "/bin/od": "busybox:core-utils",
+    "/bin/pgrep": "busybox:utils",
+    "/bin/pidof": "busybox:utils",
+    "/bin/pkill": "busybox:utils",
+    "/bin/printf": "busybox:core-utils",
+    "/bin/ps": "busybox:utils",
+    "/bin/pwd": "busybox:core-utils",
+    "/bin/readlink": "busybox:core-utils",
+    "/bin/realpath": "busybox:core-utils",
+    "/bin/rm": "busybox:core-utils",
+    "/bin/rmdir": "busybox:core-utils",
+    "/bin/sed": "busybox:utils",
+    "/bin/seq": "busybox:core-utils",
+    "/bin/setsid": "busybox:system-utils",
+    "/bin/sh": "busybox:sh",
+    "/bin/sha256sum": "busybox:core-utils",
+    "/bin/sleep": "busybox:core-utils",
+    "/bin/sort": "busybox:core-utils",
+    "/bin/stat": "busybox:core-utils",
+    "/bin/stty": "busybox:core-utils",
+    "/bin/swapoff": "busybox:system-utils",
+    "/bin/swapon": "busybox:system-utils",
+    "/bin/switch_root": "busybox:system-utils",
+    "/bin/sync": "busybox:core-utils",
+    "/bin/tail": "busybox:core-utils",
+    "/bin/tar": "busybox:utils",
+    "/bin/tee": "busybox:core-utils",
+    "/bin/test": "busybox:core-utils",
+    "/bin/top": "busybox:utils",
+    "/bin/touch": "busybox:core-utils",
+    "/bin/tr": "busybox:core-utils",
+    "/bin/true": "busybox:core-utils",
+    "/bin/tty": "busybox:core-utils",
+    "/bin/udhcpc": "busybox:dhcp-client",
+    "/bin/umount": "busybox:system-utils",
+    "/bin/uname": "busybox:core-utils",
+    "/bin/uniq": "busybox:core-utils",
+    "/bin/uptime": "busybox:utils",
+    "/bin/vi": "busybox:vi",
+    "/bin/watch": "busybox:utils",
+    "/bin/wc": "busybox:core-utils",
+    "/bin/whoami": "busybox:core-utils",
+    "/bin/xargs": "busybox:utils",
+    "/bin/yes": "busybox:core-utils",
+    "/bin/zcat": "busybox:utils",
+    "/usr/share/udhcpc/default.script": "busybox:dhcp-client"
+  },
+  "tests": [
+    "linux-libre:clock"
+  ]
+}

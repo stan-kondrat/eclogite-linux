@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Facts",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.facts/v0.1"
+    },
+    "facts": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/fact"
+      },
+      "minProperties": 1
+    }
+  },
+  "required": [
+    "schema",
+    "facts"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "factScope": {
+      "title": "FactScope",
+      "description": "The scope a fact is read in: the target (the platform merged with the\nABI), the merged machine, or the builder.",
+      "enum": [
+        "target",
+        "machine",
+        "builder"
+      ]
+    },
+    "factSource": {
+      "title": "FactSource",
+      "description": "A JSON Pointer, `@detected` (measured at plan time) or `@selected` (chosen\nby resolution, such as the compiler).",
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/jsonPointer"
+        },
+        {
+          "enum": [
+            "@detected",
+            "@selected"
+          ]
+        }
+      ]
+    },
+    "factBase": {
+      "description": "The fields every fact definition has.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "values": {
+          "description": "Closed vocabulary for string and set facts.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "from": {
+          "description": "Per scope, the sources tried in order.",
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/factSource"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "machine": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/factSource"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "builder": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/factSource"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        "derive": {
+          "description": "How an array read by `from` becomes the value. Exactly one key.",
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "collect": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "collect"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "sum": {
+                  "type": "object",
+                  "properties": {
+                    "where": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "$ref": "common.schema.json#/$defs/scalar"
+                      },
+                      "minProperties": 1
+                    },
+                    "field": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "missing": {
+                      "description": "`unbounded` makes the whole sum unbounded.",
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        {
+                          "const": "unbounded"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "where",
+                    "field",
+                    "missing"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "sum"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "aggregate": {
+          "description": "How constraints across a closure combine.",
+          "type": "object",
+          "properties": {
+            "machine": {
+              "enum": [
+                "sum",
+                "max"
+              ]
+            },
+            "builder": {
+              "enum": [
+                "sum",
+                "max"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        }
+      },
+      "required": [
+        "description",
+        "type",
+        "from"
+      ]
+    },
+    "fact": {
+      "title": "FactDefinition",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/factBase"
+        }
+      ],
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "string",
+                "integer",
+                "boolean",
+                "set"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ordered"
+            },
+            "order_by": {
+              "description": "The fact whose value selects the ordering, such as `arch`.",
+              "$ref": "common.schema.json#/$defs/name"
+            },
+            "order": {
+              "description": "Lowest to highest, per value of `order_by`.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "minProperties": 1
+            }
+          },
+          "required": [
+            "type",
+            "order_by",
+            "order"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

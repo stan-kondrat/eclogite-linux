@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Types shared by every Eclogite component schema. Not a document type on its own.",
+  "$defs": {
+    "name": {
+      "title": "Name",
+      "description": "Catalog object name: lower case, digits, '.', '+', '_' and '-', at most 64 characters.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.+_-]*$",
+      "maxLength": 64
+    },
+    "packageName": {
+      "title": "PackageName",
+      "description": "Name of a package or a meta-package.",
+      "$ref": "#/$defs/name"
+    },
+    "capability": {
+      "title": "Capability",
+      "description": "Capability name such as `kernel`, `linux`, `init`, `libc`, `sh`, `vi`.\nCapabilities share the package namespace.",
+      "$ref": "#/$defs/name"
+    },
+    "aliases": {
+      "description": "Catalog-wide unique convenience names for CLI input. Not part of build identity and never inherited.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/name" },
+      "uniqueItems": true
+    },
+    "nameList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/name" },
+      "uniqueItems": true
+    },
+    "gitRevision": {
+      "title": "GitRevision",
+      "description": "Full 40-hex Git commit hash.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "title": "Sha256",
+      "description": "64-hex SHA-256 digest.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "title": "RelativePath",
+      "description": "Relative to the defining document's directory; no leading `/`, no `..`.",
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+    },
+    "absoluteGuestPath": {
+      "title": "GuestPath",
+      "description": "Absolute path inside the guest.",
+      "type": "string",
+      "pattern": "^/",
+      "tsType": "`/${string}`"
+    },
+    "guestPathPattern": {
+      "title": "GuestPathPattern",
+      "description": "Absolute guest path, or a glob starting with two stars and a slash, matching anywhere in the output.",
+      "type": "string",
+      "pattern": "^(/|\\*\\*/)",
+      "tsType": "GuestPath | `**/${string}`"
+    },
+    "jsonPointer": {
+      "title": "JsonPointer",
+      "description": "JSON Pointer such as `/machine/boot/console`.",
+      "type": "string",
+      "pattern": "^(/[^/]+)+$",
+      "tsType": "`/${string}`"
+    },
+    "variableName": {
+      "title": "VariableName",
+      "description": "`^[A-Za-z_][A-Za-z0-9_]*$`",
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "parameterName": {
+      "description": "An upper-case parameter name such as `CONSOLE`.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "parameterReference": {
+      "title": "ParameterReference",
+      "description": "A whole string that is one parameter, such as `${UID}`.",
+      "type": "string",
+      "pattern": "^\\$\\{[A-Z][A-Z0-9_]*\\}$",
+      "tsType": "`\\${${string}}`"
+    },
+    "mebibytes": {
+      "title": "Mebibytes",
+      "description": "Integer, at least 1.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "positiveInteger": {
+      "title": "PositiveInteger",
+      "description": "Integer, at least 1.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "environment": {
+      "title": "Environment",
+      "description": "Values may use `${NAME}` for builder variables and package parameters.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/variableName" },
+      "additionalProperties": { "type": "string" }
+    },
+    "value": {
+      "title": "Value",
+      "description": "Where a parameter comes from, and when it is known.\n\nA build-time value is known when the system is compiled. It enters the\nkeys of the packages that read it.\n\nA start-time value is known only when the runner starts the machine. It\nnever enters a key, an image or the compiled system, and it may be used\nonly in services, accounts, the hostname, endpoints and commands. A value\ncomputed from a start-time value is itself start-time.\n\nA plain JSON Pointer string is short for `{ \"pointer\": ... }`.",
+      "oneOf": [
+        {
+          "description": "Build time: from the resolved system, such as `/machine/resources/memory_mib`.",
+          "$ref": "#/$defs/jsonPointer"
+        },
+        {
+          "type": "object",
+          "properties": { "pointer": { "$ref": "#/$defs/jsonPointer" } },
+          "required": ["pointer"],
+          "additionalProperties": false
+        },
+        {
+          "description": "Start time: a setting of the software profile. `default` applies when\nthe profile declares no setting of that name. The value stays start-time\neither way, so a package's key never depends on which profile uses it.",
+          "type": "object",
+          "properties": {
+            "setting": { "$ref": "#/$defs/variableName" },
+            "default": { "$ref": "#/$defs/scalar" }
+          },
+          "required": ["setting"],
+          "additionalProperties": false
+        },
+        {
+          "description": "Start time: the account that runs the runner on the host.",
+          "type": "object",
+          "properties": { "host": { "enum": ["uid", "gid", "user"] } },
+          "required": ["host"],
+          "additionalProperties": false
+        },
+        {
+          "description": "`value * multiply / divide`, rounded down, for integers.",
+          "type": "object",
+          "properties": {
+            "scale": { "$ref": "#/$defs/value" },
+            "multiply": { "$ref": "#/$defs/positiveInteger" },
+            "divide": { "$ref": "#/$defs/positiveInteger" }
+          },
+          "required": ["scale", "multiply", "divide"],
+          "additionalProperties": false
+        },
+        {
+          "description": "A crypt(3) SHA-512 hash of the value, with a fresh salt at each start.",
+          "type": "object",
+          "properties": { "crypt_sha512": { "$ref": "#/$defs/value" } },
+          "required": ["crypt_sha512"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "parameters": {
+      "description": "Values exposed as `${NAME}`, keyed by upper-case names such as `CONSOLE`.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/parameterName" },
+      "additionalProperties": { "$ref": "#/$defs/value" }
+    },
+    "compiler": {
+      "title": "Compiler",
+      "description": "OPEN(12): a closed v0.1 set here, and also listed by the toolchain.",
+      "enum": ["gcc", "clang"]
+    },
+    "resources": {
+      "title": "Resources",
+      "type": "object",
+      "properties": {
+        "vcpus": { "$ref": "#/$defs/positiveInteger" },
+        "memory_mib": { "$ref": "#/$defs/mebibytes" }
+      },
+      "required": ["vcpus", "memory_mib"],
+      "additionalProperties": false
+    },
+    "imageSize": {
+      "title": "ImageSize",
+      "description": "Image size: without `size_mib`, sized from the package outputs plus\n`free_mib` (default 64). Setting both fields is an error.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "size_mib": false,
+            "free_mib": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "size_mib": { "$ref": "#/$defs/mebibytes" },
+            "free_mib": false
+          },
+          "required": ["size_mib"]
+        }
+      ]
+    },
+    "scalar": {
+      "title": "Scalar",
+      "description": "A fact value.",
+      "type": ["string", "integer", "boolean"]
+    },
+    "factOperand": {
+      "title": "FactOperand",
+      "description": "A literal, or the value of another fact in the same scope.",
+      "anyOf": [
+        { "$ref": "#/$defs/scalar" },
+        {
+          "type": "object",
+          "properties": { "fact": { "$ref": "#/$defs/name" } },
+          "required": ["fact"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "scalarList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/scalar" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "factTest": {
+      "title": "FactTest",
+      "description": "Exactly one comparison.",
+      "oneOf": [
+        { "type": "object", "properties": { "eq": { "$ref": "#/$defs/factOperand" } }, "required": ["eq"], "additionalProperties": false },
+        { "type": "object", "properties": { "ne": { "$ref": "#/$defs/factOperand" } }, "required": ["ne"], "additionalProperties": false },
+        { "type": "object", "properties": { "ge": { "$ref": "#/$defs/factOperand" } }, "required": ["ge"], "additionalProperties": false },
+        { "type": "object", "properties": { "gt": { "$ref": "#/$defs/factOperand" } }, "required": ["gt"], "additionalProperties": false },
+        { "type": "object", "properties": { "le": { "$ref": "#/$defs/factOperand" } }, "required": ["le"], "additionalProperties": false },
+        { "type": "object", "properties": { "lt": { "$ref": "#/$defs/factOperand" } }, "required": ["lt"], "additionalProperties": false },
+        { "type": "object", "properties": { "in": { "$ref": "#/$defs/scalarList" } }, "required": ["in"], "additionalProperties": false },
+        { "type": "object", "properties": { "has": { "$ref": "#/$defs/scalar" } }, "required": ["has"], "additionalProperties": false },
+        { "type": "object", "properties": { "has_any": { "$ref": "#/$defs/scalarList" } }, "required": ["has_any"], "additionalProperties": false }
+      ]
+    },
+    "predicate": {
+      "title": "Predicate",
+      "description": "Boolean expression over facts: exactly one of `all`, `any`, `not`, or a\nfact name mapped to a test.\n\n@example { \"arch\": { \"in\": [\"aarch64\", \"x86_64\"] } }\n@example { \"all\": [{ \"memory_mib\": { \"ge\": 6144 } }, { \"host_arch\": { \"eq\": { \"fact\": \"arch\" } } }] }",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": { "all": { "type": "array", "items": { "$ref": "#/$defs/predicate" }, "minItems": 1 } },
+          "required": ["all"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": { "any": { "type": "array", "items": { "$ref": "#/$defs/predicate" }, "minItems": 1 } },
+          "required": ["any"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": { "not": { "$ref": "#/$defs/predicate" } },
+          "required": ["not"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/name", "not": { "enum": ["all", "any", "not"] } },
+          "additionalProperties": { "$ref": "#/$defs/factTest" },
+          "minProperties": 1,
+          "maxProperties": 1
+        }
+      ]
+    },
+    "alternatives": {
+      "title": "Alternatives",
+      "description": "Ordered alternatives: the first one in the selected set, else the first\nwhose constraints hold. At least two entries.",
+      "type": "object",
+      "properties": {
+        "first": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/name" },
+          "minItems": 2,
+          "uniqueItems": true
+        }
+      },
+      "required": ["first"],
+      "additionalProperties": false
+    },
+    "reference": {
+      "title": "Reference",
+      "description": "A package, a capability, or ordered alternatives.",
+      "anyOf": [{ "$ref": "#/$defs/name" }, { "$ref": "#/$defs/alternatives" }]
+    },
+    "config": {
+      "title": "Config",
+      "description": "Settings required of a configurable provider. For `linux`, Kconfig options\nsuch as `{ \"CONFIG_9P_FS\": \"y\" }`.",
+      "type": "object",
+      "propertyNames": { "type": "string", "pattern": "^[A-Za-z0-9_]+$" },
+      "additionalProperties": { "type": "string", "minLength": 1 },
+      "minProperties": 1
+    },
+    "configuredReference": {
+      "title": "ConfiguredReference",
+      "description": "A dependency that requires config of its provider.\nOPEN(10): `package` also holds capabilities, as in `{ \"package\": \"linux\" }`.",
+      "type": "object",
+      "properties": {
+        "package": { "$ref": "#/$defs/name" },
+        "config": { "$ref": "#/$defs/config" }
+      },
+      "required": ["package", "config"],
+      "additionalProperties": false
+    },
+    "conditionalReference": {
+      "title": "ConditionalReference",
+      "description": "A run dependency that applies only where `when` holds, requires `config`,\nor both. At least one of the two is present.",
+      "type": "object",
+      "properties": {
+        "package": { "$ref": "#/$defs/name" },
+        "when": { "$ref": "#/$defs/predicate" },
+        "config": { "$ref": "#/$defs/config" }
+      },
+      "required": ["package"],
+      "anyOf": [{ "required": ["when"] }, { "required": ["config"] }],
+      "additionalProperties": false
+    },
+    "builderTool": {
+      "title": "BuilderTool",
+      "description": "A program from the builder image's tool manifest, such as `builder:python3`.",
+      "type": "string",
+      "pattern": "^builder:[a-z0-9][a-z0-9._+-]*$",
+      "tsType": "`builder:${string}`"
+    }
+  }
+}

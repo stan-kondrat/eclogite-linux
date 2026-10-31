@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Configuration",
+  "description": "One complete input: a system and every catalog object it may refer to.\nEach array entry is exactly what a catalog file holds on its own.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.config/v0.1"
+    },
+    "system": {
+      "$ref": "system.schema.json"
+    },
+    "machines": {
+      "type": "array",
+      "items": {
+        "$ref": "machine.schema.json"
+      }
+    },
+    "software": {
+      "type": "array",
+      "items": {
+        "$ref": "software.schema.json"
+      }
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "$ref": "platform.schema.json"
+      }
+    },
+    "abis": {
+      "type": "array",
+      "items": {
+        "$ref": "abi.schema.json"
+      }
+    },
+    "toolchains": {
+      "type": "array",
+      "items": {
+        "$ref": "toolchain.schema.json"
+      }
+    },
+    "packages": {
+      "description": "Buildable packages and meta-packages, in one namespace.",
+      "type": "array",
+      "items": {
+        "$ref": "package.schema.json"
+      }
+    },
+    "facts": {
+      "$ref": "facts.schema.json"
+    },
+    "devices": {
+      "$ref": "devices.schema.json"
+    },
+    "defaults": {
+      "$ref": "defaults.schema.json"
+    }
+  },
+  "required": [
+    "schema",
+    "system",
+    "machines",
+    "software",
+    "platforms",
+    "abis",
+    "toolchains",
+    "packages",
+    "facts",
+    "devices",
+    "defaults"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "inputDocument": {
+      "title": "InputDocument",
+      "description": "Any document the CLI accepts, selected by its `schema` field.",
+      "oneOf": [
+        {
+          "$ref": "#"
+        },
+        {
+          "$ref": "system.schema.json"
+        },
+        {
+          "$ref": "machine.schema.json"
+        },
+        {
+          "$ref": "software.schema.json"
+        },
+        {
+          "$ref": "platform.schema.json"
+        },
+        {
+          "$ref": "abi.schema.json"
+        },
+        {
+          "$ref": "toolchain.schema.json"
+        },
+        {
+          "$ref": "package.schema.json"
+        },
+        {
+          "$ref": "facts.schema.json"
+        },
+        {
+          "$ref": "devices.schema.json"
+        },
+        {
+          "$ref": "defaults.schema.json"
+        }
+      ]
+    }
+  }
+}

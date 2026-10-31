@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.machine/v1",
+  "schema": "eclogite.machine/v0.1",
   "name": "qemu-q35-x86_64",
   "aliases": ["qemu-x86_64", "x86_64-vm"],
   "platform": "x86_64",
@@ -19,6 +19,8 @@
     "kernel_arguments": ["root=/dev/vda", "ro", "console=ttyS0"]
   },
   "devices": [
+    { "kind": "serial", "model": "16550a" },
+    { "kind": "rtc", "model": "cmos-rtc" },
     { "kind": "block", "model": "virtio-blk-pci" },
     { "kind": "network", "model": "virtio-net-pci" },
     { "kind": "shared-directory", "model": "virtio-9p-pci", "optional": true }

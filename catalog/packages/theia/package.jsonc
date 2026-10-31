@@ -1,0 +1,121 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "theia",
+  "version": "1.76.0",
+  // Eclipse Theia browser example application, its offline npm dependencies
+  // and plugins, and the runit service that starts it at boot.
+  "source": {
+    "type": "git",
+    "url": "https://github.com/eclipse-theia/theia.git",
+    "revision": "3980769cc0ccf74ccac5a5a995f41dce3773d759"
+  },
+  // Fixed-output fetch phase: everything the build would download, fetched
+  // once with network access and pinned by output hash, so the build runs
+  // offline. hooks/fetch.sh fills an npm cache for package-lock.json (2,253
+  // packages) and downloads the 100 plugins from package.json theiaPlugins.
+  "fetch": {
+    // the parts of the source that determine what is downloaded
+    "inputs": ["package-lock.json", "package.json#theiaPlugins"],
+    "hook": "fetch",
+    // Prebuilt platform packages differ per architecture, so each target
+    // platform has its own output. Placeholders until the first fetch:
+    // eclogite lock --update-fetch theia
+    "output_sha256": {
+      "arm64": "pending",
+      "x86_64": "pending"
+    }
+  },
+  "compatible": {
+    // esbuild, ripgrep and @parcel/watcher ship prebuilt binaries that the
+    // fetch downloads for aarch64 and x86_64 only
+    "target": { "arch": { "in": ["aarch64", "x86_64"] } },
+    "build": {
+      "all": [
+        // TypeScript compile and webpack bundle (measured in theia-vm)
+        { "memory_mib": { "ge": 6144 } },
+        // npm workspaces run the fetched prebuilt tools during the build:
+        // they must match both the build host and the target
+        { "host_arch": { "eq": { "fact": "arch" } } }
+      ]
+    },
+    "machine": {
+      "all": [
+        // Estimate for the backend plus 100 plugins; theia-vm ran in 8 GiB
+        { "memory_mib": { "ge": 2048 } },
+        { "devices": { "has": "network" } },
+        // the workspace lives on the VM bundle's share/ directory: host-share
+        { "devices": { "has": "shared-directory" } }
+      ]
+    }
+  },
+  "builder": "npm-workspace",
+  "dependencies": {
+    "build": [
+      "builder:node",       // npm, lerna, theia CLI; also runs the fetch
+      "builder:python3",    // node-gyp
+      "builder:gcc",        // node-pty and drivelist native addons
+      "builder:make"
+    ],
+    // native addons link libstdc++
+    "link": ["libc", "c++-runtime"],
+    // the init supervises the service; the workspace is on host-share
+    "run": [
+      "nodejs", "libc", "c++-runtime", "init", "host-share",
+      // @parcel/watcher watches the workspace with inotify on Linux
+      { "package": "linux", "when": { "os": { "eq": "linux" } },
+        "config": { "CONFIG_INOTIFY_USER": "y" } }
+    ]
+  },
+  "services": {
+    // Port 3000 on all interfaces: open http://<guest address>:3000. The
+    // workspace is the VM bundle's share/ directory; without it the service
+    // waits instead of starting empty.
+    "theia": {
+      "run": [
+        "node", "-r", "/opt/theia/lib/keytar-stub.js", "lib/backend/main.js",
+        "/mnt/shared/workspace",
+        "--hostname=0.0.0.0", "--port=3000", "--log-config=log-config.json",
+        "--plugins=local-dir:/opt/theia/plugins",
+        "--ovsx-router-config=../ovsx-router-config.json"
+      ],
+      "directory": "/opt/theia/examples/browser",
+      "requires_mounts": ["/mnt/shared"],
+      "create_directories": ["/mnt/shared/workspace"]
+    }
+  },
+  "tests": {
+    "http-3000": {
+      // The backend loads 100 plugins before it answers
+      "timeout_seconds": 180
+    }
+  },
+  "arguments": {
+    "application": "examples/browser",
+    "install_prefix": "/opt/theia",
+    // Run in order, offline; each one is resumable
+    "hooks": {
+      "build": ["npm-ci", "compile"],
+      "install": ["bundle", "plugins"]
+    },
+    "environment": {
+      "PUPPETEER_SKIP_DOWNLOAD": "1",
+      "NODE_OPTIONS": "--max-old-space-size=6144",
+      // No Nx daemon or SQLite DB in a build; the DB also fails on 9p
+      "NX_DAEMON": "false",
+      "NX_DISABLE_DB": "true"
+    },
+    // hooks/npm-ci.sh rebuilds only the addons marked "build"
+    "native_addons": {
+      "node-pty": "build",
+      "drivelist": "build",
+      // needs libsecret, which is not packaged: in-memory stub, saved
+      // secrets are lost on restart
+      "keytar": "stub",
+      // used only by @theia/electron
+      "native-keymap": "skip"
+    },
+    "files": {
+      "files/keytar-stub.js": "/opt/theia/lib/keytar-stub.js"
+    }
+  }
+}

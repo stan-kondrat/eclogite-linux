@@ -1,0 +1,1631 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CompileResult",
+  "description": "The result of `eclogite lock`: a compiled system, or why it cannot be.\n\nA compiled system is a reproducible build recipe. Building the same\ncompiled document twice, on any host of the same build architecture,\nproduces bit-identical packages and images. So nothing in it floats: there\nis no `latest`, no `pending` fetch hash and no `unreleased` toolchain; every\nsource is a full revision and every input is identified by its content\nhash; every setting that can change an output is recorded. A value that\ncannot be pinned is a compile error, not a field to fill in later.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/compiledSystem"
+    },
+    {
+      "$ref": "#/$defs/compileFailure"
+    }
+  ],
+  "$defs": {
+    "compiledSystem": {
+      "title": "CompiledSystem",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "description": "OPEN(2): reserved name; defined in Milestone 3.",
+          "const": "eclogite.lock/v0.1"
+        },
+        "input_sha256": {
+          "description": "Hash of every input that took part, in canonical form. `build` fails\nwhen the current inputs no longer match it. Milestone 3.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "system": {
+          "description": "The system file and where each referenced object came from.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "common.schema.json#/$defs/name"
+            },
+            "origin": {
+              "description": "Where the system file itself was read from.",
+              "$ref": "#/$defs/origin"
+            },
+            "machine": {
+              "$ref": "#/$defs/origin"
+            },
+            "software": {
+              "$ref": "#/$defs/origin"
+            }
+          },
+          "required": [
+            "name",
+            "origin",
+            "machine",
+            "software"
+          ],
+          "additionalProperties": false
+        },
+        "machine": {
+          "description": "The machine with `extends` merged; `aliases` and `extends` removed.",
+          "$ref": "#/$defs/resolvedMachine"
+        },
+        "software": {
+          "description": "The software profile as written, without `aliases`.",
+          "type": "object",
+          "properties": {
+            "schema": {
+              "$ref": "software.schema.json#/properties/schema"
+            },
+            "name": {
+              "$ref": "software.schema.json#/properties/name"
+            },
+            "abi": {
+              "$ref": "software.schema.json#/properties/abi"
+            },
+            "compiler": {
+              "$ref": "software.schema.json#/properties/compiler"
+            },
+            "packages": {
+              "$ref": "software.schema.json#/properties/packages"
+            },
+            "providers": {
+              "$ref": "software.schema.json#/properties/providers"
+            },
+            "settings": {
+              "$ref": "software.schema.json#/properties/settings"
+            },
+            "parameters": {
+              "$ref": "software.schema.json#/properties/parameters"
+            },
+            "root": {
+              "$ref": "software.schema.json#/properties/root"
+            },
+            "image": {
+              "$ref": "software.schema.json#/properties/image"
+            },
+            "volumes": {
+              "$ref": "software.schema.json#/properties/volumes"
+            },
+            "state": {
+              "$ref": "software.schema.json#/properties/state"
+            },
+            "users": {
+              "$ref": "software.schema.json#/properties/users"
+            },
+            "groups": {
+              "$ref": "software.schema.json#/properties/groups"
+            },
+            "service_overrides": {
+              "$ref": "software.schema.json#/properties/service_overrides"
+            },
+            "endpoints": {
+              "$ref": "software.schema.json#/properties/endpoints"
+            },
+            "commands": {
+              "$ref": "software.schema.json#/properties/commands"
+            },
+            "evidence": {
+              "$ref": "software.schema.json#/properties/evidence"
+            }
+          },
+          "required": [
+            "schema",
+            "name",
+            "packages",
+            "root",
+            "image"
+          ],
+          "additionalProperties": false
+        },
+        "platform": {
+          "$ref": "platform.schema.json"
+        },
+        "abi": {
+          "$ref": "abi.schema.json"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "facts": {
+          "description": "Fact values that `compatible`, `variants` and `when` were evaluated with.",
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/factValue"
+              }
+            },
+            "machine": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/factValue"
+              }
+            }
+          },
+          "required": [
+            "target",
+            "machine"
+          ],
+          "additionalProperties": false
+        },
+        "compiler": {
+          "description": "The system compiler and where it was set.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "common.schema.json#/$defs/compiler"
+            },
+            "from": {
+              "$ref": "#/$defs/settingSource"
+            }
+          },
+          "required": [
+            "name",
+            "from"
+          ],
+          "additionalProperties": false
+        },
+        "build_environment": {
+          "description": "The same for every build of this system, whatever the host.",
+          "$ref": "#/$defs/buildEnvironment"
+        },
+        "choices": {
+          "description": "One provider per capability, for every capability anything in the closure provides.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/choice"
+          }
+        },
+        "closure": {
+          "description": "Installed packages, in visit order: depth-first along run dependencies\nfrom each `software.packages` entry. Meta-packages are included.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/compiledPackage"
+          }
+        },
+        "selected_by": {
+          "description": "Why each package of the closure and of `build_only` is there: the chain\nfrom the software profile, such as\n`[\"software\", \"reference-system\", \"network\", \"dhcpcd\"]`.\n`eclogite why` prints it.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "build_only": {
+          "description": "Packages that are built but not installed, because something needs them\nonly to build (such as gnulib). They are pinned like the closure.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/compiledBuildablePackage"
+          }
+        },
+        "build_order": {
+          "description": "Buildable packages in topological order of build and link dependencies,\nincluding build-only packages that are not in the closure. Ties are\nbroken by name, so the order is byte-stable.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/packageName"
+          }
+        },
+        "conditions": {
+          "description": "Every conditional run dependency that was evaluated, and whether it held.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conditionResult"
+          }
+        },
+        "config": {
+          "description": "Per configurable package: every required option with its source, and the effective config.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/compiledConfig"
+          }
+        },
+        "owned_files": {
+          "description": "Capability-owned files installed by the image step, keyed by guest path.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/ownedFile"
+          }
+        },
+        "services": {
+          "description": "Every service the image step generates for the init system.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/compiledService"
+          }
+        },
+        "accounts": {
+          "description": "Every account of the packages and the software profile. `files` says\nwhether the image step writes /etc/passwd, /etc/group and /etc/shadow,\nor whether they link into /run and init completes them at each start\nbecause an account has a start-time field.",
+          "type": "object",
+          "properties": {
+            "users": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/compiledUser"
+              }
+            },
+            "groups": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/compiledGroup"
+              }
+            },
+            "files": {
+              "enum": [
+                "image",
+                "start"
+              ]
+            }
+          },
+          "required": [
+            "users",
+            "groups",
+            "files"
+          ],
+          "additionalProperties": false
+        },
+        "runtime": {
+          "description": "What the runner does at start time.",
+          "$ref": "#/$defs/runtime"
+        },
+        "mounts": {
+          "description": "The /etc/fstab entries, keyed by mount point: the root, the software's\n`tmpfs` entries, the volumes and every package's `mounts`.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/compiledMount"
+          }
+        },
+        "tests": {
+          "description": "Built-in checks and every package test whose `when` holds, in run order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/compiledTest"
+          }
+        },
+        "images": {
+          "type": "object",
+          "properties": {
+            "root": {
+              "$ref": "#/$defs/compiledImage"
+            },
+            "volumes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/compiledVolume"
+              }
+            }
+          },
+          "required": [
+            "root",
+            "volumes"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema",
+        "input_sha256",
+        "system",
+        "machine",
+        "software",
+        "platform",
+        "abi",
+        "target",
+        "facts",
+        "compiler",
+        "build_environment",
+        "choices",
+        "closure",
+        "selected_by",
+        "build_only",
+        "build_order",
+        "conditions",
+        "config",
+        "owned_files",
+        "services",
+        "accounts",
+        "runtime",
+        "mounts",
+        "tests",
+        "images"
+      ],
+      "additionalProperties": false
+    },
+    "origin": {
+      "title": "Origin",
+      "description": "Where a referenced object was found.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The canonical name.",
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "alias": {
+          "description": "The alias the reference used, if any. Aliases are not build identity.",
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "defined_in": {
+          "description": "A catalog (`catalog:<name>`) or a file path relative to the system file.",
+          "type": "string",
+          "minLength": 1
+        },
+        "document_sha256": {
+          "description": "Hash of the document as parsed into the typed model. Milestone 3.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "required": [
+        "name",
+        "defined_in",
+        "document_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "settingSource": {
+      "title": "SettingSource",
+      "description": "Where a setting came from.",
+      "enum": [
+        "system",
+        "software",
+        "defaults"
+      ]
+    },
+    "factValue": {
+      "title": "FactValue",
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/scalar"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/scalar"
+          }
+        },
+        {
+          "const": "unbounded"
+        }
+      ]
+    },
+    "resolvedMachine": {
+      "title": "ResolvedMachine",
+      "description": "A complete machine with `extends` merged, as resolution uses it.",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/schema"
+        },
+        "name": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/name"
+        },
+        "status": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/status"
+        },
+        "platform": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/platform"
+        },
+        "resources": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/resources"
+        },
+        "runtime": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/runtime"
+        },
+        "boot": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/boot"
+        },
+        "gpio": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/gpio"
+        },
+        "devices": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/devices"
+        },
+        "limitations": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/limitations"
+        },
+        "references": {
+          "$ref": "machine.schema.json#/$defs/complete/properties/references"
+        },
+        "merged_from": {
+          "description": "The machine chain this was merged from, base last.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/name"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema",
+        "name",
+        "platform",
+        "resources",
+        "runtime",
+        "boot",
+        "devices",
+        "merged_from"
+      ],
+      "additionalProperties": false
+    },
+    "target": {
+      "title": "Target",
+      "type": "object",
+      "properties": {
+        "platform": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "abi": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "abi_from": {
+          "$ref": "#/$defs/settingSource"
+        },
+        "triplet": {
+          "description": "Such as `aarch64-linux-gnu`.",
+          "type": "string",
+          "pattern": "^[a-z0-9_]+(-[a-z0-9_]+){2,3}$"
+        },
+        "toolchain": {
+          "$ref": "#/$defs/toolchainIdentity"
+        }
+      },
+      "required": [
+        "platform",
+        "abi",
+        "abi_from",
+        "triplet",
+        "toolchain"
+      ],
+      "additionalProperties": false
+    },
+    "buildEnvironment": {
+      "title": "BuildEnvironment",
+      "description": "Everything about a build that is not a declared input but could still\nchange its output. Builders run with exactly this and nothing from the host.",
+      "type": "object",
+      "properties": {
+        "source_date_epoch": {
+          "description": "SOURCE_DATE_EPOCH for every build, and the time every file in the images\nis clamped to. It is chosen once, when the system is compiled.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "variables": {
+          "description": "The whole environment of every builder, before the package's own\n`environment` and the builder variables (CC, DESTDIR, …) are added.\n@example { \"LC_ALL\": \"C.UTF-8\", \"TZ\": \"UTC\", \"SOURCE_DATE_EPOCH\": \"1793059200\" }",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "umask": {
+          "description": "Such as `0022`.",
+          "type": "string",
+          "pattern": "^0[0-7]{3}$"
+        },
+        "build_directory": {
+          "description": "Every package is built in this directory, so no host path is compiled in.",
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "user": {
+          "description": "The builder user, the same for every build.",
+          "type": "object",
+          "properties": {
+            "uid": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "gid": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "uid",
+            "gid"
+          ],
+          "additionalProperties": false
+        },
+        "hostname": {
+          "type": "string",
+          "minLength": 1
+        },
+        "network": {
+          "description": "Builds never have network access; only `fetch` phases do, and they are pinned.",
+          "const": "none"
+        },
+        "jobs": {
+          "description": "Parallel jobs are not an input: a package whose output depends on them\nis not reproducible.",
+          "const": "not an input"
+        }
+      },
+      "required": [
+        "source_date_epoch",
+        "variables",
+        "umask",
+        "build_directory",
+        "user",
+        "hostname",
+        "network",
+        "jobs"
+      ],
+      "additionalProperties": false
+    },
+    "toolchainIdentity": {
+      "title": "ToolchainIdentity",
+      "description": "The builder image and target toolchain artifact used for every build.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "release": {
+          "description": "A published release; a toolchain without one cannot be compiled against.",
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "const": "unreleased"
+          }
+        },
+        "host": {
+          "description": "Build host architecture, such as `aarch64`. Layers are never shared across hosts.",
+          "type": "string",
+          "minLength": 1
+        },
+        "builder_image_sha256": {
+          "description": "The dev image booted as the builder VM. Milestone 3.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "target_sha256": {
+          "description": "The target toolchain mounted at /opt/eclogite/toolchains/<triplet>. Milestone 3.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "required": [
+        "name",
+        "release",
+        "host",
+        "builder_image_sha256",
+        "target_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "choice": {
+      "title": "Choice",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "reason": {
+          "$ref": "#/$defs/choiceReason"
+        },
+        "via": {
+          "description": "For `already chosen`: the capability the provider was chosen for first.",
+          "$ref": "common.schema.json#/$defs/capability"
+        },
+        "reference": {
+          "description": "For `default` or an alternative: the reference that was resolved.",
+          "$ref": "common.schema.json#/$defs/reference"
+        }
+      },
+      "required": [
+        "provider",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "choiceReason": {
+      "title": "ChoiceReason",
+      "description": "Why a provider was chosen, in resolution order (docs/resolution.md, step 3).\nThe golden files write `override` for both overrides; here they are told\napart.",
+      "enum": [
+        "system override",
+        "software override",
+        "selected",
+        "already chosen",
+        "default"
+      ]
+    },
+    "conditionResult": {
+      "title": "ConditionResult",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "The package whose run dependency this is, or `software`.",
+          "anyOf": [
+            {
+              "$ref": "common.schema.json#/$defs/packageName"
+            },
+            {
+              "const": "software"
+            }
+          ]
+        },
+        "dependency": {
+          "description": "The package or capability the entry names.",
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "when": {
+          "$ref": "common.schema.json#/$defs/predicate"
+        },
+        "held": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "from",
+        "dependency",
+        "when",
+        "held"
+      ],
+      "additionalProperties": false
+    },
+    "compiledPackage": {
+      "title": "CompiledPackage",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/compiledBuildablePackage"
+        },
+        {
+          "$ref": "#/$defs/compiledMetaPackage"
+        }
+      ]
+    },
+    "compiledMetaPackage": {
+      "title": "CompiledMetaPackage",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "provides": {
+          "description": "Capabilities the package provides; only some may be chosen.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/capability"
+          }
+        },
+        "kind": {
+          "const": "meta"
+        },
+        "run": {
+          "description": "Run dependencies that applied, resolved to packages.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resolvedDependency"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "provides",
+        "kind",
+        "run"
+      ],
+      "additionalProperties": false
+    },
+    "compiledBuildablePackage": {
+      "title": "CompiledBuildablePackage",
+      "description": "A compiled package depends only on its target, compiler and providers,\nnever on the system that selected it, so systems for the same target\nshare these entries; why a system selected a package is in its\n`selected_by`.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "provides": {
+          "description": "Capabilities the package provides; only some may be chosen.",
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/capability"
+          }
+        },
+        "kind": {
+          "const": "buildable"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "description": "As written; a git source always has its full revision.",
+          "$ref": "package.schema.json#/$defs/source"
+        },
+        "source_tree_sha256": {
+          "description": "Hash of the prepared source tree: the checkout at `source.revision` with\n`patches` applied, file times and owners normalized. It does not depend\non how the source was fetched. Absent for a source of type `none`.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "builder": {
+          "$ref": "package.schema.json#/$defs/builderName"
+        },
+        "compiler": {
+          "description": "Absent for builders that compile nothing (`files`, `source-tree`).",
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "common.schema.json#/$defs/compiler"
+            },
+            "reason": {
+              "description": "`system`: the system compiler; `fallback`: the first one its `compatible.build` allows.",
+              "enum": [
+                "system",
+                "fallback"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "arguments": {
+          "description": "`arguments` with the variants that held merged in. The shape is the\nbuilder's arguments type; CommonArguments is the part every builder\nshares.",
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "builders/common.schema.json#/$defs/common"
+            }
+          ],
+          "additionalProperties": true
+        },
+        "variants_applied": {
+          "description": "Indexes into the package's `variants` that held.",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "parameters": {
+          "description": "Build-time parameters with the value they got. Start-time parameters are\nin `runtime.values`, because they never enter the key.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "$ref": "common.schema.json#/$defs/value"
+              },
+              "value": {
+                "$ref": "common.schema.json#/$defs/scalar"
+              }
+            },
+            "required": [
+              "from",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "build": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/resolvedDependency"
+                  },
+                  {
+                    "$ref": "#/$defs/resolvedBuilderTool"
+                  }
+                ]
+              }
+            },
+            "link": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/resolvedDependency"
+              }
+            },
+            "run": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/resolvedDependency"
+              }
+            }
+          },
+          "required": [
+            "build",
+            "link",
+            "run"
+          ],
+          "additionalProperties": false
+        },
+        "fetch": {
+          "description": "With the fetch output hash for this target, if the package has a fetch phase.",
+          "type": "object",
+          "properties": {
+            "hook": {
+              "$ref": "common.schema.json#/$defs/name"
+            },
+            "output_sha256": {
+              "$ref": "common.schema.json#/$defs/sha256"
+            }
+          },
+          "required": [
+            "hook",
+            "output_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "hashes": {
+          "description": "Content hashes of everything from the package directory that enters the key. Milestone 3.",
+          "type": "object",
+          "properties": {
+            "patches": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "$ref": "common.schema.json#/$defs/sha256"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "hooks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "common.schema.json#/$defs/name"
+                  },
+                  "sha256": {
+                    "$ref": "common.schema.json#/$defs/sha256"
+                  }
+                },
+                "required": [
+                  "name",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "$ref": "common.schema.json#/$defs/sha256"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "builder": {
+              "$ref": "common.schema.json#/$defs/sha256"
+            }
+          },
+          "required": [
+            "patches",
+            "hooks",
+            "files",
+            "builder"
+          ],
+          "additionalProperties": false
+        },
+        "key": {
+          "description": "The package's build key: recipe, source, patches, hooks, builder,\narguments, parameters, platform, toolchain, compiler, its own config,\nand the keys of its build and link dependencies, and the build\nenvironment. Milestone 3.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "output_sha256": {
+          "description": "Hash of the normalized output, recorded by the first build of `key`\n(locally or as a published layer). Every later build of the same key\nmust produce it; a different output is a reproducibility failure, not a\nnew version. Absent until the package has been built once.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "required": [
+        "name",
+        "provides",
+        "kind",
+        "version",
+        "source",
+        "builder",
+        "arguments",
+        "variants_applied",
+        "parameters",
+        "dependencies",
+        "hashes",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "resolvedDependency": {
+      "title": "ResolvedDependency",
+      "description": "A dependency entry and what it resolved to.",
+      "type": "object",
+      "properties": {
+        "reference": {
+          "description": "The entry as written: a package, a capability or alternatives.",
+          "$ref": "common.schema.json#/$defs/reference"
+        },
+        "package": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "capability": {
+          "description": "Set when the reference was a capability.",
+          "$ref": "common.schema.json#/$defs/capability"
+        },
+        "config": {
+          "description": "Config this entry required of the provider.",
+          "$ref": "common.schema.json#/$defs/config"
+        }
+      },
+      "required": [
+        "reference",
+        "package"
+      ],
+      "additionalProperties": false
+    },
+    "resolvedBuilderTool": {
+      "title": "ResolvedBuilderTool",
+      "description": "A `builder:<tool>` entry checked against the toolchain's tool manifest.",
+      "type": "object",
+      "properties": {
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "$ref": "common.schema.json#/$defs/gitRevision"
+        }
+      },
+      "required": [
+        "tool"
+      ],
+      "additionalProperties": false
+    },
+    "compiledConfig": {
+      "title": "CompiledConfig",
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "kconfig"
+        },
+        "required": {
+          "description": "Every option something required or implied, with its value and source.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source": {
+                "$ref": "#/$defs/configSource"
+              }
+            },
+            "required": [
+              "value",
+              "source"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "effective": {
+          "description": "Every declared option: its default, overridden by `required`.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "format",
+        "required",
+        "effective"
+      ],
+      "additionalProperties": false
+    },
+    "configSource": {
+      "title": "ConfigSource",
+      "description": "Where a config requirement came from (docs/resolution.md, step 7).\nThe golden files write these as strings: `host-share`, `device pl031`,\n`implied by CONFIG_9P_FS`.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "dependency"
+            },
+            "package": {
+              "$ref": "common.schema.json#/$defs/packageName"
+            }
+          },
+          "required": [
+            "kind",
+            "package"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "software"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "device"
+            },
+            "model": {
+              "$ref": "common.schema.json#/$defs/name"
+            },
+            "device_kind": {
+              "$ref": "machine.schema.json#/$defs/deviceKind"
+            }
+          },
+          "required": [
+            "kind",
+            "model",
+            "device_kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "implied"
+            },
+            "option": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "option"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ownedFile": {
+      "title": "OwnedFile",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "capability": {
+          "$ref": "common.schema.json#/$defs/capability"
+        },
+        "type": {
+          "enum": [
+            "symlink",
+            "file"
+          ]
+        },
+        "target": {
+          "description": "Symlink target, or the package file copied.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "provider",
+        "capability",
+        "type",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "compiledService": {
+      "title": "CompiledService",
+      "description": "A service with its owner. Build-time parameters are expanded; start-time\nones stay as `${NAME}` and are listed in `runtime.values`.",
+      "type": "object",
+      "properties": {
+        "run": {
+          "$ref": "package.schema.json#/$defs/service/properties/run"
+        },
+        "directory": {
+          "$ref": "package.schema.json#/$defs/service/properties/directory"
+        },
+        "environment": {
+          "$ref": "package.schema.json#/$defs/service/properties/environment"
+        },
+        "stdin": {
+          "$ref": "package.schema.json#/$defs/service/properties/stdin"
+        },
+        "requires_mounts": {
+          "$ref": "package.schema.json#/$defs/service/properties/requires_mounts"
+        },
+        "create_directories": {
+          "$ref": "package.schema.json#/$defs/service/properties/create_directories"
+        },
+        "user": {
+          "$ref": "package.schema.json#/$defs/service/properties/user"
+        },
+        "group": {
+          "$ref": "package.schema.json#/$defs/service/properties/group"
+        },
+        "log": {
+          "$ref": "package.schema.json#/$defs/service/properties/log"
+        },
+        "restart_delay_seconds": {
+          "$ref": "package.schema.json#/$defs/service/properties/restart_delay_seconds"
+        },
+        "package": {
+          "$ref": "common.schema.json#/$defs/packageName"
+        },
+        "capability": {
+          "description": "Set when the service is owned through a capability.",
+          "$ref": "common.schema.json#/$defs/capability"
+        },
+        "overridden": {
+          "description": "The fields the software profile's `service_overrides` replaced.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "run",
+        "package"
+      ],
+      "additionalProperties": false
+    },
+    "compiledMount": {
+      "title": "CompiledMount",
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "package.schema.json#/$defs/mount/properties/type"
+        },
+        "source": {
+          "$ref": "package.schema.json#/$defs/mount/properties/source"
+        },
+        "options": {
+          "$ref": "package.schema.json#/$defs/mount/properties/options"
+        },
+        "optional": {
+          "$ref": "package.schema.json#/$defs/mount/properties/optional"
+        },
+        "from": {
+          "description": "The package that declared it, or where the software profile or runner did.",
+          "anyOf": [
+            {
+              "$ref": "common.schema.json#/$defs/packageName"
+            },
+            {
+              "enum": [
+                "software.root",
+                "software.tmpfs",
+                "software.volumes",
+                "software.state",
+                "runtime.config"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "source",
+        "from"
+      ],
+      "additionalProperties": false
+    },
+    "compiledUser": {
+      "title": "CompiledUser",
+      "description": "An account with the package or profile that declared it.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "package.schema.json#/$defs/user/properties/name"
+        },
+        "uid": {
+          "description": "Allocated when the input gave none; a start-time uid stays `${NAME}`.",
+          "$ref": "package.schema.json#/$defs/accountId"
+        },
+        "group": {
+          "$ref": "package.schema.json#/$defs/user/properties/group"
+        },
+        "gid": {
+          "$ref": "package.schema.json#/$defs/user/properties/gid"
+        },
+        "groups": {
+          "$ref": "package.schema.json#/$defs/user/properties/groups"
+        },
+        "home": {
+          "$ref": "package.schema.json#/$defs/user/properties/home"
+        },
+        "shell": {
+          "$ref": "package.schema.json#/$defs/user/properties/shell"
+        },
+        "password": {
+          "$ref": "package.schema.json#/$defs/user/properties/password"
+        },
+        "description": {
+          "$ref": "package.schema.json#/$defs/user/properties/description"
+        },
+        "from": {
+          "description": "The package or profile that declared it.",
+          "anyOf": [
+            {
+              "$ref": "common.schema.json#/$defs/packageName"
+            },
+            {
+              "const": "software"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "from",
+        "uid"
+      ],
+      "additionalProperties": false
+    },
+    "compiledGroup": {
+      "title": "CompiledGroup",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "package.schema.json#/$defs/group/properties/name"
+        },
+        "gid": {
+          "$ref": "package.schema.json#/$defs/accountId"
+        },
+        "from": {
+          "description": "The package or profile that declared it.",
+          "anyOf": [
+            {
+              "$ref": "common.schema.json#/$defs/packageName"
+            },
+            {
+              "const": "software"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "from",
+        "gid"
+      ],
+      "additionalProperties": false
+    },
+    "runtime": {
+      "title": "Runtime",
+      "description": "Everything the runner does when it starts the machine. None of it enters a\nbuild, a key or an image, so changing a setting never rebuilds.",
+      "type": "object",
+      "properties": {
+        "settings": {
+          "description": "The settings the person running the machine may change.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/variableName"
+          },
+          "additionalProperties": {
+            "$ref": "software.schema.json#/$defs/setting"
+          }
+        },
+        "values": {
+          "description": "Every start-time parameter, by the package or `software` that declared\nit. The runner computes them at each start.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "common.schema.json#/$defs/parameters"
+          }
+        },
+        "delivery": {
+          "description": "How start-time values reach the guest: the runner writes them to a small\nread-only disk at each start, and init mounts it here before it\ncompletes the accounts and the hostname and starts any service. Secret\nsettings are written only in derived form, such as a crypt hash.",
+          "type": "object",
+          "properties": {
+            "device": {
+              "const": "config-disk"
+            },
+            "mount": {
+              "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+            }
+          },
+          "required": [
+            "device",
+            "mount"
+          ],
+          "additionalProperties": false
+        },
+        "state": {
+          "type": "array",
+          "items": {
+            "$ref": "software.schema.json#/$defs/stateVolume"
+          }
+        },
+        "endpoints": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "software.schema.json#/$defs/endpoint"
+          }
+        },
+        "commands": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "software.schema.json#/$defs/runnerCommand"
+          }
+        }
+      },
+      "required": [
+        "settings",
+        "values",
+        "delivery",
+        "state",
+        "endpoints",
+        "commands"
+      ],
+      "additionalProperties": false
+    },
+    "compiledTest": {
+      "title": "CompiledTest",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "`boot-shell` and `shutdown` are built in; others are `package:test`.",
+          "type": "string",
+          "pattern": "^(boot-shell|shutdown|[a-z0-9][a-z0-9.+_-]*:[a-z0-9][a-z0-9.+_-]*)$",
+          "tsType": "\"boot-shell\" | \"shutdown\" | `${string}:${string}`"
+        },
+        "timeout_seconds": {
+          "$ref": "common.schema.json#/$defs/positiveInteger"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "compiledImage": {
+      "title": "CompiledImage",
+      "type": "object",
+      "properties": {
+        "format": {
+          "$ref": "software.schema.json#/$defs/filesystem"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "filesystem_uuid": {
+          "description": "The filesystem's UUID, derived from the image's inputs rather than drawn\nat random, so the same inputs make the same image.",
+          "$ref": "#/$defs/uuid"
+        },
+        "hash_seed": {
+          "description": "ext4's directory hash seed, derived the same way.",
+          "$ref": "#/$defs/uuid"
+        },
+        "size_mib": {
+          "description": "Absent until the outputs are composed; then the computed or fixed size.",
+          "$ref": "common.schema.json#/$defs/mebibytes"
+        },
+        "free_mib": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "strip": {
+          "type": "boolean"
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/guestPathPattern"
+          }
+        },
+        "output_sha256": {
+          "description": "Hash of the image file, recorded by its first build like a package's output.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "required": [
+        "format",
+        "readonly",
+        "filesystem_uuid",
+        "hash_seed",
+        "strip",
+        "exclude"
+      ],
+      "additionalProperties": false
+    },
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "compiledVolume": {
+      "title": "CompiledVolume",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "mount": {
+          "$ref": "common.schema.json#/$defs/absoluteGuestPath"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/packageName"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "mount",
+        "packages"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/compiledImageFields"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "compileFailure": {
+      "title": "CompileFailure",
+      "description": "Resolution stops at the first error; the golden files record it.",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "eclogite.lock/v0.1"
+        },
+        "machine": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "software": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "step": {
+              "description": "The step of docs/resolution.md that failed, 1 to 11.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 11
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            },
+            "chain": {
+              "description": "The selection chain that pulled in the failing package.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "location": {
+              "description": "File, line, column and JSON Pointer, when the error is in a document.",
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "$ref": "common.schema.json#/$defs/positiveInteger"
+                },
+                "column": {
+                  "$ref": "common.schema.json#/$defs/positiveInteger"
+                },
+                "pointer": {
+                  "$ref": "common.schema.json#/$defs/jsonPointer"
+                }
+              },
+              "required": [
+                "file",
+                "line",
+                "column",
+                "pointer"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "step",
+            "message",
+            "chain"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema",
+        "machine",
+        "software",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "compiledImageFields": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "$ref": "software.schema.json#/$defs/filesystem"
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "filesystem_uuid": {
+          "description": "The filesystem's UUID, derived from the image's inputs rather than drawn\nat random, so the same inputs make the same image.",
+          "$ref": "#/$defs/uuid"
+        },
+        "hash_seed": {
+          "description": "ext4's directory hash seed, derived the same way.",
+          "$ref": "#/$defs/uuid"
+        },
+        "size_mib": {
+          "description": "Absent until the outputs are composed; then the computed or fixed size.",
+          "$ref": "common.schema.json#/$defs/mebibytes"
+        },
+        "free_mib": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "strip": {
+          "type": "boolean"
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/guestPathPattern"
+          }
+        },
+        "output_sha256": {
+          "description": "Hash of the image file, recorded by its first build like a package's output.",
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "required": [
+        "format",
+        "readonly",
+        "filesystem_uuid",
+        "hash_seed",
+        "strip",
+        "exclude"
+      ]
+    }
+  }
+}

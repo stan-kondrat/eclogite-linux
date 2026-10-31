@@ -1,9 +1,16 @@
 {
-  "schema": "eclogite.platform/v1",
+  "schema": "eclogite.platform/v0.1",
   "name": "arm64",
   "architecture": "aarch64",
-  "abi": "linux-gnu",
-  "libc": "glibc",
-  "isa": "armv8-a-baseline",
+  // CPU part of the target triplet; the ABI document adds the rest
+  "triplet_cpu": "aarch64",
+  // Source of the target-scope facts (catalog/facts.jsonc)
+  "cpu": {
+    "isa": "armv8-a",
+    "bits": 64,
+    "endian": "little",
+    "features": ["fp", "asimd"],
+    "mmu": true
+  },
   "kernel_architecture": "arm64"
 }

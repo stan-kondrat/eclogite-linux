@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.machine/v1",
+  "schema": "eclogite.machine/v0.1",
   "name": "utm-virt-arm64",
   "aliases": ["utm-arm64", "arm64-utm"],
   "platform": "arm64",
@@ -28,12 +28,15 @@
     "kernel_arguments": ["root=/dev/vda", "ro", "console=ttyAMA0"]
   },
   "devices": [
+    { "kind": "serial", "model": "pl011" },
+    { "kind": "rtc", "model": "pl031" },
     { "kind": "block", "model": "virtio-blk-device" },
     { "kind": "network", "model": "virtio-net-device", "mode": "shared" },
     { "kind": "shared-directory", "model": "virtio-9p-device", "optional": true }
   ],
   "limitations": [
     "This profile requires macOS on Apple Silicon and UTM 5 or newer.",
-    "UTM imports the root disk into its bundle; it does not modify the immutable source image."
+    "UTM shared networking has no port forwarding: open the guest's DHCP address.",
+    "UTM imports the disks into its bundle; it does not modify the immutable source images."
   ]
 }

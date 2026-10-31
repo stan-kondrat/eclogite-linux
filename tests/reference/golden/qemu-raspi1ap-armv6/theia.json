@@ -1,0 +1,5 @@
+{
+  "machine": "qemu-raspi1ap-armv6",
+  "software": "theia",
+  "error": "theia fails its target {\"arch\":{\"in\":[\"aarch64\",\"x86_64\"]}} (software -> ide)"
+}

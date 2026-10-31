@@ -41,18 +41,18 @@ and build orchestrator, with these responsibilities:
 - validate schemas, names, paths, source revisions, and semantic constraints;
 - resolve machine and software profiles and reject incompatible platform or
   device contracts;
-- expand meta-packages and resolve package, stage, build-host, target, kernel,
-  rootfs, and image edges;
+- resolve the package closure, including meta-packages, and the build-host,
+  target, kernel, rootfs, and image edges;
 - write the deterministic strict-JSON lock containing every resolved input;
 - calculate input keys and explain why a node was selected or must rebuild;
-- emit the resolved Make dependency graph and invoke Make for execution;
+- schedule the resolved graph and run each package's builder in the builder VM;
 - explicitly fetch locked sources before an offline build;
-- drive image composition and declared tests through generated Make targets;
-- export versioned machine-readable metadata and static website catalog pages.
+- compose images, generate services, and run the closure's declared tests;
+- export versioned machine-readable metadata.
 
 The responsibility boundary is equally important. `eclogite` does not compile
-package sources itself, embed package-specific shell commands, replace Make's
-parallel scheduler, mutate a running guest, select arbitrary package versions,
+package sources itself, embed package-specific shell commands, mutate a
+running guest, select arbitrary package versions,
 or allow build steps to access the network. Builders execute the resolved plan;
 the CLI defines and audits that plan.
 
@@ -72,7 +72,7 @@ Global options must precede the command:
 | `--state-dir DIR` | locks, plans, and explanations; defaults to `PROJECT/state` |
 | `--cache-dir DIR` | Git mirrors, catalog snapshots, package sources, and immutable build layers; defaults to `$XDG_CACHE_HOME/eclogite`, falling back to `~/.cache/eclogite` |
 | `--layer-store NAME\|none` | named remote layer store from the host configuration; `none` disables remote layers |
-| `-j N`, `--jobs N` | maximum concurrent Make jobs; `0` means host default |
+| `-j N`, `--jobs N` | maximum concurrent package builds; `0` means host default |
 | `--message-format human\|json` | diagnostics and progress format; JSON is versioned JSON Lines for stream processing |
 | `--color auto\|always\|never` | diagnostic color policy |
 | `-v`, `--verbose` | increase diagnostic detail; repeatable |
@@ -113,8 +113,11 @@ composition shorthand instead of `--config`:
 ```text
 --machine NAME|FILE          machine profile name, declared alias, or JSONC path
 --software NAME|FILE         base software profile name or JSONC path
---with NAME                  add a package or meta-package; repeatable
---kernel NAME                select a compatible kernel package
+--with NAME                  add a package, meta-package, or provider; repeatable
+--kernel NAME                shorthand for --with NAME where NAME provides kernel
+--abi NAME                   ABI such as linux-musl; overrides the software's
+--compiler gcc|clang         compiler; overrides the software's
+--provider CAP=NAME          capability provider such as sh=bash; repeatable
 ```
 
 `--config` and `--machine` are mutually exclusive, and shorthand requires both
@@ -157,7 +160,7 @@ eclogite validate [PATH...]
 eclogite resolve --config SYSTEM.jsonc [--output FILE]
 eclogite lock --config SYSTEM.jsonc [--output FILE]
 eclogite plan --config SYSTEM.jsonc [NODE...]
-eclogite graph --config SYSTEM.jsonc [--kind full|packages|stages]
+eclogite graph --config SYSTEM.jsonc [--kind full|packages]
                [--format tree|dot|json] [--root NODE] [--reverse]
                [--output FILE]
 eclogite why --config SYSTEM.jsonc NODE [--all]
@@ -166,21 +169,21 @@ eclogite why --config SYSTEM.jsonc NODE [--all]
 - `validate` parses JSONC and checks schemas, paths, names, references, source
   identities, machine/software compatibility, cycles, and semantic constraints.
   With no path it checks the discovered catalog. It writes nothing.
-- `resolve` composes the selected machine and software profiles, then expands
-  meta-packages, features, stages, toolchain contexts, kernel, rootfs, and image
-  nodes. It writes the resolved strict JSON to stdout or `--output`, but does
+- `resolve` composes the selected machine and software profiles, merges
+  `extends`, applies variants and parameters, and resolves the package closure,
+  kernel, rootfs, and image nodes. It writes the resolved strict JSON to stdout or `--output`, but does
   not update the lock.
 - `lock` is the explicit operation for creating or replacing a deterministic
   lock. Its default output is `state/SYSTEM/system.lock.json`.
 - `plan` compares resolved intent, the current lock, and available cache layers.
   Optional nodes restrict the report to those nodes and their dependencies.
-- `graph` renders the complete graph, package graph, or stage graph. Tree output
+- `graph` renders the complete graph or the package graph. Tree output
   is for people, DOT is for Graphviz, and JSON is the stable machine interface.
-- `why` prints provenance paths from the system root to one package, stage, or
+- `why` prints provenance paths from the system root to one package or
   output. `--all` prints every path instead of the shortest path.
 
 `NODE` uses an explicit namespace when ambiguity is possible:
-`package:coreutils`, `stage:image`, `output:linux-libre:kernel`, or
+`package:coreutils`, `output:linux-libre:kernel`, or
 `system:qemu-arm64-reference`. An unqualified unique name is accepted interactively.
 
 ### Sources and build execution
@@ -199,15 +202,17 @@ eclogite test --config SYSTEM.jsonc [TEST...] [--keep-vm]
   missing; `--no-layers` skips that. `--source` limits the source download;
   `--force` replaces a corrupt or incomplete cache entry, never a valid
   immutable entry.
-- `build` emits the intermediate units and Make plan, invokes Make, validates
-  declared outputs, and publishes successful immutable layers. Optional nodes
-  build only their dependency closures. `--no-cache` ignores build-layer hits
-  but still uses verified source downloads. `--keep-going` asks Make to continue
-  independent nodes after a failure.
+- `build` writes the intermediate units, runs each package's builder in the
+  builder VM in dependency order, validates declared outputs, and publishes
+  successful immutable layers. Optional nodes build only their dependency
+  closures. `--no-cache` ignores build-layer hits but still uses verified source
+  downloads. `--keep-going` continues independent nodes after a failure.
 - `image` composes locked package outputs and the kernel into image artifacts.
   It never installs packages into a running guest.
-- `test` runs named declared tests or all system tests. `--keep-vm` retains a
-  failed test instance for diagnosis.
+- `test` boots the image and runs the built-in `boot-shell` and `shutdown`
+  checks plus every test declared by a package in the closure, or only the
+  named ones (`TEST` is `<package>:<test>`, such as `dhcpcd:dhcp`). `--keep-vm`
+  retains a failed test instance for diagnosis.
 
 `fetch`, `cache push`, `catalog source add`, `catalog source sync`, and
 explicit `create --fetch` are the only normal network operations. `build`,
@@ -292,7 +297,7 @@ Functional correctness belongs to `test`; deterministic output belongs to
 ### Catalog and cache inspection
 
 ```text
-eclogite catalog list package|metapackage|platform|toolchain|stage|system
+eclogite catalog list package|platform|toolchain|stage|system
                          [--names-only]
 eclogite catalog show TYPE NAME
 eclogite catalog path TYPE NAME
@@ -337,17 +342,20 @@ and package sources are shared across projects under the cache root. See
 
 ### Static website generation
 
+After version 1 ([Migration](migration.md#after-version-1)); until then
+`site/` is a static prototype.
+
 ```text
 eclogite site [--output DIR] [--clean]
 ```
 
-`site` validates the catalog and writes static package, meta-package, platform,
-toolchain, stage, and system pages. It also emits strict `catalog.json`,
+`site` validates the catalog and writes static package, platform,
+toolchain, and system pages. It also emits strict `catalog.json`,
 `graph.json`, `search-index.json`, and a build manifest consumed by the
 dependency-free browser interface. The default output is `_site/`.
 
 Before generating anything, `site` parses every selected `.jsonc` and `.json`
-input, validates it against the versioned JSON Schema in `catalog/schemas/`, and
+input, validates it against the versioned JSON Schema in `schemas/`, and
 resolves the same graph used by `lock` and `build`. A schema or graph error stops
 the site build, so invalid catalog data is never published. `--clean` removes
 stale generated files inside `_site/` only; it does not remove maintained files
@@ -454,19 +462,8 @@ Planned stable exit classes are:
 | `22` | reproducibility or comparison mismatch |
 | `30` | cache, filesystem, or internal failure |
 
-## Make interface
+## Repository entry points
 
-GNU Make remains a repository convenience layer, not a second CLI grammar:
-
-```text
-make validate
-make CONFIG=catalog/systems/qemu-arm64-reference.jsonc lock
-make CONFIG=catalog/systems/qemu-arm64-reference.jsonc plan
-make CONFIG=catalog/systems/qemu-arm64-reference.jsonc build
-make CONFIG=catalog/systems/qemu-arm64-reference.jsonc image
-make CONFIG=catalog/systems/qemu-arm64-reference.jsonc test
-make site-stage
-```
-
-These targets delegate to `eclogite`; they never parse or independently resolve
-catalog data. CI should use the same entry points as local development.
+There is no root Makefile: `eclogite` is the only entry point, locally and in
+CI. Make is used only to build the tool itself (`make -C tools/eclogite`) and
+inside individual package builds.

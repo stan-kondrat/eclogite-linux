@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "System",
+  "description": "The graph root and the CLI's preferred single input. OPEN(19): no aliases.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.system/v0.1"
+    },
+    "name": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "machine": {
+      "$ref": "#/$defs/reference"
+    },
+    "software": {
+      "$ref": "#/$defs/reference"
+    },
+    "abi": {
+      "description": "Overrides the software profile's.",
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "compiler": {
+      "description": "Overrides the software profile's.",
+      "$ref": "common.schema.json#/$defs/compiler"
+    },
+    "providers": {
+      "description": "Overrides the software profile's entries and the defaults.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/packageName"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "machine",
+    "software"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "reference": {
+      "title": "ObjectReference",
+      "description": "A catalog name or alias, or a file path starting with `./` or `../`,\nrelative to this file and ending in `.json` or `.jsonc`. Absolute paths\nand URLs are rejected.",
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        {
+          "type": "string",
+          "pattern": "^\\.\\.?/.+\\.jsonc?$",
+          "tsType": "`./${string}` | `../${string}`"
+        }
+      ]
+    }
+  }
+}

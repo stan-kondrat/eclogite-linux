@@ -1,0 +1,480 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Machine",
+  "description": "Hardware profile: CPU, memory, boot, devices and runtime backend (QEMU, UTM or a physical board). Never declares guest software. A machine may instead extend another and override a few fields.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/complete"
+    },
+    {
+      "$ref": "#/$defs/derived"
+    }
+  ],
+  "$defs": {
+    "complete": {
+      "title": "CompleteMachine",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "eclogite.machine/v0.1"
+        },
+        "name": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "aliases": {
+          "description": "Catalog-wide unique CLI names; never inherited.",
+          "$ref": "common.schema.json#/$defs/aliases"
+        },
+        "status": {
+          "description": "Absent: supported. `profile-only`: described, not buildable.",
+          "const": "profile-only"
+        },
+        "platform": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "resources": {
+          "$ref": "#/$defs/resources"
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtime"
+        },
+        "boot": {
+          "$ref": "#/$defs/boot"
+        },
+        "gpio": {
+          "description": "OPEN(20): physical boards only.",
+          "type": "object",
+          "properties": {
+            "header_pins": {
+              "$ref": "common.schema.json#/$defs/positiveInteger"
+            }
+          },
+          "required": [
+            "header_pins"
+          ],
+          "additionalProperties": false
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/device"
+          },
+          "minItems": 1
+        },
+        "limitations": {
+          "$ref": "common.schema.json#/$defs/stringList"
+        },
+        "references": {
+          "description": "`https://` links.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "name",
+        "platform",
+        "resources",
+        "runtime",
+        "boot",
+        "devices"
+      ],
+      "additionalProperties": false
+    },
+    "derived": {
+      "title": "DerivedMachine",
+      "description": "Based on another machine. `resources` merges field by field, and the other\nfields replace the base's. The runtime and boot contract cannot change.",
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "eclogite.machine/v0.1"
+        },
+        "name": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "aliases": {
+          "description": "Catalog-wide unique CLI names; never inherited.",
+          "$ref": "common.schema.json#/$defs/aliases"
+        },
+        "status": {
+          "description": "Absent: supported. `profile-only`: described, not buildable.",
+          "const": "profile-only"
+        },
+        "extends": {
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "vcpus": {
+              "$ref": "common.schema.json#/$defs/positiveInteger"
+            },
+            "memory_mib": {
+              "$ref": "common.schema.json#/$defs/mebibytes"
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/device"
+          },
+          "minItems": 1
+        },
+        "limitations": {
+          "$ref": "common.schema.json#/$defs/stringList"
+        },
+        "references": {
+          "description": "`https://` links.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "name",
+        "extends"
+      ],
+      "additionalProperties": false
+    },
+    "resources": {
+      "title": "MachineResources",
+      "description": "Virtual machines declare `vcpus`; physical boards declare `cpu`.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "memory_mib": {
+              "$ref": "common.schema.json#/$defs/mebibytes"
+            },
+            "vcpus": {
+              "$ref": "common.schema.json#/$defs/positiveInteger"
+            },
+            "cpu": false
+          },
+          "required": [
+            "memory_mib",
+            "vcpus"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "memory_mib": {
+              "$ref": "common.schema.json#/$defs/mebibytes"
+            },
+            "cpu": {
+              "$ref": "#/$defs/physicalCpu"
+            },
+            "vcpus": false
+          },
+          "required": [
+            "memory_mib",
+            "cpu"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "physicalCpu": {
+      "title": "PhysicalCpu",
+      "type": "object",
+      "properties": {
+        "soc": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "description": "Such as `ARM1176JZF-S`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "cores": {
+          "$ref": "common.schema.json#/$defs/positiveInteger"
+        }
+      },
+      "required": [
+        "model",
+        "cores"
+      ],
+      "additionalProperties": false
+    },
+    "machineOptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "runtime": {
+      "title": "Runtime",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/qemu"
+        },
+        {
+          "$ref": "#/$defs/utm"
+        },
+        {
+          "$ref": "#/$defs/physical"
+        }
+      ]
+    },
+    "qemu": {
+      "title": "QemuRuntime",
+      "type": "object",
+      "properties": {
+        "backend": {
+          "const": "qemu"
+        },
+        "executable": {
+          "description": "`qemu-system-*`",
+          "type": "string",
+          "pattern": "^qemu-system-"
+        },
+        "machine": {
+          "description": "QEMU `-machine`, such as `virt` or `q35`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "machine_options": {
+          "$ref": "#/$defs/machineOptions"
+        },
+        "acceleration": {
+          "enum": [
+            "auto",
+            "tcg",
+            "kvm",
+            "hvf"
+          ]
+        }
+      },
+      "required": [
+        "backend",
+        "machine",
+        "machine_options",
+        "acceleration"
+      ],
+      "additionalProperties": false
+    },
+    "utm": {
+      "title": "UtmRuntime",
+      "type": "object",
+      "properties": {
+        "backend": {
+          "const": "utm"
+        },
+        "application": {
+          "const": "UTM"
+        },
+        "minimum_version": {
+          "description": "Such as `5`.",
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)*$"
+        },
+        "host": {
+          "type": "object",
+          "properties": {
+            "os": {
+              "const": "macos"
+            },
+            "architecture": {
+              "enum": [
+                "arm64",
+                "x86_64"
+              ]
+            }
+          },
+          "required": [
+            "os",
+            "architecture"
+          ],
+          "additionalProperties": false
+        },
+        "virtualization_backend": {
+          "enum": [
+            "qemu",
+            "apple"
+          ]
+        },
+        "machine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "machine_options": {
+          "$ref": "#/$defs/machineOptions"
+        },
+        "acceleration": {
+          "enum": [
+            "hvf",
+            "tcg"
+          ]
+        },
+        "bundle_format": {
+          "const": "utm"
+        },
+        "disk_import": {
+          "const": "copy"
+        }
+      },
+      "required": [
+        "backend",
+        "application",
+        "minimum_version",
+        "host",
+        "virtualization_backend",
+        "machine",
+        "machine_options",
+        "acceleration",
+        "bundle_format",
+        "disk_import"
+      ],
+      "additionalProperties": false
+    },
+    "physical": {
+      "title": "PhysicalRuntime",
+      "description": "OPEN(20)",
+      "type": "object",
+      "properties": {
+        "backend": {
+          "const": "physical"
+        },
+        "board": {
+          "$ref": "common.schema.json#/$defs/name"
+        }
+      },
+      "required": [
+        "backend",
+        "board"
+      ],
+      "additionalProperties": false
+    },
+    "boot": {
+      "title": "Boot",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/directKernel"
+        },
+        {
+          "$ref": "#/$defs/sdCard"
+        }
+      ]
+    },
+    "directKernel": {
+      "title": "DirectKernelBoot",
+      "type": "object",
+      "properties": {
+        "method": {
+          "const": "direct-kernel"
+        },
+        "console": {
+          "description": "`tty*`, such as `ttyAMA0`.",
+          "type": "string",
+          "pattern": "^tty"
+        },
+        "kernel_arguments": {
+          "$ref": "common.schema.json#/$defs/stringList"
+        }
+      },
+      "required": [
+        "method",
+        "console",
+        "kernel_arguments"
+      ],
+      "additionalProperties": false
+    },
+    "sdCard": {
+      "title": "SdCardBoot",
+      "description": "OPEN(13, 20): `firmware_policy` is a placeholder.",
+      "type": "object",
+      "properties": {
+        "method": {
+          "const": "sd-card-firmware"
+        },
+        "boot_media": {
+          "const": "sd-card"
+        },
+        "console": {
+          "type": "string",
+          "pattern": "^tty"
+        },
+        "firmware_policy": {
+          "const": "unresolved"
+        }
+      },
+      "required": [
+        "method",
+        "boot_media",
+        "console",
+        "firmware_policy"
+      ],
+      "additionalProperties": false
+    },
+    "deviceKind": {
+      "title": "DeviceKind",
+      "description": "The vocabulary of the `devices` fact.",
+      "enum": [
+        "audio",
+        "block",
+        "camera",
+        "display",
+        "gpio",
+        "i2c",
+        "network",
+        "power",
+        "rtc",
+        "serial",
+        "shared-directory",
+        "spi",
+        "usb",
+        "video"
+      ]
+    },
+    "device": {
+      "title": "Device",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "Must equal the model's kind in the devices document.",
+          "$ref": "#/$defs/deviceKind"
+        },
+        "model": {
+          "description": "A model from the devices document.",
+          "$ref": "common.schema.json#/$defs/name"
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "count": {
+          "description": "Physical boards only; a virtual block device gets one disk per image.",
+          "$ref": "common.schema.json#/$defs/positiveInteger"
+        },
+        "mode": {
+          "enum": [
+            "shared",
+            "bridged",
+            "host-only",
+            "user"
+          ]
+        },
+        "speed_mbps": {
+          "$ref": "common.schema.json#/$defs/positiveInteger"
+        }
+      },
+      "required": [
+        "kind",
+        "model"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

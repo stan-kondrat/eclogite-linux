@@ -1,0 +1,47 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "glibc",
+  "version": "2.43",
+  // The guest's C library, built from source. Replaces the reference build's
+  // copy of libraries from the toolchain sysroot (docs/build-model.md).
+  "source": {
+    "type": "git",
+    "url": "https://sourceware.org/git/glibc.git",
+    "revision": "f762ccf84f122d1354f103a151cba8bde797d521"
+  },
+  // Programs are linked against the toolchain sysroot's glibc: the lock fails
+  // unless the builder image's glibc has this same revision.
+  "matches_builder_tool": "glibc",
+  "provides": ["libc"],
+  "compatible": {
+    // upstream glibc builds only with GCC: on a clang system it falls back
+    "build": { "compiler": { "eq": "gcc" } },
+    "target": {
+      "all": [
+        { "os": { "eq": "linux" } },
+        { "libc": { "eq": "glibc" } }
+      ]
+    }
+  },
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:python3", "builder:bison", "builder:make"],
+    // the unwinder: pthread_cancel and backtrace load it at runtime
+    "run": ["cc-runtime"]
+  },
+  "arguments": {
+    // glibc refuses to build in its source tree
+    "out_of_tree": true,
+    "configure": ["--prefix=/usr", "--disable-werror"],
+    // Runtime only: loader, shared libraries, ldconfig, getent. Headers and
+    // static libraries stay in the toolchain sysroot, the link-time copy.
+    "remove": [
+      "/usr/include",
+      "/usr/share/i18n",
+      "/usr/share/info",
+      "/usr/libexec/getconf",
+      "/var/db",
+      "**/*.a"
+    ]
+  }
+}

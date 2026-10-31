@@ -7,9 +7,10 @@ same comparison tests.
 ## Milestone 0 — research and repository boundary
 
 - Record the old package styles, pipeline, risks, and reusable assets.
-- Define the C/Make responsibility boundary and repository layout.
-- Draft JSONC shapes for packages, meta-packages, platforms, machine profiles,
-  software profiles, stages, and system compositions.
+- Define the `eclogite`/builder responsibility boundary and repository layout.
+- Draft JSONC shapes and JSON Schemas for packages (including meta-packages),
+  platforms, machine profiles, software profiles, toolchains, facts, and system
+  compositions.
 - Document the standalone C17 CLI boundary and its test strategy.
 
 Exit condition: the design documents agree on names, ownership, graph semantics,
@@ -30,34 +31,42 @@ fixture reports an exact file/line/column and field path.
 
 ## Milestone 2 — typed catalog and graph
 
-- Decode AST nodes into package, meta-package, platform, machine, software,
-  toolchain, stage, and system structures.
-- Validate references and immutable source revisions.
-- Expand meta-packages with `why` provenance.
-- Resolve build/link/run dependencies in host and target contexts.
-- Detect dependency and stage cycles.
+- Decode AST nodes into package, platform, machine, software, toolchain,
+  facts, and system structures.
+- Validate references, hook/test/file paths, and immutable source revisions.
+- Merge machine `extends`; take the platform from the machine and the ABI and
+  compiler from the system, software or defaults; derive the triplet, and
+  each package's compiler with its fallback.
+- Resolve build/link/run dependencies, including meta-packages,
+  capabilities, `providers` overrides, `first` alternatives, capability-owned
+  files and the one-kernel, one-init rule, with `why` provenance for every
+  choice.
+- Evaluate `compatible` constraints and apply `variants` and `parameters`.
+- Detect cycles in build and link dependencies; run dependencies may be cyclic.
 - Implement `validate`, `graph`, and `why` commands.
+- Implement [resolution](resolution.md) step by step; the
+  [golden results](../tests/reference/) are the acceptance tests.
 
 Exit condition: a catalog describing the original userland resolves in a
 byte-stable topological order on macOS and Linux.
 
-## Milestone 3 — lock and Make emission
+## Milestone 3 — lock and plan
 
 - Define canonical serialization and SHA-256 input keys.
-- Hash recipes, sources, patches, builders/hooks, platform, toolchain, and
-  dependency keys.
-- Write a resolved lock and `plan.mk` atomically.
-- Implement `lock`, `plan`, `explain`, and `emit-make`.
+- Hash recipes, sources, patches, builders/hooks, parameters, platform,
+  toolchain, and dependency keys.
+- Write a resolved lock atomically.
+- Implement `lock`, `plan`, and `explain`.
 - Make stale locks a hard error.
 
-Exit condition: locking twice is byte-identical, a one-field change produces an
-explained rebuild set, and Make can display the resolved graph without running
-package builds.
+Exit condition: locking twice is byte-identical, and a one-field change
+produces an explained rebuild set.
 
 ## Milestone 4 — first packages
 
 - Add immutable source preparation and per-package output trees.
-- Implement generic `configure`, `autotools`, and `make` builders.
+- Implement the scheduler and the builder VM, then the `configure` builder
+  (without bootstrap), the `make` builder, and hooks.
 - Migrate bash, dhcpcd, iproute2, and runit first; they cover the main simple
   styles without beginning with the gnulib bootstrap complexity.
 - Compare file manifests with the old build.
@@ -67,9 +76,12 @@ network or undeclared target libraries.
 
 ## Milestone 5 — complete userland and kernel
 
-- Add gnulib bootstrap and explicit hooks for real package exceptions.
-- Migrate all 15 userland packages.
-- Import kernel config as verified fragments and implement the kernel builder.
+- Add the `autoreconf` and `gnulib` bootstraps of the `configure` builder.
+- Migrate all 15 userland packages, `glibc` and `gcc-runtime`.
+- Import kernel config as verified fragments and implement the `linux-kernel`
+  builder,
+  merging the config that dependencies on `linux` and the machine's devices
+  require.
 - Record effective `.config` and reject silently ignored required symbols.
 
 Exit condition: package manifests and effective kernel settings match the
@@ -78,10 +90,12 @@ reference within documented differences.
 ## Milestone 6 — root, image, and boot tests
 
 - Compose package outputs instead of installing into one shared root.
-- Migrate rootfs templates into a `base-files` package with explicit service
-  declarations and a file manifest.
+- Migrate the remaining rootfs templates into `base-files`; generate runit
+  services from package `services`, and `/etc/fstab` and `/etc/hostname`
+  from the software profile and package `mounts`.
 - Resolve shared libraries from declared outputs/toolchain sysroot.
-- Build ext4 images and reuse the existing serial boot tests and VM runners.
+- Build ext4 images sized from their contents; run the built-in boot checks
+  and every package's `tests` over the serial console.
 - Generate both QEMU and UTM runtime drivers from the same locked ARM64 image;
   verify UTM on Apple Silicon with direct boot, console, shared networking,
   disk import, and preservation of the bundle-local shared directory.
@@ -114,3 +128,17 @@ image, and Eclogite uses them as its build runtime.
 
 The original `linux-libre-vm` build stays an independent project; Eclogite
 never removes or archives its Make rules.
+
+## After version 1
+
+Designed, but deliberately outside version 1. The documents describing them
+stay as direction, not as work to refine now:
+
+- generating the website from the catalog (`eclogite site`); `site/` stays a
+  static prototype with its own data file;
+- the CI evidence store and the `evidence` policy beyond `warn-untested`;
+- S3-compatible layer stores and signed provenance beyond the GHCR store of
+  Milestone 7;
+- physical Raspberry Pi machine profiles, which stay `profile-only`;
+- the Theia IDE example, which needs `npm-workspace`, fetch phases and volumes
+  on top of the reference system.

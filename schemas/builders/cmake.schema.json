@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CmakeArguments",
+  "description": "A CMake project configured for the target, built with Ninja and installed with DESTDIR.\nOPEN(6): named `targets` here and `make_targets` elsewhere; no install_targets.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/common"
+    }
+  ],
+  "properties": {
+    "directory": {
+      "description": "Contains CMakeLists.txt.",
+      "$ref": "../common.schema.json#/$defs/relativePath"
+    },
+    "cmake": {
+      "description": "The builder adds the toolchain file and the generator.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "unevaluatedProperties": false
+}

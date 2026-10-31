@@ -1,0 +1,107 @@
+{
+  "schema": "eclogite.toolchain/v0.1",
+  "name": "linux-libre-vm",
+  // The builder image: linux-libre-vm's dev image, its cross toolchains and
+  // the tool manifest. Every ABI builds with it; what it does not ship yet is
+  // marked "planned", and a system that needs it fails resolution with that
+  // reason. It runs builds and never contributes files to a guest
+  // (docs/build-model.md).
+  "provider": "linux-libre-vm",
+  // Placeholder until linux-libre-vm publishes builder image releases
+  "release": "unreleased",
+  "builder": {
+    "hosts": ["aarch64", "x86_64"],
+    // Source of the builder-scope facts; the builder VM size is a default
+    // that a package's "build" constraint may raise
+    "resources": {
+      "vcpus": 4,
+      "memory_mib": 4096
+    }
+  },
+  // Cross toolchains and sysroots, by target triplet
+  // (<platform triplet_cpu>-<ABI triplet suffix>)
+  "targets": {
+    "x86_64-linux-gnu": {},
+    "aarch64-linux-gnu": {},
+    "armv6-linux-gnueabihf": {},
+    // musl sysroots: linux-libre-vm does not build them yet
+    // (musl-cross-make is the likely source)
+    "x86_64-linux-musl": { "status": "planned" },
+    "aarch64-linux-musl": { "status": "planned" },
+    "armv6-linux-musleabihf": { "status": "planned" }
+  },
+  // Snapshot of the tool manifest linux-libre-vm will publish with each
+  // release: what packages may name as "builder:<tool>", and the revisions
+  // that "matches_builder_tool" and the base runtime packages are checked
+  // against. Revisions are the linux-libre-vm submodule commits on 2026-10-06.
+  // Compilers, in fallback order: a package the system's compiler cannot
+  // build (its "compatible.build") uses the first other one that can. Each
+  // names the manifest tools it needs.
+  "compilers": {
+    "gcc": ["gcc", "binutils"],
+    "clang": ["clang", "lld"]
+  },
+  "tools": {
+    // LLVM: clang targets every triplet with one binary and uses the same
+    // glibc or musl sysroots. Not yet in the builder image: a package built
+    // with clang fails resolution with "clang is planned".
+    "clang": {
+      "version": "23.1.3",
+      "source": "https://github.com/llvm/llvm-project.git",
+      "revision": "0d261d1ca552c95a8f007e061c787ac7132fbcbc",
+      "status": "planned"
+    },
+    "lld": {
+      "version": "23.1.3",
+      "source": "https://github.com/llvm/llvm-project.git",
+      "revision": "0d261d1ca552c95a8f007e061c787ac7132fbcbc",
+      "status": "planned"
+    },
+    // build systems of the LLVM runtimes
+    "cmake": { "source": "https://gitlab.kitware.com/cmake/cmake.git", "status": "planned" },
+    "ninja": { "source": "https://github.com/ninja-build/ninja.git", "status": "planned" },
+    "gcc": {
+      "version": "15.3.0",
+      "source": "https://gcc.gnu.org/git/gcc.git",
+      "revision": "4db0e8df15bef836558857c291c323add11d035c"
+    },
+    "binutils": {
+      "source": "https://sourceware.org/git/binutils-gdb.git",
+      "revision": "6ce87bbc521cf46eaee9a1f7ef61cee2cdfb3e32"
+    },
+    // the libc of the musl sysroots; the musl package must match it
+    "musl": {
+      "version": "1.2.6",
+      "source": "https://git.musl-libc.org/git/musl",
+      "revision": "9fa28ece75d8a2191de7c5bb53bed224c5947417",
+      "status": "planned"
+    },
+    "glibc": {
+      "version": "2.43",
+      "source": "https://sourceware.org/git/glibc.git",
+      "revision": "f762ccf84f122d1354f103a151cba8bde797d521"
+    },
+    "perl": {
+      "source": "https://github.com/Perl/perl5.git",
+      "revision": "e634cc838fb1785dfafb5d13b52807ea16b5c52c"
+    },
+    "python3": {
+      "version": "3.14.8",
+      "source": "https://github.com/python/cpython.git",
+      "revision": "8e6e75d9102e39bed2a2b279203a396741180f12"
+    },
+    "node": {
+      "version": "26.10.0",
+      "source": "https://github.com/nodejs/node.git",
+      "revision": "151845ab90d3926ceb36eedf1eade09619c3adc9"
+    },
+    "bc": {
+      "source": "https://github.com/gavinhoward/bc.git",
+      "revision": "70c51d95e02d20fc3fc82791dc3f1aa0e9d47f0d"
+    },
+    "make": { "version": "4.4.1", "source": "tarball" },
+    "m4": { "version": "1.4.21", "source": "tarball" },
+    "bison": { "version": "3.8.2", "source": "tarball" },
+    "flex": { "version": "2.6.4", "source": "tarball" }
+  }
+}

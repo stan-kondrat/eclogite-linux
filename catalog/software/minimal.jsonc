@@ -1,0 +1,33 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "minimal",
+  // The smallest bootable system: base only, a root shell on the serial
+  // console. No network, no host share, no editor; add packages to grow it.
+  // The kernel, init and libc are the platform's defaults unless "packages"
+  // names other providers.
+  "packages": ["base"],
+  "root": {
+    "hostname": "eclogite",
+    "readonly": true,
+    "tmpfs": ["/run", "/tmp"]
+  },
+  "image": {
+    "format": "ext4",
+    // Composition policy: applied to the package outputs when the image is
+    // built, so package keys and the shared layer cache are unaffected
+    "strip": true,
+    "exclude": [
+      "/usr/include",
+      "/usr/share/man",
+      "/usr/share/info",
+      "/usr/share/doc",
+      "/usr/share/locale",
+      "**/*.a",
+      "**/*.la"
+    ],
+    "free_mib": 16
+  },
+  "evidence": {
+    "default": "warn-untested"
+  }
+}

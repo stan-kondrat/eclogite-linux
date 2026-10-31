@@ -189,7 +189,7 @@
     if (source.boot.firmwarePolicy) { boot.firmware_policy = source.boot.firmwarePolicy; }
 
     var definition = {
-      schema: "eclogite.machine/v1",
+      schema: "eclogite.machine/v0.1",
       name: nameInput.value.trim() || "unnamed-machine",
       platform: platformSelect.value,
       resources: {

@@ -8,3 +8,5 @@
 /sources/
 *.swp
 *~
+__pycache__/
+/site/types/node_modules/

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Defaults",
+  "description": "The distribution's choices, used only where a system selects nothing.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "eclogite.defaults/v0.1"
+    },
+    "abi": {
+      "$ref": "common.schema.json#/$defs/name"
+    },
+    "compiler": {
+      "$ref": "common.schema.json#/$defs/compiler"
+    },
+    "providers": {
+      "description": "`kernel` and `init` are required. Entries may be ordered alternatives.",
+      "type": "object",
+      "properties": {
+        "kernel": {
+          "$ref": "common.schema.json#/$defs/reference"
+        },
+        "init": {
+          "$ref": "common.schema.json#/$defs/reference"
+        }
+      },
+      "required": [
+        "kernel",
+        "init"
+      ],
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/name"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/reference"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "abi",
+    "compiler",
+    "providers"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "eclogite.machine/v0.1",
+  "name": "utm-virt-arm64-8g",
+  "aliases": ["utm-arm64-8g"],
+  // Same UTM contract as utm-virt-arm64 with room for an IDE server.
+  // Memory is a locked resource, so this is a separate machine identity.
+  "extends": "utm-virt-arm64",
+  "resources": {
+    "vcpus": 2,
+    "memory_mib": 8192
+  }
+}

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Explore the Eclogite Linux package catalog and interactive dependency graph.">
   <title>Software catalog — Eclogite Linux</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20261006-4">
-  <script src="assets/catalog-data.js?v=20261006-4" defer></script>
-  <script src="assets/site.js?v=20261006-4" defer></script>
-  <script src="assets/graph.js?v=20261006-4" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=20261015-7">
+  <script src="assets/catalog-data.js?v=20261015-7" defer></script>
+  <script src="assets/site.js?v=20261015-7" defer></script>
+  <script src="assets/graph.js?v=20261015-7" defer></script>
 </head>
 <body data-page="packages">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -41,7 +41,7 @@
         <p>This manager composes immutable images; it does not install into a running guest. Select a system, inspect why each node exists, and trace build or runtime dependencies through the current catalog.</p>
         <div class="catalog-badges">
           <span><i class="dot dot-package"></i><b data-stat="packages">18</b> packages</span>
-          <span><i class="dot dot-meta"></i><b data-stat="metapackages">4</b> groups</span>
+          <span><i class="dot dot-meta"></i><b data-stat="metapackages">6</b> groups</span>
           <span><i class="dot dot-system"></i><b data-stat="systems">3</b> systems</span>
         </div>
       </div>
@@ -49,7 +49,7 @@
 
     <aside class="catalog-status" aria-label="Catalog implementation status">
       <span>migration snapshot</span>
-      <p>The graph below mirrors the current JSONC reference fixtures imported from <code>linux-libre-vm</code>. It is useful for reviewing names and dependency shape, but the fixtures are not yet reproducibly buildable. The production graph will replace the temporary distribution-GCC toolchain fixture with the pinned <code>linux-libre-vm</code> build runtime and target-toolchain artifacts.</p>
+      <p>The graph below mirrors the current JSONC reference fixtures imported from <code>linux-libre-vm</code>. It is useful for reviewing names and dependency shape, but the fixtures are not yet reproducibly buildable. Meta-packages are ordinary packages with run dependencies only; each machine selects its platform, and the platform names the <code>linux-libre-vm</code> toolchain that builds for it.</p>
     </aside>
 
     <section class="graph-app" aria-labelledby="graph-title">
@@ -72,7 +72,7 @@
           <select id="view-filter">
             <option value="full">Full system</option>
             <option value="packages">Packages only</option>
-            <option value="stages">Stages and outputs</option>
+            <option value="structure">Systems and profiles</option>
           </select>
         </label>
         <button id="fit-graph" class="icon-button" type="button" title="Fit graph to view" aria-label="Fit graph to view">Fit</button>
@@ -86,7 +86,6 @@
             <label class="check-row"><input type="checkbox" data-kind-filter="machine" checked><i class="dot dot-machine"></i> Machines <b data-kind-count="machine">0</b></label>
             <label class="check-row"><input type="checkbox" data-kind-filter="software" checked><i class="dot dot-software"></i> Software <b data-kind-count="software">0</b></label>
             <label class="check-row"><input type="checkbox" data-kind-filter="platform" checked><i class="dot dot-platform"></i> Platforms <b data-kind-count="platform">0</b></label>
-            <label class="check-row"><input type="checkbox" data-kind-filter="stage" checked><i class="dot dot-stage"></i> Stages <b data-kind-count="stage">0</b></label>
             <label class="check-row"><input type="checkbox" data-kind-filter="metapackage" checked><i class="dot dot-meta"></i> Meta-packages <b data-kind-count="metapackage">0</b></label>
             <label class="check-row"><input type="checkbox" data-kind-filter="package" checked><i class="dot dot-package"></i> Packages <b data-kind-count="package">0</b></label>
             <label class="check-row"><input type="checkbox" data-kind-filter="toolchain" checked><i class="dot dot-toolchain"></i> Toolchains <b data-kind-count="toolchain">0</b></label>
@@ -105,7 +104,6 @@
             <span><i data-edge-key="selection"></i> selection</span>
             <span><i data-edge-key="build"></i> build dependency</span>
             <span><i data-edge-key="runtime"></i> runtime dependency</span>
-            <span><i data-edge-key="order"></i> stage order</span>
           </div>
         </aside>
 

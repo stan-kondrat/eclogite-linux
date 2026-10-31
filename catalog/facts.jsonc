@@ -1,0 +1,130 @@
+{
+  "schema": "eclogite.facts/v0.1",
+  // Typed values that "compatible" and "variants" predicates are evaluated
+  // against (docs/build-model.md). Each fact is read by JSON Pointer from the
+  // target (the machine's hardware platform merged with the selected ABI),
+  // the machine, or the builder (the toolchain's builder VM).
+  "facts": {
+    "arch": {
+      "description": "CPU architecture family of the target.",
+      "type": "string",
+      "values": ["aarch64", "arm", "x86_64"],
+      "from": { "target": ["/architecture"] }
+    },
+    "os": {
+      "description": "Operating system family of the target: its kernel, libc and init come from compatible packages.",
+      "type": "string",
+      "values": ["linux", "freebsd"],
+      "from": { "target": ["/os"] }
+    },
+    "abi": {
+      "description": "Selected ABI: operating system and libc.",
+      "type": "string",
+      "values": ["linux-gnu", "linux-musl"],
+      "from": { "target": ["/abi"] }
+    },
+    "libc": {
+      "description": "C library the target platform is built against.",
+      "type": "string",
+      "values": ["glibc", "musl"],
+      "from": { "target": ["/libc"] }
+    },
+    "bits": {
+      "description": "Pointer width of the target ABI.",
+      "type": "integer",
+      "from": { "target": ["/cpu/bits"] }
+    },
+    "endian": {
+      "description": "Byte order of the target.",
+      "type": "string",
+      "values": ["little", "big"],
+      "from": { "target": ["/cpu/endian"] }
+    },
+    "mmu": {
+      "description": "Whether the target has a memory management unit.",
+      "type": "boolean",
+      "from": { "target": ["/cpu/mmu"] }
+    },
+    "isa": {
+      "description": "Minimum instruction set level the target platform guarantees.",
+      "type": "ordered",
+      // Values are ordered within one architecture family; comparing values of
+      // different families is a resolution error.
+      "order_by": "arch",
+      "order": {
+        "arm": ["armv5te", "armv6", "armv6k", "armv6zk", "armv7-a", "armv8-a"],
+        "aarch64": ["armv8-a", "armv8.2-a", "armv9-a"],
+        "x86_64": ["x86-64", "x86-64-v2", "x86-64-v3", "x86-64-v4"]
+      },
+      "from": { "target": ["/cpu/isa"] }
+    },
+    "cpu_features": {
+      "description": "Optional CPU features the target platform guarantees beyond its ISA level.",
+      "type": "set",
+      "values": [
+        // arm
+        "vfpv2", "vfpv3", "neon", "hard-float", "thumb",
+        // aarch64
+        "fp", "asimd", "crc32", "lse",
+        // x86_64
+        "sse2", "sse4.2", "avx2"
+      ],
+      "from": { "target": ["/cpu/features"] }
+    },
+    "devices": {
+      // The vocabulary is the machine schema's device kinds
+      "description": "Device kinds the machine provides.",
+      "type": "set",
+      "from": { "machine": ["/devices"] },
+      "derive": { "collect": "kind" }
+    },
+    "block_devices": {
+      "description": "Block devices the machine can attach: the root image and each software volume need one.",
+      "type": "integer",
+      "from": { "machine": ["/devices"] },
+      // Sum of "count" over block entries. A virtual machine's block entry
+      // has no count: it names the device model and attaches one per image.
+      // Physical boards declare their count.
+      "derive": { "sum": { "where": { "kind": "block" }, "field": "count", "missing": "unbounded" } },
+      "aggregate": { "machine": "sum" }
+    },
+    "memory_mib": {
+      "description": "Memory available to the guest, or to one build in the builder VM.",
+      "type": "integer",
+      "from": {
+        "machine": ["/resources/memory_mib"],
+        "builder": ["/builder/resources/memory_mib"]
+      },
+      // Machine constraints of every package in the closure are added up:
+      // packages run side by side. Build constraints are not: builds run one
+      // at a time.
+      "aggregate": { "machine": "sum", "builder": "max" }
+    },
+    "vcpus": {
+      "description": "CPU cores available to the guest, or to the builder VM.",
+      "type": "integer",
+      "from": {
+        // virtual machines declare vcpus; physical boards declare cpu.cores
+        "machine": ["/resources/vcpus", "/resources/cpu/cores"],
+        "builder": ["/builder/resources/vcpus"]
+      },
+      "aggregate": { "machine": "max", "builder": "max" }
+    },
+    "compiler": {
+      "description": "Compiler chosen for the package being built.",
+      "type": "string",
+      "values": ["gcc", "clang"],
+      // Not read from a document: resolved per package from the system's
+      // compiler and the package's build constraints
+      "from": { "builder": ["@selected"] }
+    },
+    "host_arch": {
+      "description": "Architecture of the builder image that runs a build.",
+      "type": "string",
+      "values": ["aarch64", "x86_64"],
+      // Not read from a catalog document: detected on the build host at plan
+      // time and checked against the toolchain's /builder/hosts.
+      "from": { "builder": ["@detected"] }
+    }
+  }
+}

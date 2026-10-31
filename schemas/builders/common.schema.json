@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Arguments every builder accepts. Every builder runs the steps prepare, patch, configure, build and install, then normalizes the layout (programs from /usr/bin, /usr/sbin and /sbin move to /bin; #! interpreters under those directories are rewritten to /bin) and applies files, symlinks, remove and strip to the package output. Nothing here is required, so the same schema also validates a variant's partial arguments.",
+  "$defs": {
+    "common": {
+      "title": "CommonArguments",
+      "type": "object",
+      "properties": {
+        "hooks": {
+          "description": "`hooks/<name>.sh` per step. `<step>` replaces the builder's step, and\n`pre-<step>` and `post-<step>` run around it. An empty list skips the step.",
+          "type": "object",
+          "properties": {
+            "pre-configure": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "configure": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "post-configure": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "pre-build": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "build": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "post-build": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "pre-install": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "install": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            },
+            "post-install": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/name"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "environment": {
+          "$ref": "../common.schema.json#/$defs/environment"
+        },
+        "files": {
+          "description": "Package file → guest path, copied into the output.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "../common.schema.json#/$defs/relativePath"
+          },
+          "additionalProperties": {
+            "$ref": "../common.schema.json#/$defs/absoluteGuestPath"
+          }
+        },
+        "symlinks": {
+          "description": "Link path → target.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "../common.schema.json#/$defs/absoluteGuestPath"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "remove": {
+          "description": "Removed after install.",
+          "type": "array",
+          "items": {
+            "$ref": "../common.schema.json#/$defs/guestPathPattern"
+          },
+          "uniqueItems": true
+        },
+        "strip": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

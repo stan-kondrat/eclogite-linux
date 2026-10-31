@@ -1,5 +1,5 @@
 {
-  "schema": "eclogite.package/v1",
+  "schema": "eclogite.package/v0.1",
   "name": "dhcpcd",
   "version": "10.3.2",
   "source": {
@@ -7,12 +7,25 @@
     "url": "https://github.com/NetworkConfiguration/dhcpcd.git",
     "revision": "243ad84ac67a87d631ff7eb83b2eed2727acebb5"
   },
-  "builder": "dhcpcd",
-  "patches": [],
+  "provides": ["dhcp-client"],
+  // Its configure is a hand-written script, not autoconf
+  "builder": "configure",
   "dependencies": {
-    "build": [],
-    "link": [],
-    "run": []
+    "run": ["libc", "init"]
+  },
+  "services": {
+    // IPv4 DHCP on all interfaces; -B keeps it in the foreground for runsv
+    "dhcpcd": {
+      "run": ["dhcpcd", "-B", "-4", "-q"]
+    }
+  },
+  "tests": {
+    // hooks are tests/<name>.sh, run in the booted guest
+    "dhcp": {
+      "when": { "devices": { "has": "network" } },
+      "needs": ["ip"],
+      "timeout_seconds": 60
+    }
   },
   "arguments": {
     "configure": [

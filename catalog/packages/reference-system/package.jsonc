@@ -1,0 +1,16 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "reference-system",
+  // Complete userland matching the linux-libre-vm reference build
+  "dependencies": {
+    "run": [
+      "base",
+      "utils",
+      "network",
+      "editor",
+      // the reference build mounts the host share when the VM runner offers
+      // one; a machine without a shared directory gets no 9p at all
+      { "package": "host-share", "when": { "devices": { "has": "shared-directory" } } }
+    ]
+  }
+}
