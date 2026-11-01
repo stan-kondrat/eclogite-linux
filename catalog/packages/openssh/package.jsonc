@@ -1,0 +1,63 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "openssh",
+  "version": "10.6p1",
+  // Release tag V_10_6_P1 of openssh-portable (peeled commit), chosen
+  // 2026-11-01. Installs sshd and ssh-keygen with ssh, scp and sftp.
+  "source": {
+    "type": "git",
+    "url": "https://github.com/openssh/openssh-portable.git",
+    "revision": "a8c72b842423f0774f542d3c2197247c3dd28d74"
+  },
+  "compatible": {
+    // privilege separation, setuid-free sshd, /run
+    "target": { "os": { "eq": "linux" } }
+  },
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"],
+    "link": ["libc", "openssl", "zlib"],
+    "run": ["libc", "openssl", "zlib"]
+  },
+  // The privilege-separation account sshd drops to. The directory it
+  // confines the pre-auth child to, /run/sshd, is on tmpfs: the service
+  // that runs sshd lists it in create_directories (the devbox package does).
+  "users": [
+    {
+      "name": "sshd",
+      "home": "/run/sshd",
+      "shell": "/bin/false",
+      "description": "sshd privilege separation"
+    }
+  ],
+  "arguments": {
+    // The git checkout has no configure script
+    "bootstrap": "autoreconf",
+    "configure": [
+      "--prefix=/usr",
+      "--sysconfdir=/etc/ssh",
+      "--with-privsep-path=/run/sshd",
+      "--with-privsep-user=sshd",
+      "--with-pid-file=/run/sshd.pid",
+      "--with-default-path=/bin",
+      "--without-pam",
+      "--without-selinux",
+      "--without-libedit",
+      "--disable-strip",
+      "--disable-etc-default-login",
+      "--disable-lastlog",
+      "--disable-utmp",
+      "--disable-utmpx",
+      "--disable-wtmp",
+      "--disable-wtmpx"
+    ],
+    // no host keys in the image, and the root is read-only: ssh-keygen -A
+    // creates them at start (see the sshd service of the devbox)
+    "install_targets": ["install-nokeys"],
+    "remove": ["/usr/share/man"],
+    "strip": true
+  },
+  "tests": {
+    "keygen": { "timeout_seconds": 20 }
+  }
+}

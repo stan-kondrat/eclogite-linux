@@ -83,8 +83,7 @@ never enter that job.
 
 This is an intentional first step. It publishes the reviewed website that
 exists today without claiming that the catalog generator already exists.
-`eclogite site` is after version 1
-([Migration](migration.md#after-version-1)). Once it exists, the staging job
+`eclogite site` is after version 1. Once it exists, the staging job
 will combine three sources:
 
 1. maintained pages and presentation from `site/`;

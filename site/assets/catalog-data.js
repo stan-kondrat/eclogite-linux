@@ -2,7 +2,7 @@
   "use strict";
 
   // Generated from catalog/ by a one-off script until `eclogite site` exists
-  // (docs/migration.md, after version 1). Meta-packages are packages with run
+  // (after version 1). Meta-packages are packages with run
   // dependencies only; they are listed separately here for the graph's colors.
   window.ECLOGITE_CATALOG = {
     generatedAt: "2026-10-15",
@@ -54,6 +54,19 @@
         }
       },
       {
+        name: "ca-certificates",
+        version: "2026.10.23",
+        builder: "files",
+        source: "https://github.com/certifi/python-certifi.git",
+        revision: "b60466c9f2882d9cf088943c650b0faac06c080c",
+        description: "Mozilla CA bundle for TLS clients, installed as a file.",
+        dependencies: {
+          build: [],
+          link: [],
+          runtime: []
+        }
+      },
+      {
         name: "console-login",
         version: "1",
         builder: "files",
@@ -85,6 +98,28 @@
           ],
           runtime: [
             "libc"
+          ]
+        }
+      },
+      {
+        name: "curl",
+        version: "8.23.0",
+        builder: "configure",
+        source: "https://github.com/curl/curl.git",
+        revision: "3163ec065643ba20709f190111f42c3e1fe95273",
+        description: "URL transfer library and tool; git's HTTPS transport.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc",
+            "openssl",
+            "zlib"
+          ],
+          runtime: [
+            "libc",
+            "openssl",
+            "zlib",
+            "ca-certificates"
           ]
         }
       },
@@ -160,6 +195,30 @@
             "libc"
           ],
           runtime: []
+        }
+      },
+      {
+        name: "git",
+        version: "2.56.0",
+        builder: "make",
+        source: "https://github.com/git/git.git",
+        revision: "a018953688f1b10bddf91bff8747068f5f4746a4",
+        description: "Distributed version control, built with HTTPS support.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc",
+            "curl",
+            "openssl",
+            "zlib"
+          ],
+          runtime: [
+            "libc",
+            "sh",
+            "curl",
+            "openssl",
+            "zlib"
+          ]
         }
       },
       {
@@ -248,6 +307,25 @@
         }
       },
       {
+        name: "less",
+        version: "712",
+        builder: "configure",
+        source: "https://github.com/gwsw/less.git",
+        revision: "7f46e9ff46216f3e560cd1f41ddf3b36b11eec0e",
+        description: "Terminal pager.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc",
+            "ncurses"
+          ],
+          runtime: [
+            "libc",
+            "ncurses"
+          ]
+        }
+      },
+      {
         name: "linux-libre",
         version: "7.1.3-gnu",
         builder: "linux-kernel",
@@ -291,6 +369,23 @@
         }
       },
       {
+        name: "ncurses",
+        version: "6.6",
+        builder: "configure",
+        source: "https://github.com/ThomasDickey/ncurses-snapshots.git",
+        revision: "0096bd402c4a9c8f39bd7ed266e1b8920327e4d8",
+        description: "Terminal handling library and terminfo database used by less.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc"
+          ],
+          runtime: [
+            "libc"
+          ]
+        }
+      },
+      {
         name: "nodejs",
         version: "26.10.0",
         builder: "configure",
@@ -306,6 +401,44 @@
           runtime: [
             "libc",
             "c++-runtime"
+          ]
+        }
+      },
+      {
+        name: "openssh",
+        version: "10.6p1",
+        builder: "configure",
+        source: "https://github.com/openssh/openssh-portable.git",
+        revision: "a8c72b842423f0774f542d3c2197247c3dd28d74",
+        description: "OpenSSH sshd, ssh-keygen and clients, with the sshd privilege-separation account.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc",
+            "openssl",
+            "zlib"
+          ],
+          runtime: [
+            "libc",
+            "openssl",
+            "zlib"
+          ]
+        }
+      },
+      {
+        name: "openssl",
+        version: "3.6.5",
+        builder: "make",
+        source: "https://github.com/openssl/openssl.git",
+        revision: "c8bd5a57108599ac650bbae77fcabe3109dab2e8",
+        description: "OpenSSL 3.x TLS and crypto library linked by curl, git and OpenSSH.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc"
+          ],
+          runtime: [
+            "libc"
           ]
         }
       },
@@ -418,6 +551,23 @@
         source: "https://github.com/vim/vim.git",
         revision: "d22ff1c955ff87e8273210eae125aab0e85b6c30",
         description: "Tiny-feature Vim build for console editing.",
+        dependencies: {
+          build: [],
+          link: [
+            "libc"
+          ],
+          runtime: [
+            "libc"
+          ]
+        }
+      },
+      {
+        name: "zlib",
+        version: "1.3.2",
+        builder: "configure",
+        source: "https://github.com/madler/zlib.git",
+        revision: "da607da739fa6047df13e66a2af6b8bec7c2a498",
+        description: "Compression library that curl, git and OpenSSH link.",
         dependencies: {
           build: [],
           link: [

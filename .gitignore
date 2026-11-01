@@ -10,3 +10,4 @@
 *~
 __pycache__/
 /site/types/node_modules/
+/tools/eclogite-mjs/node_modules/

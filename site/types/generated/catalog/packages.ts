@@ -175,6 +175,23 @@ export const busybox = {
   arguments: { hooks: { configure: ["config"], install: ["install"] } },
 } satisfies Package;
 
+/** catalog/packages/ca-certificates/package.jsonc */
+export const caCertificates = {
+  schema: "eclogite.package/v0.1",
+  name: "ca-certificates",
+  version: "2026.10.23",
+  source: {
+    type: "git",
+    url: "https://github.com/certifi/python-certifi.git",
+    revision: "b60466c9f2882d9cf088943c650b0faac06c080c",
+  },
+  builder: "files",
+  arguments: {
+    hooks: { install: ["install"] },
+    symlinks: { "/etc/ssl/cert.pem": "certs/ca-certificates.crt" },
+  },
+} satisfies Package;
+
 /** catalog/packages/console-login/package.jsonc */
 export const consoleLogin = {
   schema: "eclogite.package/v0.1",
@@ -225,6 +242,55 @@ export const coreutils = {
   },
 } satisfies Package;
 
+/** catalog/packages/curl/package.jsonc */
+export const curl = {
+  schema: "eclogite.package/v0.1",
+  name: "curl",
+  version: "8.23.0",
+  source: {
+    type: "git",
+    url: "https://github.com/curl/curl.git",
+    revision: "3163ec065643ba20709f190111f42c3e1fe95273",
+  },
+  builder: "configure",
+  dependencies: {
+    build: ["builder:gcc", "builder:make"],
+    link: ["libc", "openssl", "zlib"],
+    run: ["libc", "openssl", "zlib", "ca-certificates"],
+  },
+  arguments: {
+    bootstrap: "autoreconf",
+    configure: [
+      "--prefix=/usr",
+      "--with-openssl",
+      "--with-zlib",
+      "--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt",
+      "--without-ca-path",
+      "--disable-static",
+      "--disable-docs",
+      "--disable-manual",
+      "--disable-ldap",
+      "--disable-ldaps",
+      "--disable-rtsp",
+      "--disable-dict",
+      "--disable-telnet",
+      "--disable-pop3",
+      "--disable-imap",
+      "--disable-smtp",
+      "--disable-gopher",
+      "--disable-mqtt",
+      "--without-libpsl",
+      "--without-libidn2",
+      "--without-brotli",
+      "--without-zstd",
+      "--without-nghttp2",
+    ],
+    remove: ["/usr/share/man", "/usr/share/aclocal", "/usr/bin/curl-config"],
+    strip: true,
+  },
+  tests: { version: { timeout_seconds: 10 } },
+} satisfies Package;
+
 /** catalog/packages/dhcpcd/package.jsonc */
 export const dhcpcd = {
   schema: "eclogite.package/v0.1",
@@ -239,7 +305,9 @@ export const dhcpcd = {
   builder: "configure",
   dependencies: { run: ["libc", "init"] },
   services: { dhcpcd: { run: ["dhcpcd", "-B", "-4", "-q"] } },
-  tests: { dhcp: { when: { devices: { has: "network" } }, needs: ["ip"], timeout_seconds: 60 } },
+  tests: {
+    dhcp: { when: { devices: { has: "network" } }, needs: ["iproute2"], timeout_seconds: 60 },
+  },
   arguments: {
     configure: [
       "--prefix=/usr",
@@ -333,6 +401,39 @@ export const gccRuntime = {
     install_targets: ["install-target-libgcc", "install-target-libstdc++-v3", "install-target-libatomic"],
     remove: ["/usr/include", "/usr/share", "**/*.a", "**/*.la", "**/*-gdb.py"],
   },
+} satisfies Package;
+
+/** catalog/packages/git/package.jsonc */
+export const git = {
+  schema: "eclogite.package/v0.1",
+  name: "git",
+  version: "2.56.0",
+  source: {
+    type: "git",
+    url: "https://github.com/git/git.git",
+    revision: "a018953688f1b10bddf91bff8747068f5f4746a4",
+  },
+  builder: "make",
+  dependencies: {
+    build: ["builder:gcc", "builder:make"],
+    link: ["libc", "curl", "openssl", "zlib"],
+    run: ["libc", "sh", "curl", "openssl", "zlib"],
+  },
+  arguments: {
+    variables: {
+      prefix: "/usr",
+      NO_GETTEXT: "1",
+      NO_TCLTK: "1",
+      NO_PERL: "1",
+      NO_PYTHON: "1",
+      NO_EXPAT: "1",
+      NO_INSTALL_HARDLINKS: "1",
+      SKIP_DASHED_BUILT_INS: "1",
+    },
+    remove: ["/usr/share/man", "/usr/share/doc", "/usr/share/gitweb", "/usr/share/perl5"],
+    strip: true,
+  },
+  tests: { version: { timeout_seconds: 10 } },
 } satisfies Package;
 
 /** catalog/packages/glibc/package.jsonc */
@@ -464,6 +565,29 @@ export const iproute2 = {
   arguments: { configure: ["--prefix=/usr"] },
 } satisfies Package;
 
+/** catalog/packages/less/package.jsonc */
+export const less = {
+  schema: "eclogite.package/v0.1",
+  name: "less",
+  version: "712",
+  source: {
+    type: "git",
+    url: "https://github.com/gwsw/less.git",
+    revision: "7f46e9ff46216f3e560cd1f41ddf3b36b11eec0e",
+  },
+  builder: "configure",
+  dependencies: {
+    build: ["builder:gcc", "builder:make"],
+    link: ["libc", "ncurses"],
+    run: ["libc", "ncurses"],
+  },
+  arguments: {
+    bootstrap: "autoreconf",
+    configure: ["--prefix=/usr", "--with-regex=posix"],
+    remove: ["/usr/share/man"],
+  },
+} satisfies Package;
+
 /** catalog/packages/linux-libre/package.jsonc */
 export const linuxLibre = {
   schema: "eclogite.package/v0.1",
@@ -593,6 +717,36 @@ export const musl = {
   },
 } satisfies Package;
 
+/** catalog/packages/ncurses/package.jsonc */
+export const ncurses = {
+  schema: "eclogite.package/v0.1",
+  name: "ncurses",
+  version: "6.6",
+  source: {
+    type: "git",
+    url: "https://github.com/ThomasDickey/ncurses-snapshots.git",
+    revision: "0096bd402c4a9c8f39bd7ed266e1b8920327e4d8",
+  },
+  builder: "configure",
+  dependencies: { build: ["builder:gcc", "builder:make"], link: ["libc"], run: ["libc"] },
+  arguments: {
+    configure: [
+      "--prefix=/usr",
+      "--with-shared",
+      "--with-termlib",
+      "--enable-widec",
+      "--without-debug",
+      "--without-ada",
+      "--without-cxx-binding",
+      "--without-manpages",
+      "--without-tests",
+      "--with-default-terminfo-dir=/usr/share/terminfo",
+      "--disable-stripping",
+    ],
+    strip: true,
+  },
+} satisfies Package;
+
 /** catalog/packages/network/package.jsonc */
 export const network = {
   schema: "eclogite.package/v0.1",
@@ -655,6 +809,97 @@ export const nodejs = {
       },
     },
   ],
+} satisfies Package;
+
+/** catalog/packages/openssh/package.jsonc */
+export const openssh = {
+  schema: "eclogite.package/v0.1",
+  name: "openssh",
+  version: "10.6p1",
+  source: {
+    type: "git",
+    url: "https://github.com/openssh/openssh-portable.git",
+    revision: "a8c72b842423f0774f542d3c2197247c3dd28d74",
+  },
+  compatible: { target: { os: { eq: "linux" } } },
+  builder: "configure",
+  dependencies: {
+    build: ["builder:gcc", "builder:make"],
+    link: ["libc", "openssl", "zlib"],
+    run: ["libc", "openssl", "zlib"],
+  },
+  users: [
+    {
+      name: "sshd",
+      home: "/run/sshd",
+      shell: "/bin/false",
+      description: "sshd privilege separation",
+    },
+  ],
+  arguments: {
+    bootstrap: "autoreconf",
+    configure: [
+      "--prefix=/usr",
+      "--sysconfdir=/etc/ssh",
+      "--with-privsep-path=/run/sshd",
+      "--with-privsep-user=sshd",
+      "--with-pid-file=/run/sshd.pid",
+      "--with-default-path=/bin",
+      "--without-pam",
+      "--without-selinux",
+      "--without-libedit",
+      "--disable-strip",
+      "--disable-etc-default-login",
+      "--disable-lastlog",
+      "--disable-utmp",
+      "--disable-utmpx",
+      "--disable-wtmp",
+      "--disable-wtmpx",
+    ],
+    install_targets: ["install-nokeys"],
+    remove: ["/usr/share/man"],
+    strip: true,
+  },
+  tests: { keygen: { timeout_seconds: 20 } },
+} satisfies Package;
+
+/** catalog/packages/openssl/package.jsonc */
+export const openssl = {
+  schema: "eclogite.package/v0.1",
+  name: "openssl",
+  version: "3.6.5",
+  source: {
+    type: "git",
+    url: "https://github.com/openssl/openssl.git",
+    revision: "c8bd5a57108599ac650bbae77fcabe3109dab2e8",
+  },
+  builder: "make",
+  dependencies: {
+    build: ["builder:perl", "builder:gcc", "builder:make"],
+    link: ["libc"],
+    run: ["libc"],
+  },
+  arguments: {
+    hooks: { configure: ["configure"] },
+    install_targets: ["install_sw", "install_ssldirs"],
+    remove: ["/usr/share/doc", "/usr/share/man", "/usr/lib/*.a"],
+    strip: true,
+  },
+  variants: [
+    {
+      when: { arch: { eq: "aarch64" } },
+      arguments: { environment: { OPENSSL_TARGET: "linux-aarch64" } },
+    },
+    {
+      when: { arch: { eq: "x86_64" } },
+      arguments: { environment: { OPENSSL_TARGET: "linux-x86_64" } },
+    },
+    {
+      when: { arch: { eq: "arm" } },
+      arguments: { environment: { OPENSSL_TARGET: "linux-armv4" } },
+    },
+  ],
+  tests: { version: { timeout_seconds: 10 } },
 } satisfies Package;
 
 /** catalog/packages/procps-ng/package.jsonc */
@@ -913,5 +1158,20 @@ export const vim = {
   },
 } satisfies Package;
 
+/** catalog/packages/zlib/package.jsonc */
+export const zlib = {
+  schema: "eclogite.package/v0.1",
+  name: "zlib",
+  version: "1.3.2",
+  source: {
+    type: "git",
+    url: "https://github.com/madler/zlib.git",
+    revision: "da607da739fa6047df13e66a2af6b8bec7c2a498",
+  },
+  builder: "configure",
+  dependencies: { link: ["libc"], run: ["libc"] },
+  arguments: { configure: ["--prefix=/usr", "--shared"], remove: ["/usr/share/man"] },
+} satisfies Package;
+
 /** Every document above, in name order. */
-export const all: Package[] = [base, baseFiles, bash, busybox, consoleLogin, coreutils, dhcpcd, diffutils, editor, findutils, gawk, gccRuntime, glibc, gnuUtils, gnulib, grep, gzip, hostShare, ide, iproute2, linuxLibre, llvmRuntime, musl, network, nodejs, procpsNg, referenceSystem, runit, sed, tar, theia, utilLinux, vim];
+export const all: Package[] = [base, baseFiles, bash, busybox, caCertificates, consoleLogin, coreutils, curl, dhcpcd, diffutils, editor, findutils, gawk, gccRuntime, git, glibc, gnuUtils, gnulib, grep, gzip, hostShare, ide, iproute2, less, linuxLibre, llvmRuntime, musl, ncurses, network, nodejs, openssh, openssl, procpsNg, referenceSystem, runit, sed, tar, theia, utilLinux, vim, zlib];

@@ -1,0 +1,37 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "ncurses",
+  "version": "6.6",
+  // Release tag v6_6 of Thomas Dickey's ncurses-snapshots (peeled commit),
+  // chosen 2026-11-01; the repository also holds the dated snapshots
+  "source": {
+    "type": "git",
+    "url": "https://github.com/ThomasDickey/ncurses-snapshots.git",
+    "revision": "0096bd402c4a9c8f39bd7ed266e1b8920327e4d8"
+  },
+  "builder": "configure",
+  "dependencies": {
+    // tic runs on the builder to compile the terminfo database
+    "build": ["builder:gcc", "builder:make"],
+    "link": ["libc"],
+    // the libraries and the terminfo database under /usr/share/terminfo
+    "run": ["libc"]
+  },
+  "arguments": {
+    "configure": [
+      "--prefix=/usr",
+      "--with-shared",
+      "--with-termlib",
+      "--enable-widec",
+      "--without-debug",
+      "--without-ada",
+      "--without-cxx-binding",
+      "--without-manpages",
+      "--without-tests",
+      // one lookup path: the read-only root has no per-user database
+      "--with-default-terminfo-dir=/usr/share/terminfo",
+      "--disable-stripping"
+    ],
+    "strip": true
+  }
+}

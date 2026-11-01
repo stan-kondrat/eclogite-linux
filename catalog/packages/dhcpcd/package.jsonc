@@ -23,7 +23,7 @@
     // hooks are tests/<name>.sh, run in the booted guest
     "dhcp": {
       "when": { "devices": { "has": "network" } },
-      "needs": ["ip"],
+      "needs": ["iproute2"],
       "timeout_seconds": 60
     }
   },

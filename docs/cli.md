@@ -342,7 +342,7 @@ and package sources are shared across projects under the cache root. See
 
 ### Static website generation
 
-After version 1 ([Migration](migration.md#after-version-1)); until then
+After version 1; until then
 `site/` is a static prototype.
 
 ```text

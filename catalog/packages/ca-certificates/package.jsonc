@@ -1,0 +1,25 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "ca-certificates",
+  "version": "2026.10.23",
+  // The Mozilla CA bundle as packaged by certifi: tag 2026.10.23 (the newest
+  // at the pick date, 2026-11-01), peeled commit. certifi/cacert.pem is the
+  // bundle; there is nothing to compile.
+  "source": {
+    "type": "git",
+    "url": "https://github.com/certifi/python-certifi.git",
+    "revision": "b60466c9f2882d9cf088943c650b0faac06c080c"
+  },
+  "builder": "files",
+  "arguments": {
+    // Package "files" come from the package directory, not the source tree,
+    // so the bundle is copied from the source by an install hook
+    "hooks": {
+      "install": ["install"]
+    },
+    // the path curl, OpenSSL and OpenSSH-era tools look for
+    "symlinks": {
+      "/etc/ssl/cert.pem": "certs/ca-certificates.crt"
+    }
+  }
+}

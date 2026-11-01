@@ -32,11 +32,11 @@ Each item gives its options, with the recommendation listed first.
 1. **`eclogite.host/v0.1`.** Options: (a) add a schema for it now; (b) list it as
    outside v0.1.
 2. **Lock file.** Options: (a) reserve `eclogite.lock/v0.1` and document that it
-   is generated output, defined in Milestone 3; (b) define it now.
+   is generated output, defined with the lock and plan commands; (b) define it now.
 3. **Builder argument versioning.** Options: (a) version builder arguments
    with the package schema id (a builder change bumps `eclogite.package`);
    (b) give each builder its own id.
-4. **`evidence` in software.** `docs/migration.md` puts it after v0.1, but the
+4. **`evidence` in software.** the plan puts it after v0.1, but the
    schema and every catalog software profile already have it. Options:
    (a) remove it from v0.1 and reserve the name; (b) keep it with only
    `warn-untested` working.

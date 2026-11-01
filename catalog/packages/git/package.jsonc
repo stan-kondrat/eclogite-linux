@@ -1,0 +1,37 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "git",
+  "version": "2.56.0",
+  // Release tag v2.56.0 (peeled commit), chosen 2026-11-01
+  "source": {
+    "type": "git",
+    "url": "https://github.com/git/git.git",
+    "revision": "a018953688f1b10bddf91bff8747068f5f4746a4"
+  },
+  // Git's Makefile is the build; its configure script is optional and needs
+  // autoconf, so the settings are make variables
+  "builder": "make",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"],
+    "link": ["libc", "curl", "openssl", "zlib"],
+    // git-remote-https loads libcurl; the helper scripts need sh
+    "run": ["libc", "sh", "curl", "openssl", "zlib"]
+  },
+  "arguments": {
+    "variables": {
+      "prefix": "/usr",
+      "NO_GETTEXT": "1",
+      "NO_TCLTK": "1",
+      "NO_PERL": "1",
+      "NO_PYTHON": "1",
+      "NO_EXPAT": "1",
+      "NO_INSTALL_HARDLINKS": "1",
+      "SKIP_DASHED_BUILT_INS": "1"
+    },
+    "remove": ["/usr/share/man", "/usr/share/doc", "/usr/share/gitweb", "/usr/share/perl5"],
+    "strip": true
+  },
+  "tests": {
+    "version": { "timeout_seconds": 10 }
+  }
+}

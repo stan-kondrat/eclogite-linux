@@ -20,7 +20,7 @@ in the guest, from source.**
 | | Provided by | Examples |
 |---|---|---|
 | Build side: programs that run during builds | `linux-libre-vm` builder image | GCC, binutils, cross toolchains, make, perl, Python, Node.js |
-| Target side: every file in a guest image | Eclogite packages | Linux-libre, glibc, `libstdc++`, coreutils, runit, Python, Node.js, Theia |
+| Target side: every file in a guest image | Eclogite packages | Linux-libre, glibc, `libstdc++`, coreutils, runit, OpenSSL, OpenSSH, git, Python, Node.js, Theia |
 
 Nothing is copied from the builder image or from a toolchain sysroot into a
 guest. In particular:

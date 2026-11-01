@@ -9,8 +9,8 @@
 // mounts, tests and the runner's start-time contract. Nothing in the result
 // is a reference to resolve any more, and builds read only this.
 //
-// Fields marked "Milestone 3" are keys and content hashes, defined with the
-// lock and plan (docs/migration.md).
+// Keys and content hashes are written by the lock and plan commands
+// (docs/cli.md).
 //
 // Generated from schemas/ by site/types/generate.mjs. Do not edit: change
 // the schema and run `npm run types` in site/types.
@@ -31,11 +31,11 @@ import type * as Input from "./input";
 export type CompileResult = CompiledSystem | CompileFailure;
 
 export interface CompiledSystem {
-  /** OPEN(2): reserved name; defined in Milestone 3. */
+  /** OPEN(2): reserved name; generated output. */
   schema: "eclogite.lock/v0.1";
   /**
    * Hash of every input that took part, in canonical form. `build` fails
-   * when the current inputs no longer match it. Milestone 3.
+   * when the current inputs no longer match it.
    */
   input_sha256: Input.Sha256;
   /** The system file and where each referenced object came from. */
@@ -189,7 +189,7 @@ export interface Origin {
   alias?: Input.Name;
   /** A catalog (`catalog:<name>`) or a file path relative to the system file. */
   defined_in: string;
-  /** Hash of the document as parsed into the typed model. Milestone 3. */
+  /** Hash of the document as parsed into the typed model. */
   document_sha256: Input.Sha256;
 }
 
@@ -270,9 +270,9 @@ export interface ToolchainIdentity {
   release: string;
   /** Build host architecture, such as `aarch64`. Layers are never shared across hosts. */
   host: string;
-  /** The dev image booted as the builder VM. Milestone 3. */
+  /** The dev image booted as the builder VM. */
   builder_image_sha256: Input.Sha256;
-  /** The target toolchain mounted at /opt/eclogite/toolchains/<triplet>. Milestone 3. */
+  /** The target toolchain mounted at /opt/eclogite/toolchains/<triplet>. */
   target_sha256: Input.Sha256;
 }
 
@@ -371,9 +371,7 @@ export interface CompiledBuildablePackage {
     hook: Input.Name;
     output_sha256: Input.Sha256;
   };
-  /**
-   * Content hashes of everything from the package directory that enters the key. Milestone 3.
-   */
+  /** Content hashes of everything from the package directory that enters the key. */
   hashes: {
     patches: {
       path: string;
@@ -393,7 +391,7 @@ export interface CompiledBuildablePackage {
    * The package's build key: recipe, source, patches, hooks, builder,
    * arguments, parameters, platform, toolchain, compiler, its own config,
    * and the keys of its build and link dependencies, and the build
-   * environment. Milestone 3.
+   * environment.
    */
   key: Input.Sha256;
   /**

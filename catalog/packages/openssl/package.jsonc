@@ -1,0 +1,40 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "openssl",
+  "version": "3.6.5",
+  // Release tag openssl-3.6.5 (peeled commit), chosen 2026-11-01. The 3.x
+  // series is the one curl, git and OpenSSH link; 3.6 is the newest release
+  // series at the pick date.
+  "source": {
+    "type": "git",
+    "url": "https://github.com/openssl/openssl.git",
+    "revision": "c8bd5a57108599ac650bbae77fcabe3109dab2e8"
+  },
+  // It ships ./Configure and ./config, no ./configure, so it builds with
+  // make and a configure hook (hooks/configure.sh reads OPENSSL_TARGET)
+  "builder": "make",
+  "dependencies": {
+    "build": ["builder:perl", "builder:gcc", "builder:make"],
+    "link": ["libc"],
+    "run": ["libc"]
+  },
+  "arguments": {
+    "hooks": {
+      "configure": ["configure"]
+    },
+    "install_targets": ["install_sw", "install_ssldirs"],
+    "remove": ["/usr/share/doc", "/usr/share/man", "/usr/lib/*.a"],
+    "strip": true
+  },
+  "variants": [
+    { "when": { "arch": { "eq": "aarch64" } },
+      "arguments": { "environment": { "OPENSSL_TARGET": "linux-aarch64" } } },
+    { "when": { "arch": { "eq": "x86_64" } },
+      "arguments": { "environment": { "OPENSSL_TARGET": "linux-x86_64" } } },
+    { "when": { "arch": { "eq": "arm" } },
+      "arguments": { "environment": { "OPENSSL_TARGET": "linux-armv4" } } }
+  ],
+  "tests": {
+    "version": { "timeout_seconds": 10 }
+  }
+}

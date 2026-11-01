@@ -1,7 +1,6 @@
 # Reference results
 
-Acceptance data for the C host tool's resolver
-([Milestone 2](../../docs/migration.md)). For the current catalog,
+Acceptance data for the host tool's resolver. For the current catalog,
 [`golden/`](golden/) records the expected resolution of every machine ×
 software profile, following the steps of
 [docs/resolution.md](../../docs/resolution.md).

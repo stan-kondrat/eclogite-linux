@@ -1,0 +1,23 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "less",
+  "version": "712",
+  // Release tag v712 (peeled commit), chosen 2026-11-01
+  "source": {
+    "type": "git",
+    "url": "https://github.com/gwsw/less.git",
+    "revision": "7f46e9ff46216f3e560cd1f41ddf3b36b11eec0e"
+  },
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"],
+    "link": ["libc", "ncurses"],
+    "run": ["libc", "ncurses"]
+  },
+  "arguments": {
+    // The git checkout has no configure script
+    "bootstrap": "autoreconf",
+    "configure": ["--prefix=/usr", "--with-regex=posix"],
+    "remove": ["/usr/share/man"]
+  }
+}

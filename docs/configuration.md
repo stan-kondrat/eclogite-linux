@@ -787,7 +787,7 @@ on Apple Silicon.
 
 A machine with `"status": "profile-only"` records hardware that is not yet
 buildable; `eclogite create` rejects it. The Raspberry Pi profiles are
-profile-only until after version 1 ([Migration](migration.md#after-version-1)).
+profile-only until after version 1.
 
 ## Toolchain and build runtime
 

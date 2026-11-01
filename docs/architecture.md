@@ -331,8 +331,7 @@ The public `vm.sh` interface remains the same as for QEMU.
 
 ## Website output
 
-Generating the site from the catalog is after version 1
-([Migration](migration.md#after-version-1)); until then `site/` is a static
+Generating the site from the catalog is after version 1; until then `site/` is a static
 prototype with its own data file.
 
 `site/` contains only maintained HTML, CSS, and dependency-free browser

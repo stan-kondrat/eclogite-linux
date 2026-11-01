@@ -25,7 +25,7 @@ its QEMU backend with Hypervisor.framework acceleration, direct kernel boot,
 serial console, shared networking, and an imported copy of the root disk.
 
 The host builder is currently at the research and layout stage: its contracts,
-catalog, and migration plan are being agreed before the C implementation
+and catalog are being agreed before the C implementation
 begins. A dependency-free static website prototype is already implemented in
 `site/` so the catalog and graph model can be reviewed in a browser.
 
@@ -44,7 +44,6 @@ Read these documents before adding packages:
 - [Generated VM bundle](docs/vm-bundle.md)
 - [Installation, remote catalogs, and shared cache](docs/storage.md)
 - [GitHub CI and release plan](docs/ci.md)
-- [Migration plan](docs/migration.md)
 
 The planned host-tool boundary is described in
 [tools/eclogite/README.md](tools/eclogite/README.md). It will be independently
@@ -86,7 +85,7 @@ tools/eclogite/      reserved standalone C host-tool boundary
 tools/vm.sh/         reserved bundle-local vm.sh runner boundary
 site/                maintained static website source and catalog presentation;
                      site/types/generated/: TypeScript types and catalog, generated from schemas/ and catalog/
-docs/                research, design, and migration decisions
+docs/                research, and design decisions
 state/               planned locks, build plans, and explanations (ignored)
 out/                 planned package outputs, roots, and images (ignored)
 ```

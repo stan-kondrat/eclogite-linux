@@ -16,11 +16,11 @@
       "type": "object",
       "properties": {
         "schema": {
-          "description": "OPEN(2): reserved name; defined in Milestone 3.",
+          "description": "OPEN(2): reserved name; generated output.",
           "const": "eclogite.lock/v0.1"
         },
         "input_sha256": {
-          "description": "Hash of every input that took part, in canonical form. `build` fails\nwhen the current inputs no longer match it. Milestone 3.",
+          "description": "Hash of every input that took part, in canonical form. `build` fails\nwhen the current inputs no longer match it.",
           "$ref": "common.schema.json#/$defs/sha256"
         },
         "system": {
@@ -363,7 +363,7 @@
           "minLength": 1
         },
         "document_sha256": {
-          "description": "Hash of the document as parsed into the typed model. Milestone 3.",
+          "description": "Hash of the document as parsed into the typed model.",
           "$ref": "common.schema.json#/$defs/sha256"
         }
       },
@@ -582,11 +582,11 @@
           "minLength": 1
         },
         "builder_image_sha256": {
-          "description": "The dev image booted as the builder VM. Milestone 3.",
+          "description": "The dev image booted as the builder VM.",
           "$ref": "common.schema.json#/$defs/sha256"
         },
         "target_sha256": {
-          "description": "The target toolchain mounted at /opt/eclogite/toolchains/<triplet>. Milestone 3.",
+          "description": "The target toolchain mounted at /opt/eclogite/toolchains/<triplet>.",
           "$ref": "common.schema.json#/$defs/sha256"
         }
       },
@@ -859,7 +859,7 @@
           "additionalProperties": false
         },
         "hashes": {
-          "description": "Content hashes of everything from the package directory that enters the key. Milestone 3.",
+          "description": "Content hashes of everything from the package directory that enters the key.",
           "type": "object",
           "properties": {
             "patches": {
@@ -934,7 +934,7 @@
           "additionalProperties": false
         },
         "key": {
-          "description": "The package's build key: recipe, source, patches, hooks, builder,\narguments, parameters, platform, toolchain, compiler, its own config,\nand the keys of its build and link dependencies, and the build\nenvironment. Milestone 3.",
+          "description": "The package's build key: recipe, source, patches, hooks, builder,\narguments, parameters, platform, toolchain, compiler, its own config,\nand the keys of its build and link dependencies, and the build\nenvironment.",
           "$ref": "common.schema.json#/$defs/sha256"
         },
         "output_sha256": {

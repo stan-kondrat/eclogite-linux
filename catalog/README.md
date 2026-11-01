@@ -10,6 +10,14 @@ The inventory is:
 
 - 15 installed userland packages from the reference build, plus `glibc` and
   `gcc-runtime` built from the toolchain's source revisions;
+- the devbox packages (the Linux devbox VM analogue), built from
+  release tags picked on 2026-11-01: `zlib` 1.3.2, `ncurses` 6.6, `openssl`
+  3.6.5, `curl` 8.23.0, `ca-certificates` (the Mozilla bundle via certifi
+  2026.10.23, `files` builder), `git` 2.56.0, `less` 712 and `openssh` 10.6p1
+  (sshd and ssh-keygen, with the `sshd` privilege-separation account; the
+  service and `/run/sshd` belong to the package that runs sshd). `curl` and
+  `openssh` link `openssl` and `zlib`, `git` links `curl`, `openssl` and
+  `zlib`, `less` links `ncurses`; none is in a software profile yet;
 - Linux-libre as an ordinary package that provides the `kernel` capability,
   with per-architecture image targets as `variants` and a `clock` test;
 - Gnulib as a source-only build dependency;
@@ -145,8 +153,8 @@ not silently convert reference-build behavior into a supposedly finished model:
   artifacts in `mk/15-cross-toolchain.mk`. Eclogite uses those as its build
   runtime and pinned inputs, and only as the builder: nothing from them is
   installed into a guest ([build model](../docs/build-model.md));
-- the Raspberry Pi profiles are `profile-only` until after version 1
-  ([migration](../docs/migration.md#after-version-1)).
+- the Raspberry Pi profiles are `profile-only` until after version 1.
+  (a later release).
 
 Until these gaps are resolved, the JSONC files are fixtures for reviewing the
 data model. They must not be presented as reproducibly buildable definitions.

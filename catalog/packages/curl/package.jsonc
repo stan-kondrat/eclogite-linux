@@ -1,0 +1,53 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "curl",
+  "version": "8.23.0",
+  // Release tag curl-8_23_0 (peeled commit), chosen 2026-11-01
+  "source": {
+    "type": "git",
+    "url": "https://github.com/curl/curl.git",
+    "revision": "3163ec065643ba20709f190111f42c3e1fe95273"
+  },
+  "builder": "configure",
+  "dependencies": {
+    "build": ["builder:gcc", "builder:make"],
+    "link": ["libc", "openssl", "zlib"],
+    // libcurl and the curl program; git's HTTPS transport loads libcurl.
+    // The CA bundle is read from the path given to --with-ca-bundle.
+    "run": ["libc", "openssl", "zlib", "ca-certificates"]
+  },
+  "arguments": {
+    // The git checkout has no configure script
+    "bootstrap": "autoreconf",
+    "configure": [
+      "--prefix=/usr",
+      "--with-openssl",
+      "--with-zlib",
+      "--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt",
+      "--without-ca-path",
+      "--disable-static",
+      "--disable-docs",
+      "--disable-manual",
+      "--disable-ldap",
+      "--disable-ldaps",
+      "--disable-rtsp",
+      "--disable-dict",
+      "--disable-telnet",
+      "--disable-pop3",
+      "--disable-imap",
+      "--disable-smtp",
+      "--disable-gopher",
+      "--disable-mqtt",
+      "--without-libpsl",
+      "--without-libidn2",
+      "--without-brotli",
+      "--without-zstd",
+      "--without-nghttp2"
+    ],
+    "remove": ["/usr/share/man", "/usr/share/aclocal", "/usr/bin/curl-config"],
+    "strip": true
+  },
+  "tests": {
+    "version": { "timeout_seconds": 10 }
+  }
+}
