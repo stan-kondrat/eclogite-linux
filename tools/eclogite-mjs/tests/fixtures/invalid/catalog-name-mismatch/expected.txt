@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-name-mismatch/catalog/packages/zz-file/package.jsonc:3:3: name "zz-other" does not match its file (directory name "zz-file") (/name)
+1 problem
+exit 10

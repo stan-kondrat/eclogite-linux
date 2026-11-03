@@ -1,0 +1,7 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-rev",
+  "version": "1",
+  "source": { "type": "git", "url": "https://example.org/x.git", "revision": "main" },
+  "builder": "files"
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-val",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "compatible": { "target": { "arch": { "eq": "mips" } } }
+}

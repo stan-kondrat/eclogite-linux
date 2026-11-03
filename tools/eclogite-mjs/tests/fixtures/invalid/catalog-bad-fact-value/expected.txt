@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-bad-fact-value/catalog/packages/zz-val/package.jsonc:7:47: "mips" is not a value of fact arch (/compatible/target/arch/eq)
+1 problem
+exit 10

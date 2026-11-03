@@ -1,0 +1,4 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-system-unknown-machine/catalog/systems/zz-sys.jsonc:1:66: machine "no-such-machine" does not exist (/machine)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-system-unknown-machine/catalog/systems/zz-sys.jsonc:1:129: package coreutils does not provide sh (/providers/sh)
+2 problems
+exit 10

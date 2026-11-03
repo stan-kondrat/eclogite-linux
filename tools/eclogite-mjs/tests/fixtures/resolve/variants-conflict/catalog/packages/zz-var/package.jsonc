@@ -1,0 +1,11 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-var",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "variants": [
+    { "when": { "os": { "eq": "linux" } }, "arguments": { "strip": true } },
+    { "when": { "arch": { "eq": "aarch64" } }, "arguments": { "strip": false } }
+  ]
+}

@@ -1,0 +1,4 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-unknown-dependency/catalog/packages/zz-dep/package.jsonc:7:29: dependency "no-such-package" is neither a package nor a capability (/dependencies/run/0)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-unknown-dependency/catalog/packages/zz-dep/package.jsonc:7:68: dependency "nope" is neither a package nor a capability (/dependencies/run/1/first/1)
+2 problems
+exit 10

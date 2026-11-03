@@ -1,0 +1,2 @@
+eclogite-mjs: error: no alternative of {"first":["zz-x86","zz-mips"]} fits: zz-x86: target {"arch":{"eq":"x86_64"}}; zz-mips: target {"arch":{"eq":"arm"}}
+exit 11

@@ -1,0 +1,2 @@
+eclogite-mjs: error: glibc is not configurable; zz-nc requires CONFIG_X
+exit 11

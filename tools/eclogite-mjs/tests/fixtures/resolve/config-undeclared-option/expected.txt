@@ -1,0 +1,2 @@
+eclogite-mjs: error: linux-libre does not declare CONFIG_NOPE; zz-opt requires it
+exit 11

@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-missing-hook/catalog/packages/zz-hook/package.jsonc:7:41: hook file hooks/absent.sh does not exist (/arguments/hooks/install/0)
+1 problem
+exit 10

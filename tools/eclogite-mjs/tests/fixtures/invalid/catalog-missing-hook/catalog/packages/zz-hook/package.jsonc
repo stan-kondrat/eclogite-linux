@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-hook",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "arguments": { "hooks": { "install": ["absent"] } }
+}

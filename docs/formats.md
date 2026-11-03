@@ -101,3 +101,36 @@ Each item gives its options, with the recommendation listed first.
 ## Decisions
 
 None agreed yet.
+
+## Rules fixed by the reference tool
+
+Not decisions of the list above: how the reference tool
+([tools/eclogite-mjs](../tools/eclogite-mjs/README.md)) reads what the schemas
+cannot say, until the C tool exists and the formats are frozen. The tool's README
+holds the complete rules and the disagreements it found; the user-visible ones:
+
+- **Validator.** Ajv stays in the reference only as a test oracle
+  (`tests/ajv-oracle.test.mjs`). The tool validates with its own small
+  validator, which the C tool mirrors: `unevaluatedProperties` and `allOf` make
+  a library-free design cheaper than the diagnostics Ajv gives (alternatives
+  are reduced to the best one, unknown properties are reported at their key).
+  The supported keywords are listed in `src/validator.mjs`; a schema using
+  another is a hard error. The C tool must agree with Ajv on valid versus
+  invalid for every fixture and may differ in nothing else observable.
+- **Source form.** Trailing commas are errors; integers are limited to
+  +-(2^53-1); the diagnostic column counts UTF-8 bytes.
+- **Canonical form** (every hash): keys in byte order, no whitespace, decimal
+  integers, minimal string escapes. **Lock file**: pretty-printed with every
+  object's keys in byte order, 2-space indent, one final newline.
+- **Order.** The closure is the preorder of a depth-first walk in document
+  order; maps are printed in key order; `build_order` is a topological order
+  that takes the smallest name first.
+- **Pinning.** A lock refuses a `pending` fetch hash and an `unreleased`
+  toolchain; `--allow-unpinned` writes a development lock (zero digest,
+  `dev-<hash>` release) for the conformance run only.
+- **Secrets.** The `default` of a `secret` setting never reaches the lock.
+- **Keys.** A package key hashes its recipe, source, patches, hooks, files,
+  builder, compiler, merged arguments, build-time parameters, fetch hash,
+  effective config, platform, toolchain, build environment and the keys of its
+  build and link dependencies; services, accounts, mounts, tests and run
+  dependencies are outside it.

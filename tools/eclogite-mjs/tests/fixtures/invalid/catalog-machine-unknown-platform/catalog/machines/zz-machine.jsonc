@@ -1,0 +1,28 @@
+{
+  "schema": "eclogite.machine/v0.1",
+  "name": "zz-machine",
+  
+  "platform": "arm65",
+  "resources": {
+    "vcpus": 1,
+    "memory_mib": 256
+  },
+  "runtime": {
+    "backend": "qemu",
+    "machine": "virt",
+    "machine_options": ["gic-version=3"],
+    "acceleration": "auto"
+  },
+  "boot": {
+    "method": "direct-kernel",
+    "console": "ttyAMA0",
+    "kernel_arguments": ["root=/dev/vda", "ro", "console=ttyAMA0"]
+  },
+  "devices": [
+    { "kind": "serial", "model": "pl011" },
+    { "kind": "rtc", "model": "pl031" },
+    { "kind": "block", "model": "virtio-blk-device" },
+    { "kind": "network", "model": "virtio-net-device" },
+    { "kind": "shared-directory", "model": "virtio-9p-device", "optional": true }
+  ]
+}

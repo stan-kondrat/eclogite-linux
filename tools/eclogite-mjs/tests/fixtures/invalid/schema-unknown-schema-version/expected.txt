@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-unknown-schema-version/catalog/packages/zz-ver/package.jsonc:1:13: unknown schema "eclogite.package/v9" (/schema)
+1 problem
+exit 10

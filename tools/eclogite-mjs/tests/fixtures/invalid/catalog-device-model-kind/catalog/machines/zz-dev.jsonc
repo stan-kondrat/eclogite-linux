@@ -1,0 +1,1 @@
+{ "schema": "eclogite.machine/v0.1", "name": "zz-dev", "extends": "qemu-virt-arm64", "devices": [ { "kind": "serial", "model": "pl031" }, { "kind": "rtc", "model": "no-such-model" } ] }

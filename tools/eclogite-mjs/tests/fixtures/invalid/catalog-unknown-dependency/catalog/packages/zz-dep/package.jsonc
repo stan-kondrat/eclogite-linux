@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-dep",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "dependencies": { "run": ["no-such-package", { "first": ["libc", "nope"] }] }
+}

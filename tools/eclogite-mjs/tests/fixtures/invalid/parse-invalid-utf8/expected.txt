@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-invalid-utf8/catalog/systems/zz-utf8.jsonc:1:49: invalid UTF-8
+1 problem
+exit 10

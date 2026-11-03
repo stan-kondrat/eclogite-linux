@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-patch",
+  "version": "1",
+  "source": { "type": "git", "url": "https://example.org/x.git", "revision": "0123456789abcdef0123456789abcdef01234567" },
+  "builder": "make",
+  "patches": ["patches/0001.patch"]
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-tool",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "dependencies": { "build": ["builder:rustc"] }
+}

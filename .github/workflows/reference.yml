@@ -1,0 +1,68 @@
+name: Reference tool
+
+# Runs the mjs reference tool (tools/eclogite-mjs) on Linux and macOS: the
+# catalog validates, every machine x software resolution equals
+# tests/reference/golden/, locks are valid and byte-identical, and the
+# fixtures in tools/eclogite-mjs/tests/ give their expected diagnostics.
+# Draft: not pushed yet.
+
+on:
+  pull_request:
+    paths:
+      - "tools/eclogite-mjs/**"
+      - "schemas/**"
+      - "catalog/**"
+      - "tests/reference/**"
+      - "site/types/**"
+      - ".github/workflows/reference.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "tools/eclogite-mjs/**"
+      - "schemas/**"
+      - "catalog/**"
+      - "tests/reference/**"
+      - "site/types/**"
+      - ".github/workflows/reference.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reference:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install the reference tool's dependencies
+        working-directory: tools/eclogite-mjs
+        run: npm ci
+
+      - name: Validate the catalog
+        run: node tools/eclogite-mjs/bin/eclogite-mjs.mjs validate catalog
+
+      - name: Verify golden files, locks and keys
+        run: tests/reference/run
+
+      - name: Fixtures and commands
+        working-directory: tools/eclogite-mjs
+        run: node --test tests/*.test.mjs
+
+      - name: Generated site types are current
+        working-directory: site/types
+        run: |
+          npm ci
+          node generate.mjs check

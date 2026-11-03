@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-wrong-type/catalog/packages/zz-type/package.jsonc:7:14: must be string (/version)
+1 problem
+exit 10

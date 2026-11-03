@@ -1,0 +1,17 @@
+{
+  "schema": "eclogite.machine/v0.1",
+  "name": "utm-virt-arm64-devbox",
+  "aliases": ["devbox-vm"],
+  // The script's MEM=8192 and CPUS=1: Theia's build needs several GiB, and the
+  // kernel has no SMP. Resources are build inputs, so a change means a
+  // different machine, not a setting.
+  "extends": "utm-virt-arm64",
+  "resources": { "vcpus": 1, "memory_mib": 8192 },
+  // `limitations` replaces the base's list, so the base's entries are repeated
+  "limitations": [
+    "This profile requires macOS on Apple Silicon and UTM 5 or newer.",
+    "UTM shared networking has no port forwarding: open the guest's DHCP address.",
+    "UTM imports the disks into its bundle; it does not modify the immutable source images.",
+    "One vCPU: linux-libre's arm64 configuration has no SMP."
+  ]
+}

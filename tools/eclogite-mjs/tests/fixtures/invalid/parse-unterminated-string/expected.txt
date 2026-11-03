@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-unterminated-string/catalog/packages/zz-str/package.jsonc:3:11: unterminated string (/name)
+1 problem
+exit 10

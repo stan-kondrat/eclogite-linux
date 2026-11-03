@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-matches-builder-tool-revision/catalog/packages/zz-match/package.jsonc:6:27: source revision 0123456789abcdef0123456789abcdef01234567 differs from the toolchain tool's 151845ab90d3926ceb36eedf1eade09619c3adc9 (/matches_builder_tool)
+1 problem
+exit 10

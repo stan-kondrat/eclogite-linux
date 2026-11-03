@@ -1,0 +1,2 @@
+eclogite-mjs: error: test zz-need:t needs vim, which is not in the closure
+exit 11

@@ -1,0 +1,1 @@
+--machine raspberry-pi-model-b-256mb --software zz-case

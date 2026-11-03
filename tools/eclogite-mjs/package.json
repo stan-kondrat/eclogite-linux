@@ -1,0 +1,16 @@
+{
+  "name": "eclogite-mjs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reference parser, compiler and verifier for Eclogite catalogs (Node ES modules, no build step).",
+  "bin": { "eclogite-mjs": "bin/eclogite-mjs.mjs" },
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "verify": "node bin/eclogite-mjs.mjs verify"
+  },
+  "dependencies": {
+    "ajv": "8.17.1"
+  }
+}

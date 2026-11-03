@@ -1,0 +1,2 @@
+eclogite-mjs: error: CONFIG_PROC_FS=m (zz-val) is not allowed by linux-libre: y, n
+exit 11

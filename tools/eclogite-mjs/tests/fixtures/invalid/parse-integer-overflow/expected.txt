@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-integer-overflow/catalog/packages/zz-big/package.jsonc:7:40: integer out of range (beyond +-9007199254740991) (/tests/x/timeout_seconds)
+1 problem
+exit 10

@@ -1,0 +1,2 @@
+eclogite-mjs: error: build/link dependency cycle: zz-a -> zz-b -> zz-a
+exit 11

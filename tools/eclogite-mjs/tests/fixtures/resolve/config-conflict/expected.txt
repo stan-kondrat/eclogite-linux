@@ -1,0 +1,2 @@
+eclogite-mjs: error: CONFIG_PROC_FS is required as y by runit and as n by zz-conf
+exit 11

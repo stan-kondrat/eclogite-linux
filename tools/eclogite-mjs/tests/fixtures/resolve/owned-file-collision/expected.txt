@@ -1,0 +1,2 @@
+eclogite-mjs: error: /bin/sh is owned by both bash:sh and zz-own:zz-shell
+exit 11

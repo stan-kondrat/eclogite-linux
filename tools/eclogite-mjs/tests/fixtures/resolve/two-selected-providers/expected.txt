@@ -1,0 +1,2 @@
+eclogite-mjs: error: several selected packages provide sh: bash, busybox; name one in providers
+exit 11

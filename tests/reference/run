@@ -1,0 +1,11 @@
+#!/bin/sh
+# Runs the conformance check of the reference results: every machine x
+# software resolution against tests/reference/golden/, the compiled locks, and
+# tests/reference/lock-hashes.json. The files are rewritten only with
+# --update, never silently; review the diff before committing it.
+#
+#   tests/reference/run            check
+#   tests/reference/run --update   rewrite golden files and lock hashes
+set -eu
+root=$(cd "$(dirname "$0")/../.." && pwd)
+exec node "$root/tools/eclogite-mjs/bin/eclogite-mjs.mjs" verify "$@"

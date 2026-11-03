@@ -1,0 +1,4 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-duplicate-name/catalog/packages/zz-dupname/package.jsonc:3:3: name "base" does not match its file (directory name "zz-dupname") (/name)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-duplicate-name/catalog/packages/zz-dupname/package.jsonc:3:3: package "base" is already defined in catalog/packages/base/package.jsonc (/name)
+2 problems
+exit 10

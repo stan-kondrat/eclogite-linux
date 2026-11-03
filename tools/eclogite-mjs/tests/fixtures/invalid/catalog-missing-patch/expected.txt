@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-missing-patch/catalog/packages/zz-patch/package.jsonc:7:15: patch patches/0001.patch does not exist (/patches/0)
+1 problem
+exit 10

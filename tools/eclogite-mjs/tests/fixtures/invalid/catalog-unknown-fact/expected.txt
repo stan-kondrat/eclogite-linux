@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-unknown-fact/catalog/packages/zz-fact/package.jsonc:7:31: unknown fact "cpu" (/compatible/target/cpu)
+1 problem
+exit 10

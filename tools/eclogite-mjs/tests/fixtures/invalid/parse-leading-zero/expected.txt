@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-leading-zero/catalog/packages/zz-zero/package.jsonc:7:40: leading zero in number (/tests/x/timeout_seconds)
+1 problem
+exit 10

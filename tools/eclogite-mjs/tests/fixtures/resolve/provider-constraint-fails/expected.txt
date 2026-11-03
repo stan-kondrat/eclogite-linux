@@ -1,0 +1,2 @@
+eclogite-mjs: error: theia fails its target {"arch":{"in":["aarch64","x86_64"]}} (software)
+exit 11

@@ -1,0 +1,7 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-zero",
+  "version": "1",
+  "source": { "type": "git", "url": "https://example.org/x.git", "revision": "0000000000000000000000000000000000000000" },
+  "builder": "make"
+}

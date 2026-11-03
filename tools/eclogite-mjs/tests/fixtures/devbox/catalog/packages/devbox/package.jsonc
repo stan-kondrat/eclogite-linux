@@ -1,0 +1,35 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "devbox",
+  "version": "1",
+  // The devbox's own package: the sshd service with its host keys on the
+  // state volume, the login environment and sshd settings, and the tools the
+  // script installs beyond the Theia system. A fixture of the reference
+  // tool; the catalog's devbox package is added separately.
+  "source": { "type": "none" },
+  "builder": "files",
+  "compatible": {
+    // home, workspace and npm cache live on the share
+    "machine": { "all": [{ "devices": { "has": "shared-directory" } }, { "devices": { "has": "network" } }] }
+  },
+  "dependencies": {
+    "run": ["openssh", "git", "less", "ca-certificates", "host-share", "init"]
+  },
+  "services": {
+    // -D keeps sshd in the foreground for the supervisor, -e logs to stderr
+    "sshd": {
+      "run": ["sh", "-c", "ssh-keygen -A -f /var/lib/devbox && exec /bin/sshd -D -e"],
+      "create_directories": [{ "path": "/var/lib/devbox/etc/ssh", "mode": "0700" }, "/run/sshd"]
+    }
+  },
+  "arguments": {
+    "files": {
+      "files/profile.sh": "/etc/profile.d/devbox.sh",
+      "files/sshd.conf": "/etc/ssh/sshd_config.d/devbox.conf"
+    },
+    "symlinks": {
+      // programs the user installs later (npm -g) start with #!/usr/bin/env node
+      "/usr/bin/env": "/bin/env"
+    }
+  }
+}

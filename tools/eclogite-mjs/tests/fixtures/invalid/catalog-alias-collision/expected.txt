@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-alias-collision/catalog/software/zz-soft.jsonc:4:15: alias "ide" is also an alias of theia (catalog/software/theia.jsonc) (/aliases/0)
+1 problem
+exit 10

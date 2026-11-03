@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-type",
+  
+  "source": { "type": "none" },
+  "builder": "files",
+  "version": 1
+}

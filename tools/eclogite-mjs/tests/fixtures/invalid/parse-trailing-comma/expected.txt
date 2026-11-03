@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-trailing-comma/catalog/packages/zz-comma/package.jsonc:4:1: trailing comma
+1 problem
+exit 10

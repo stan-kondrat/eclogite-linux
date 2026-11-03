@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-missing-required/catalog/packages/zz-req/package.jsonc:1:1: missing required property "version"
+1 problem
+exit 10

@@ -1,0 +1,2 @@
+eclogite-mjs: error: zz-var: variants 0 and 1 set /strip to different values
+exit 11

@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-bad-unicode-escape/catalog/packages/zz-uni/package.jsonc:4:15: malformed \u escape (/version)
+1 problem
+exit 10

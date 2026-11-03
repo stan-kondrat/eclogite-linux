@@ -1,0 +1,1 @@
+{ "schema": "eclogite.system/v0.1", "name": "zz-clang", "machine": "qemu-virt-arm64", "software": "minimal", "compiler": "clang" }

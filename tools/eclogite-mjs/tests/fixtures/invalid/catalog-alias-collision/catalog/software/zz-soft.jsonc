@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "zz-soft",
+  "aliases": ["ide"],
+  "packages": ["base"],
+  "root": { "hostname": "x", "readonly": true, "tmpfs": [] },
+  "image": { "format": "ext4" }
+}

@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-float/catalog/packages/zz-float/package.jsonc:7:40: floating-point numbers are not allowed (/tests/x/timeout_seconds)
+1 problem
+exit 10

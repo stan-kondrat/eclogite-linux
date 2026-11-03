@@ -1,0 +1,2 @@
+eclogite-mjs: error: linux-libre: compiler clang is planned in toolchain linux-libre-vm
+exit 11

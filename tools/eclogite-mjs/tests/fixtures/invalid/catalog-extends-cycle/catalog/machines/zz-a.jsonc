@@ -1,0 +1,1 @@
+{ "schema": "eclogite.machine/v0.1", "name": "zz-a", "extends": "zz-b" }

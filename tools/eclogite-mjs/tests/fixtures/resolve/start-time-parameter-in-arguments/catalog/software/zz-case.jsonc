@@ -1,0 +1,9 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "zz-case",
+  "packages": ["base","zz-start"],
+  "settings": { "NAME": { "description": "a name", "type": "string", "default": "x" } },
+  "parameters": {},
+  "root": { "hostname": "x", "readonly": true, "tmpfs": ["/run"] },
+  "image": { "format": "ext4" }
+}

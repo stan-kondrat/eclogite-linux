@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-meta-with-source/catalog/packages/zz-meta/package.jsonc:4:3: unknown property "source" (/source)
+1 problem
+exit 10

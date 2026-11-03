@@ -1,0 +1,3474 @@
+{
+  "abi": {
+    "libc": "glibc",
+    "name": "linux-gnu",
+    "os": "linux",
+    "schema": "eclogite.abi/v0.1",
+    "toolchain": "linux-libre-vm",
+    "triplet": {
+      "aarch64": "linux-gnu",
+      "arm": "linux-gnueabihf",
+      "x86_64": "linux-gnu"
+    }
+  },
+  "accounts": {
+    "files": "start",
+    "groups": [
+      {
+        "from": "openssh",
+        "gid": 100,
+        "name": "sshd"
+      },
+      {
+        "from": "software",
+        "gid": "${GID}",
+        "name": "${USER}"
+      }
+    ],
+    "users": [
+      {
+        "description": "sshd privilege separation",
+        "from": "openssh",
+        "group": "sshd",
+        "home": "/run/sshd",
+        "name": "sshd",
+        "shell": "/bin/false",
+        "uid": 100
+      },
+      {
+        "description": "devbox",
+        "from": "software",
+        "gid": "${GID}",
+        "group": "${USER}",
+        "home": "/mnt/shared/home/${USER}",
+        "name": "${USER}",
+        "password": "${PASSWORD_HASH}",
+        "shell": "/bin/bash",
+        "uid": "${UID}"
+      }
+    ]
+  },
+  "build_environment": {
+    "build_directory": "/build/src",
+    "hostname": "eclogite-builder",
+    "jobs": "not an input",
+    "network": "none",
+    "source_date_epoch": 1793059200,
+    "umask": "0022",
+    "user": {
+      "gid": 1000,
+      "uid": 1000
+    },
+    "variables": {
+      "HOME": "/build/home",
+      "LANG": "C.UTF-8",
+      "LC_ALL": "C.UTF-8",
+      "PATH": "/opt/eclogite/toolchains/aarch64-linux-gnu/bin:/bin",
+      "SOURCE_DATE_EPOCH": "1793059200",
+      "TZ": "UTC"
+    }
+  },
+  "build_only": [
+    {
+      "arguments": {},
+      "builder": "source-tree",
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "9012a87df6780f724dd9933a88ed492547676daf090a93c48132c5e348c90439",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "dec18e15b1d1ac350b74ab56481a877fd9a52137b187e493b2346ca4c465c38f",
+      "kind": "buildable",
+      "name": "gnulib",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "added3409c778144f5f80e7ec1b7b7a7847272c0",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/gnulib.git"
+      },
+      "source_tree_sha256": "96e57a8dbd5052809deb7677be050f9835a518b6fb50bc6c6c15185f0db3e975",
+      "variants_applied": [],
+      "version": "snapshot-added3409"
+    }
+  ],
+  "build_order": [
+    "base-files",
+    "ca-certificates",
+    "console-login",
+    "devbox",
+    "dhcpcd",
+    "gawk",
+    "glibc",
+    "bash",
+    "gcc-runtime",
+    "gnulib",
+    "coreutils",
+    "diffutils",
+    "findutils",
+    "grep",
+    "gzip",
+    "host-share",
+    "iproute2",
+    "linux-libre",
+    "ncurses",
+    "less",
+    "nodejs",
+    "openssl",
+    "procps-ng",
+    "runit",
+    "sed",
+    "tar",
+    "theia",
+    "util-linux",
+    "vim",
+    "zlib",
+    "curl",
+    "git",
+    "openssh"
+  ],
+  "choices": {
+    "c++-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "already chosen",
+      "via": "cc-runtime"
+    },
+    "cc-runtime": {
+      "provider": "gcc-runtime",
+      "reason": "default",
+      "reference": "gcc-runtime"
+    },
+    "core-utils": {
+      "provider": "coreutils",
+      "reason": "default",
+      "reference": "coreutils"
+    },
+    "dhcp-client": {
+      "provider": "dhcpcd",
+      "reason": "default",
+      "reference": "dhcpcd"
+    },
+    "init": {
+      "provider": "runit",
+      "reason": "default",
+      "reference": "runit"
+    },
+    "ip": {
+      "provider": "iproute2",
+      "reason": "default",
+      "reference": "iproute2"
+    },
+    "kernel": {
+      "provider": "linux-libre",
+      "reason": "default",
+      "reference": "linux-libre"
+    },
+    "libc": {
+      "provider": "glibc",
+      "reason": "default",
+      "reference": {
+        "first": [
+          "glibc",
+          "musl"
+        ]
+      }
+    },
+    "linux": {
+      "provider": "linux-libre",
+      "reason": "already chosen",
+      "via": "kernel"
+    },
+    "sh": {
+      "provider": "bash",
+      "reason": "default",
+      "reference": "bash"
+    },
+    "system-utils": {
+      "provider": "util-linux",
+      "reason": "default",
+      "reference": "util-linux"
+    },
+    "utils": {
+      "provider": "gnu-utils",
+      "reason": "default",
+      "reference": "gnu-utils"
+    },
+    "vi": {
+      "provider": "vim",
+      "reason": "default",
+      "reference": "vim"
+    }
+  },
+  "closure": [
+    {
+      "kind": "meta",
+      "name": "reference-system",
+      "provides": [],
+      "run": [
+        {
+          "package": "base",
+          "reference": "base"
+        },
+        {
+          "capability": "utils",
+          "package": "gnu-utils",
+          "reference": "utils"
+        },
+        {
+          "package": "network",
+          "reference": "network"
+        },
+        {
+          "package": "editor",
+          "reference": "editor"
+        },
+        {
+          "package": "host-share",
+          "reference": "host-share"
+        }
+      ]
+    },
+    {
+      "kind": "meta",
+      "name": "base",
+      "provides": [],
+      "run": [
+        {
+          "package": "base-files",
+          "reference": "base-files"
+        },
+        {
+          "capability": "libc",
+          "package": "glibc",
+          "reference": "libc"
+        },
+        {
+          "capability": "init",
+          "package": "runit",
+          "reference": "init"
+        },
+        {
+          "capability": "sh",
+          "package": "bash",
+          "reference": "sh"
+        },
+        {
+          "capability": "core-utils",
+          "package": "coreutils",
+          "reference": "core-utils"
+        },
+        {
+          "capability": "system-utils",
+          "package": "util-linux",
+          "reference": "system-utils"
+        },
+        {
+          "package": "console-login",
+          "reference": "console-login"
+        }
+      ]
+    },
+    {
+      "arguments": {
+        "symlinks": {
+          "/etc/resolv.conf": "../run/resolv.conf"
+        }
+      },
+      "builder": "files",
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": [
+          {
+            "capability": "linux",
+            "config": {
+              "CONFIG_DEVTMPFS": "y",
+              "CONFIG_TMPFS": "y"
+            },
+            "package": "linux-libre",
+            "reference": "linux"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "7f75c62b2a54c7dc7b937f4dbd0ce5f0add8f122f61798d496c2903ca0c0b3fd",
+      "kind": "buildable",
+      "name": "base-files",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "type": "none"
+      },
+      "variants_applied": [],
+      "version": "1"
+    },
+    {
+      "arguments": {
+        "image": "Image.gz"
+      },
+      "builder": "linux-kernel",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "5c409cddacda71248affb6ada84b500e25dabd10b170181f4cc1ecda2984c4f9",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "ceddd7ca76052831b6834c5b0767dea4298b1566927b60446c51ca1c58b01e59",
+      "kind": "buildable",
+      "name": "linux-libre",
+      "parameters": {},
+      "provides": [
+        "kernel",
+        "linux"
+      ],
+      "source": {
+        "revision": "3e85aed47058aaeb9916cf756f2c2cbd41e32589",
+        "type": "git",
+        "url": "git://linux-libre.fsfla.org/releases.git"
+      },
+      "source_tree_sha256": "1fa2e152a8a332a981632b0235b0c7d51660050112ad302ab894ee1a6210476e",
+      "variants_applied": [
+        0
+      ],
+      "version": "7.1.3-gnu"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--disable-werror"
+        ],
+        "out_of_tree": true,
+        "remove": [
+          "/usr/include",
+          "/usr/share/i18n",
+          "/usr/share/info",
+          "/usr/libexec/getconf",
+          "/var/db",
+          "**/*.a"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "revision": "8e6e75d9102e39bed2a2b279203a396741180f12",
+            "tool": "python3",
+            "version": "3.14.8"
+          },
+          {
+            "tool": "bison",
+            "version": "3.8.2"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [],
+        "run": [
+          {
+            "capability": "cc-runtime",
+            "package": "gcc-runtime",
+            "reference": "cc-runtime"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "e847e128962e022846bba20b8d05dd750d6794983142b933710c9933e8ce58ec",
+      "kind": "buildable",
+      "name": "glibc",
+      "parameters": {},
+      "provides": [
+        "libc"
+      ],
+      "source": {
+        "revision": "f762ccf84f122d1354f103a151cba8bde797d521",
+        "type": "git",
+        "url": "https://sourceware.org/git/glibc.git"
+      },
+      "source_tree_sha256": "8bee804061ffbb2d364bc914d973689b55738bddb1c5924a4619a3c524e78c87",
+      "variants_applied": [],
+      "version": "2.43"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--enable-languages=c,c++",
+          "--disable-multilib",
+          "--disable-bootstrap",
+          "--disable-nls"
+        ],
+        "install_targets": [
+          "install-target-libgcc",
+          "install-target-libstdc++-v3",
+          "install-target-libatomic"
+        ],
+        "make_targets": [
+          "all-target-libgcc",
+          "all-target-libstdc++-v3",
+          "all-target-libatomic"
+        ],
+        "out_of_tree": true,
+        "remove": [
+          "/usr/include",
+          "/usr/share",
+          "**/*.a",
+          "**/*.la",
+          "**/*-gdb.py"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "41ffe24eec069a780ea7cc54610048b394e4dbecdde314c5f750a49bcdab00cc",
+      "kind": "buildable",
+      "name": "gcc-runtime",
+      "parameters": {},
+      "provides": [
+        "cc-runtime",
+        "c++-runtime"
+      ],
+      "source": {
+        "revision": "4db0e8df15bef836558857c291c323add11d035c",
+        "type": "git",
+        "url": "https://gcc.gnu.org/git/gcc.git"
+      },
+      "source_tree_sha256": "637d6b0df6897d2b0ba647980843d97a2686fbb8d453a6f082ec560277b129b8",
+      "variants_applied": [],
+      "version": "15.3.0"
+    },
+    {
+      "arguments": {
+        "directory": "src",
+        "files": {
+          "files/etc/runit/1": "/etc/runit/1",
+          "files/etc/runit/2": "/etc/runit/2",
+          "files/etc/runit/3": "/etc/runit/3",
+          "files/etc/runit/ctrlaltdel": "/etc/runit/ctrlaltdel"
+        },
+        "hooks": {
+          "configure": [
+            "conf-cc"
+          ],
+          "install": [
+            "install"
+          ]
+        },
+        "symlinks": {
+          "/bin/init": "runit-init",
+          "/etc/runit/reboot": "/run/runit/reboot",
+          "/etc/runit/stopit": "/run/runit/stopit"
+        }
+      },
+      "builder": "make",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "sh",
+            "package": "bash",
+            "reference": "sh"
+          },
+          {
+            "capability": "core-utils",
+            "package": "coreutils",
+            "reference": "core-utils"
+          },
+          {
+            "capability": "system-utils",
+            "package": "util-linux",
+            "reference": "system-utils"
+          },
+          {
+            "capability": "linux",
+            "config": {
+              "CONFIG_PROC_FS": "y",
+              "CONFIG_SYSFS": "y",
+              "CONFIG_UNIX98_PTYS": "y"
+            },
+            "package": "linux-libre",
+            "reference": "linux"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "c32099cebe32599598a5b20564f181f3ee9d9fce06c3164feaf75d7c6472cf8f",
+        "files": [
+          {
+            "path": "files/etc/runit/1",
+            "sha256": "2ec822ea8dc41065d81913094f32d53564bd4cf26ab330a8f0f923fa3d6d3f91"
+          },
+          {
+            "path": "files/etc/runit/2",
+            "sha256": "9d44a74e5bab8aa63a788922c8be8037dd83a252c4d3a980717e0d51e5967bfc"
+          },
+          {
+            "path": "files/etc/runit/3",
+            "sha256": "95705748ec46103db4cf51b7e6fa1d1a34842cb8b57d20762b8a9cc6e1bd490f"
+          },
+          {
+            "path": "files/etc/runit/ctrlaltdel",
+            "sha256": "aa484922d9720b7a03c14f161f3abd7ee5f25edd442dc45d16868fc8b2848c86"
+          }
+        ],
+        "hooks": [
+          {
+            "name": "conf-cc",
+            "sha256": "21371920e32da1ce57f86f2f135279064fe3262a7953ef4156c0edea5524b3ca"
+          },
+          {
+            "name": "install",
+            "sha256": "058e59d96341d5d8b9e7632a6969b646dd8beac5a80ea747c0630d27cfed78a8"
+          }
+        ],
+        "patches": [
+          {
+            "path": "patches/0001-runit-in-bin.patch",
+            "sha256": "8ca5ec44fed8cf3f5480e3666d9c0df7933f9a5b851f87695343670a508a8307"
+          }
+        ]
+      },
+      "key": "b4df180c87803bec5d17ba424c7f3c0be7f5bca496a8d0b7aa125fc3aff3f6a7",
+      "kind": "buildable",
+      "name": "runit",
+      "parameters": {},
+      "provides": [
+        "init"
+      ],
+      "source": {
+        "revision": "0e52a89654d375a8d634c5d9d18ab29fdb666976",
+        "type": "git",
+        "url": "https://github.com/g-pape/runit.git"
+      },
+      "source_tree_sha256": "5a5680c6bb7eb59a36f17abe802b0e396b8c72426bb13b8a0c63e2b0c8a98e67",
+      "variants_applied": [],
+      "version": "2.3.1"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "ed3c23c27f767a5f6a081fb75b404be3d69c6020684815f8f9d561fe15214157",
+      "kind": "buildable",
+      "name": "bash",
+      "parameters": {},
+      "provides": [
+        "sh"
+      ],
+      "source": {
+        "revision": "b8c60bc9ca365f8261fa97900b6fa939f6ebc303",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/bash.git"
+      },
+      "source_tree_sha256": "37fea77066153b2affa8fa1dadecd6a3780e7379f5e8c4a82b3f03f527c13e78",
+      "variants_applied": [],
+      "version": "5.3"
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "ff425a4e3fc5093af4a7904daac801ac5719d2d90548180a3cd866b9e0827bc2",
+      "kind": "buildable",
+      "name": "coreutils",
+      "parameters": {},
+      "provides": [
+        "core-utils"
+      ],
+      "source": {
+        "revision": "e2a405981ff5441dcfb217797699c94968218aca",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/coreutils.git"
+      },
+      "source_tree_sha256": "cdb9e660fa8b074833708e9c21d24143ec13221a1b3ef8272b37da581875638c",
+      "variants_applied": [],
+      "version": "9.6"
+    },
+    {
+      "arguments": {
+        "bootstrap": "autoreconf",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules",
+          "--disable-liblastlog2",
+          "--disable-makeinstall-chown",
+          "--disable-makeinstall-setuid",
+          "--without-python",
+          "--without-ncursesw",
+          "--without-ncurses",
+          "--without-tinfo"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "c2743a3034c0140b1b47fc54c43b1117c87fcb60f5a80ead07bfd7486effaeb4",
+      "kind": "buildable",
+      "name": "util-linux",
+      "parameters": {},
+      "provides": [
+        "system-utils"
+      ],
+      "source": {
+        "revision": "dbcc687f6ab1568982cdf3fe391c0beb818b7e28",
+        "type": "git",
+        "url": "https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git"
+      },
+      "source_tree_sha256": "36d257f0a6af6629376a86be7b0decd413d4135910dbad0f0f2ef2446909f5cb",
+      "variants_applied": [],
+      "version": "2.40.4"
+    },
+    {
+      "arguments": {},
+      "builder": "files",
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": [
+          {
+            "capability": "system-utils",
+            "package": "util-linux",
+            "reference": "system-utils"
+          },
+          {
+            "capability": "sh",
+            "package": "bash",
+            "reference": "sh"
+          },
+          {
+            "capability": "init",
+            "package": "runit",
+            "reference": "init"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "d8bf00152d51067aeed1144da250c77139dd4c96b19222c96841714ab58caa40",
+      "kind": "buildable",
+      "name": "console-login",
+      "parameters": {
+        "CONSOLE": {
+          "from": "/machine/boot/console",
+          "value": "ttyAMA0"
+        }
+      },
+      "provides": [],
+      "source": {
+        "type": "none"
+      },
+      "variants_applied": [],
+      "version": "1"
+    },
+    {
+      "kind": "meta",
+      "name": "gnu-utils",
+      "provides": [
+        "utils"
+      ],
+      "run": [
+        {
+          "package": "grep",
+          "reference": "grep"
+        },
+        {
+          "package": "sed",
+          "reference": "sed"
+        },
+        {
+          "package": "gawk",
+          "reference": "gawk"
+        },
+        {
+          "package": "findutils",
+          "reference": "findutils"
+        },
+        {
+          "package": "diffutils",
+          "reference": "diffutils"
+        },
+        {
+          "package": "gzip",
+          "reference": "gzip"
+        },
+        {
+          "package": "tar",
+          "reference": "tar"
+        },
+        {
+          "package": "procps-ng",
+          "reference": "procps-ng"
+        }
+      ]
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "41dcebddfd88d3569eda8020f1ec48e9bc3a2794d4043f21b181adcf674113c4",
+      "kind": "buildable",
+      "name": "grep",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "f951840aa510277fe48e5f2579a98f517246ea86",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/grep.git"
+      },
+      "source_tree_sha256": "6d0081eb8e83a5a18443f0aa25e96ad91fa71a40c3014421430c3ca1800e0f6e",
+      "variants_applied": [],
+      "version": "3.11"
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "fa77ca2f140fd4c56bdbf7144ad3ce7849cb21b160563b8166512a4253de6093",
+      "kind": "buildable",
+      "name": "sed",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "7e2e575a36bc88c0f3f3d6d8083c5f5b0ed44009",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/sed.git"
+      },
+      "source_tree_sha256": "6828cf847a122d5a1d2569912e16a587393923017b3a92f1db446f4d79c0473f",
+      "variants_applied": [],
+      "version": "4.9"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "d82ba9032f5e75027a54da22587e28fd76bf030fc83da8c2e3781b011a9b4e69",
+      "kind": "buildable",
+      "name": "gawk",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "52af7f12758da12db0ddbdb117a84e0685cd2f72",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/gawk.git"
+      },
+      "source_tree_sha256": "5f0d847ea94ac079e9ac6f70f8f80d82fbbc1ac5c1d0322918e5d0522332cb57",
+      "variants_applied": [],
+      "version": "5.4.1"
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "88ef26da7d01f8c1ce1de7709b0b8b14a6ae901fb9f939311c6b0122700800a4",
+      "kind": "buildable",
+      "name": "findutils",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "c67264238d9487d5313a131674cd7a01ca299927",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/findutils.git"
+      },
+      "source_tree_sha256": "50de1b9cf68911b687a62cb2996254cd9eff19807fdffcbe68a32e1163d924ed",
+      "variants_applied": [],
+      "version": "4.10.0"
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "9aaffeb22f81caa8cf8a3a43b8b52317d037344c14dbfa378886dd8a478b9c75",
+      "kind": "buildable",
+      "name": "diffutils",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "b1a657b85a7142b146b004a0db6a03dc6374b164",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/diffutils.git"
+      },
+      "source_tree_sha256": "35502c9d4c774c7b040887d53e4a5cc2469d39f36e42c6c4df3ebfb371d990d7",
+      "variants_applied": [],
+      "version": "3.10"
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "c4437f63aad54553dddd0edff883c76db827ecb833eb79667c806fed70a8af1d",
+      "kind": "buildable",
+      "name": "gzip",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "0ff67062bc123d07dfb1f05c78231107aa9d1869",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/gzip.git"
+      },
+      "source_tree_sha256": "904463758b46f934bafa882d68a203aedc27bcbbe0f9fb04b1dbb6d4a298b845",
+      "variants_applied": [],
+      "version": "1.13"
+    },
+    {
+      "arguments": {
+        "bootstrap": "gnulib",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "package": "gnulib",
+            "reference": "gnulib"
+          }
+        ],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "51e9e570681f30b731c31343592d897b32602ce6dfeabbb2c823f00136096613",
+      "kind": "buildable",
+      "name": "tar",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "e545d446dfe6564265cdf4186641ee76f4acc7fa",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/tar.git"
+      },
+      "source_tree_sha256": "96d34df264dc05fb61af77b836b63d1727762afa40926050d69f7515edc5ff19",
+      "variants_applied": [],
+      "version": "1.35"
+    },
+    {
+      "arguments": {
+        "bootstrap": "autoreconf",
+        "configure": [
+          "--prefix=/usr",
+          "--disable-nls",
+          "--disable-silent-rules",
+          "--disable-liblastlog2",
+          "--without-ncurses"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "7165c8c24287b69f310d790fbdfc608cfddd33c22b370e43dacccdcad4f030cf",
+      "kind": "buildable",
+      "name": "procps-ng",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "f46b2f7929cdfe2913ed0a7f585b09d6adbf994e",
+        "type": "git",
+        "url": "https://gitlab.com/procps-ng/procps.git"
+      },
+      "source_tree_sha256": "83f067f16b6170948c61174b1765eafdc605fb91f6c8ec71b6eae5e8f43b1b9d",
+      "variants_applied": [],
+      "version": "4.0.5"
+    },
+    {
+      "kind": "meta",
+      "name": "network",
+      "provides": [],
+      "run": [
+        {
+          "capability": "ip",
+          "package": "iproute2",
+          "reference": "ip"
+        },
+        {
+          "capability": "dhcp-client",
+          "package": "dhcpcd",
+          "reference": "dhcp-client"
+        }
+      ]
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "a02a1ee588a8928353c0a84d425eb9e0cc304832275e5949d90bb6fb692c4718",
+      "kind": "buildable",
+      "name": "iproute2",
+      "parameters": {},
+      "provides": [
+        "ip"
+      ],
+      "source": {
+        "revision": "d7d8203844bad5f9d8a6f3708c9b39141369aa51",
+        "type": "git",
+        "url": "https://git.kernel.org/pub/scm/network/iproute2/iproute2.git"
+      },
+      "source_tree_sha256": "7b46a4a403e989fdac2f9ba896cf10a8e0c9339068387c756f07efc899853a4f",
+      "variants_applied": [],
+      "version": "7.1.0"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--sysconfdir=/etc",
+          "--datadir=/usr/share",
+          "--libexecdir=/usr/libexec",
+          "--dbdir=/var/db/dhcpcd",
+          "--rundir=/var/run/dhcpcd"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "init",
+            "package": "runit",
+            "reference": "init"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "8199234e6aa31cdb68ffec8cedf4309def9a9b53a32ac1040db76eda92229797",
+      "kind": "buildable",
+      "name": "dhcpcd",
+      "parameters": {},
+      "provides": [
+        "dhcp-client"
+      ],
+      "source": {
+        "revision": "243ad84ac67a87d631ff7eb83b2eed2727acebb5",
+        "type": "git",
+        "url": "https://github.com/NetworkConfiguration/dhcpcd.git"
+      },
+      "source_tree_sha256": "70cd16d8909754e4c665298830414bf42c6a939538f4e0b63b32a756b1a6bf30",
+      "variants_applied": [],
+      "version": "10.3.2"
+    },
+    {
+      "kind": "meta",
+      "name": "editor",
+      "provides": [],
+      "run": [
+        {
+          "capability": "vi",
+          "package": "vim",
+          "reference": "vi"
+        }
+      ]
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--with-features=tiny",
+          "--disable-gui",
+          "--without-x",
+          "--disable-netbeans",
+          "--disable-channel",
+          "--disable-gpm",
+          "--disable-acl",
+          "--disable-nls",
+          "--disable-smack",
+          "--disable-selinux",
+          "--enable-gui=no"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "fc6bdad811641eec15323f75a9d857d72c6ceffadae431be64e27e7a7624e28d",
+      "kind": "buildable",
+      "name": "vim",
+      "parameters": {},
+      "provides": [
+        "vi"
+      ],
+      "source": {
+        "revision": "d22ff1c955ff87e8273210eae125aab0e85b6c30",
+        "type": "git",
+        "url": "https://github.com/vim/vim.git"
+      },
+      "source_tree_sha256": "234c75dcc187478d1de36c0d3ff6f7f32be981efebbbad2214666a7acd25faee",
+      "variants_applied": [],
+      "version": "9.2.0725"
+    },
+    {
+      "arguments": {},
+      "builder": "files",
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": [
+          {
+            "capability": "linux",
+            "config": {
+              "CONFIG_9P_FS": "y"
+            },
+            "package": "linux-libre",
+            "reference": "linux"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "2497c8b6c0867d25c9a27ac00c8953c862fb8a28b7ce343043ca9229f8852565",
+      "kind": "buildable",
+      "name": "host-share",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "type": "none"
+      },
+      "variants_applied": [],
+      "version": "1"
+    },
+    {
+      "kind": "meta",
+      "name": "ide",
+      "provides": [],
+      "run": [
+        {
+          "package": "theia",
+          "reference": "theia"
+        }
+      ]
+    },
+    {
+      "arguments": {
+        "application": "examples/browser",
+        "environment": {
+          "NODE_OPTIONS": "--max-old-space-size=6144",
+          "NX_DAEMON": "false",
+          "NX_DISABLE_DB": "true",
+          "PUPPETEER_SKIP_DOWNLOAD": "1"
+        },
+        "files": {
+          "files/keytar-stub.js": "/opt/theia/lib/keytar-stub.js"
+        },
+        "hooks": {
+          "build": [
+            "npm-ci",
+            "compile"
+          ],
+          "install": [
+            "bundle",
+            "plugins"
+          ]
+        },
+        "install_prefix": "/opt/theia",
+        "native_addons": {
+          "drivelist": "build",
+          "keytar": "stub",
+          "native-keymap": "skip",
+          "node-pty": "build"
+        }
+      },
+      "builder": "npm-workspace",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "151845ab90d3926ceb36eedf1eade09619c3adc9",
+            "tool": "node",
+            "version": "26.10.0"
+          },
+          {
+            "revision": "8e6e75d9102e39bed2a2b279203a396741180f12",
+            "tool": "python3",
+            "version": "3.14.8"
+          },
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "c++-runtime",
+            "package": "gcc-runtime",
+            "reference": "c++-runtime"
+          }
+        ],
+        "run": [
+          {
+            "package": "nodejs",
+            "reference": "nodejs"
+          },
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "c++-runtime",
+            "package": "gcc-runtime",
+            "reference": "c++-runtime"
+          },
+          {
+            "capability": "init",
+            "package": "runit",
+            "reference": "init"
+          },
+          {
+            "package": "host-share",
+            "reference": "host-share"
+          },
+          {
+            "capability": "linux",
+            "config": {
+              "CONFIG_INOTIFY_USER": "y"
+            },
+            "package": "linux-libre",
+            "reference": "linux"
+          }
+        ]
+      },
+      "fetch": {
+        "hook": "fetch",
+        "output_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "hashes": {
+        "builder": "f3b1ae01b3b5dd0301f75dc68c453932fa9301809c5402386a4378eb74a174c3",
+        "files": [
+          {
+            "path": "files/keytar-stub.js",
+            "sha256": "a739515c00443d9ec1a426e186eebb35137ea6752958bf312c20785499a2a041"
+          }
+        ],
+        "hooks": [
+          {
+            "name": "bundle",
+            "sha256": "4772f3bd0ec097e4c6e4d1223b242033bc37ee8e09ac957eeeba7073bd911347"
+          },
+          {
+            "name": "compile",
+            "sha256": "817f3a1a20ad5c21833a45a74483ee852c13ea75d13ab07170fc58644a9cd11e"
+          },
+          {
+            "name": "fetch",
+            "sha256": "68d4b9b6875fff42adff5bac7a54466ab29390ab7b231155e4435749620ebc14"
+          },
+          {
+            "name": "npm-ci",
+            "sha256": "964b3b558164cacecc240e30f7c210f959f236eed9f5be062b805e17b684d936"
+          },
+          {
+            "name": "plugins",
+            "sha256": "337ea49600aa45767eeabf08e4db09ef8a469996d9227fea85cd87dddcff71f4"
+          }
+        ],
+        "patches": []
+      },
+      "key": "76b98c776eb31d5323b882e935fd3cc1e31092ed6f2e75f69065afd1a61c87fb",
+      "kind": "buildable",
+      "name": "theia",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "3980769cc0ccf74ccac5a5a995f41dce3773d759",
+        "type": "git",
+        "url": "https://github.com/eclipse-theia/theia.git"
+      },
+      "source_tree_sha256": "01e420d4bef9618d522c9d02264d2171e6e28e35f0ea254fa52148103939e083",
+      "variants_applied": [],
+      "version": "1.76.0"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--cross-compiling",
+          "--dest-os=linux",
+          "--dest-cpu=arm64"
+        ],
+        "environment": {
+          "AR_host": "ar",
+          "CC_host": "gcc",
+          "CXX_host": "g++",
+          "LINK": "${CXX}",
+          "LINK_host": "g++"
+        },
+        "remove": [
+          "/usr/share/man",
+          "/usr/share/doc/node",
+          "/usr/include/node"
+        ],
+        "strip": true
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "8e6e75d9102e39bed2a2b279203a396741180f12",
+            "tool": "python3",
+            "version": "3.14.8"
+          },
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "c++-runtime",
+            "package": "gcc-runtime",
+            "reference": "c++-runtime"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "c++-runtime",
+            "package": "gcc-runtime",
+            "reference": "c++-runtime"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "5cca62d54583a6748cea499dcc207c0ed6e5692ce85c141ed57d12cee79befe5",
+      "kind": "buildable",
+      "name": "nodejs",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "151845ab90d3926ceb36eedf1eade09619c3adc9",
+        "type": "git",
+        "url": "https://github.com/nodejs/node.git"
+      },
+      "source_tree_sha256": "96eec647831a019e3ac4352a1d3ac4f2de62263e7333923b71bbbb04d1b72427",
+      "variants_applied": [
+        0
+      ],
+      "version": "26.10.0"
+    },
+    {
+      "arguments": {
+        "files": {
+          "files/profile.sh": "/etc/profile.d/devbox.sh",
+          "files/sshd.conf": "/etc/ssh/sshd_config.d/devbox.conf"
+        },
+        "symlinks": {
+          "/usr/bin/env": "/bin/env"
+        }
+      },
+      "builder": "files",
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": [
+          {
+            "package": "openssh",
+            "reference": "openssh"
+          },
+          {
+            "package": "git",
+            "reference": "git"
+          },
+          {
+            "package": "less",
+            "reference": "less"
+          },
+          {
+            "package": "ca-certificates",
+            "reference": "ca-certificates"
+          },
+          {
+            "package": "host-share",
+            "reference": "host-share"
+          },
+          {
+            "capability": "init",
+            "package": "runit",
+            "reference": "init"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "files": [
+          {
+            "path": "files/profile.sh",
+            "sha256": "786a00f8d1dcacca76dc6ab6b21ab003dc5b18f37d84e1e2587b18bc6c2f4680"
+          },
+          {
+            "path": "files/sshd.conf",
+            "sha256": "58a3ac9639f62d86ee1aa6c38a587f926b7943d4a5c38f1f71537645963d7883"
+          }
+        ],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "99fd8fc341008a4e4c65d32b1006a53b645574d5ca95860b2538eec6807562bf",
+      "kind": "buildable",
+      "name": "devbox",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "type": "none"
+      },
+      "variants_applied": [],
+      "version": "1"
+    },
+    {
+      "arguments": {
+        "bootstrap": "autoreconf",
+        "configure": [
+          "--prefix=/usr",
+          "--sysconfdir=/etc/ssh",
+          "--with-privsep-path=/run/sshd",
+          "--with-privsep-user=sshd",
+          "--with-pid-file=/run/sshd.pid",
+          "--with-default-path=/bin",
+          "--without-pam",
+          "--without-selinux",
+          "--without-libedit",
+          "--disable-strip",
+          "--disable-etc-default-login",
+          "--disable-lastlog",
+          "--disable-utmp",
+          "--disable-utmpx",
+          "--disable-wtmp",
+          "--disable-wtmpx"
+        ],
+        "install_targets": [
+          "install-nokeys"
+        ],
+        "remove": [
+          "/usr/share/man"
+        ],
+        "strip": true
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "openssl",
+            "reference": "openssl"
+          },
+          {
+            "package": "zlib",
+            "reference": "zlib"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "openssl",
+            "reference": "openssl"
+          },
+          {
+            "package": "zlib",
+            "reference": "zlib"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "81378621bc76e174a4a9c28aee9695636a43e050e42e940764277e705de8692b",
+      "kind": "buildable",
+      "name": "openssh",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "a8c72b842423f0774f542d3c2197247c3dd28d74",
+        "type": "git",
+        "url": "https://github.com/openssh/openssh-portable.git"
+      },
+      "source_tree_sha256": "1f2b623b2f0b4cfb51c8251339e36ec92bafb45b3d130d56ea03826870718561",
+      "variants_applied": [],
+      "version": "10.6p1"
+    },
+    {
+      "arguments": {
+        "environment": {
+          "OPENSSL_TARGET": "linux-aarch64"
+        },
+        "hooks": {
+          "configure": [
+            "configure"
+          ]
+        },
+        "install_targets": [
+          "install_sw",
+          "install_ssldirs"
+        ],
+        "remove": [
+          "/usr/share/doc",
+          "/usr/share/man",
+          "/usr/lib/*.a"
+        ],
+        "strip": true
+      },
+      "builder": "make",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "e634cc838fb1785dfafb5d13b52807ea16b5c52c",
+            "tool": "perl"
+          },
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "c32099cebe32599598a5b20564f181f3ee9d9fce06c3164feaf75d7c6472cf8f",
+        "files": [],
+        "hooks": [
+          {
+            "name": "configure",
+            "sha256": "6d4165d83dc19994a3093c857bd79f168562c8c3f99b28d70cdc8ce4b598f695"
+          }
+        ],
+        "patches": []
+      },
+      "key": "66564034f81be5999efff80d54e3df9008b860e78bcfdcd9bbfe7ae0bad00b7d",
+      "kind": "buildable",
+      "name": "openssl",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "c8bd5a57108599ac650bbae77fcabe3109dab2e8",
+        "type": "git",
+        "url": "https://github.com/openssl/openssl.git"
+      },
+      "source_tree_sha256": "db9b8a96c466a281b1c54cae9ea0c8dc4b1608d54aa797b289cb59a1d736c274",
+      "variants_applied": [
+        0
+      ],
+      "version": "3.6.5"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--shared"
+        ],
+        "remove": [
+          "/usr/share/man"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "749eb637e77ef13de2cfa68f2ebbac4b2463f64ea2e2486bf970850e16ba31e1",
+      "kind": "buildable",
+      "name": "zlib",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "da607da739fa6047df13e66a2af6b8bec7c2a498",
+        "type": "git",
+        "url": "https://github.com/madler/zlib.git"
+      },
+      "source_tree_sha256": "58f4f60dc08fc52612fa457c3c66b934df71816e799e5a359ee2a868d2ba7658",
+      "variants_applied": [],
+      "version": "1.3.2"
+    },
+    {
+      "arguments": {
+        "remove": [
+          "/usr/share/man",
+          "/usr/share/doc",
+          "/usr/share/gitweb",
+          "/usr/share/perl5"
+        ],
+        "strip": true,
+        "variables": {
+          "NO_EXPAT": "1",
+          "NO_GETTEXT": "1",
+          "NO_INSTALL_HARDLINKS": "1",
+          "NO_PERL": "1",
+          "NO_PYTHON": "1",
+          "NO_TCLTK": "1",
+          "SKIP_DASHED_BUILT_INS": "1",
+          "prefix": "/usr"
+        }
+      },
+      "builder": "make",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "curl",
+            "reference": "curl"
+          },
+          {
+            "package": "openssl",
+            "reference": "openssl"
+          },
+          {
+            "package": "zlib",
+            "reference": "zlib"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "capability": "sh",
+            "package": "bash",
+            "reference": "sh"
+          },
+          {
+            "package": "curl",
+            "reference": "curl"
+          },
+          {
+            "package": "openssl",
+            "reference": "openssl"
+          },
+          {
+            "package": "zlib",
+            "reference": "zlib"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "c32099cebe32599598a5b20564f181f3ee9d9fce06c3164feaf75d7c6472cf8f",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "adfa4952210184b0463e5831db4964ef21c96864a546bf4d385ac602eb0f9133",
+      "kind": "buildable",
+      "name": "git",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "a018953688f1b10bddf91bff8747068f5f4746a4",
+        "type": "git",
+        "url": "https://github.com/git/git.git"
+      },
+      "source_tree_sha256": "8ffbc3ed95d3961ad2599f5e0a7975759f8f0694a3057d3cbf8208af82092273",
+      "variants_applied": [],
+      "version": "2.56.0"
+    },
+    {
+      "arguments": {
+        "bootstrap": "autoreconf",
+        "configure": [
+          "--prefix=/usr",
+          "--with-openssl",
+          "--with-zlib",
+          "--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt",
+          "--without-ca-path",
+          "--disable-static",
+          "--disable-docs",
+          "--disable-manual",
+          "--disable-ldap",
+          "--disable-ldaps",
+          "--disable-rtsp",
+          "--disable-dict",
+          "--disable-telnet",
+          "--disable-pop3",
+          "--disable-imap",
+          "--disable-smtp",
+          "--disable-gopher",
+          "--disable-mqtt",
+          "--without-libpsl",
+          "--without-libidn2",
+          "--without-brotli",
+          "--without-zstd",
+          "--without-nghttp2"
+        ],
+        "remove": [
+          "/usr/share/man",
+          "/usr/share/aclocal",
+          "/usr/bin/curl-config"
+        ],
+        "strip": true
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "openssl",
+            "reference": "openssl"
+          },
+          {
+            "package": "zlib",
+            "reference": "zlib"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "openssl",
+            "reference": "openssl"
+          },
+          {
+            "package": "zlib",
+            "reference": "zlib"
+          },
+          {
+            "package": "ca-certificates",
+            "reference": "ca-certificates"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "04c14413962159209b6726da50c766c2ca0706d64a75437cb915aacb8ffa0cca",
+      "kind": "buildable",
+      "name": "curl",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "3163ec065643ba20709f190111f42c3e1fe95273",
+        "type": "git",
+        "url": "https://github.com/curl/curl.git"
+      },
+      "source_tree_sha256": "4588010ad1b30a7f2ba63d6e143b31bd5ff9d247bbb3354565ba1f00e74e03aa",
+      "variants_applied": [],
+      "version": "8.23.0"
+    },
+    {
+      "arguments": {
+        "hooks": {
+          "install": [
+            "install"
+          ]
+        },
+        "symlinks": {
+          "/etc/ssl/cert.pem": "certs/ca-certificates.crt"
+        }
+      },
+      "builder": "files",
+      "dependencies": {
+        "build": [],
+        "link": [],
+        "run": []
+      },
+      "hashes": {
+        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "files": [],
+        "hooks": [
+          {
+            "name": "install",
+            "sha256": "57e653549ae17f21fdae7cc68e26989d225dafd36e8f9ecfd15f8a2d7c223899"
+          }
+        ],
+        "patches": []
+      },
+      "key": "f7423717862bfa0840d198abe75828c5a42eb5e5d818428b27461394670602f1",
+      "kind": "buildable",
+      "name": "ca-certificates",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "b60466c9f2882d9cf088943c650b0faac06c080c",
+        "type": "git",
+        "url": "https://github.com/certifi/python-certifi.git"
+      },
+      "source_tree_sha256": "13238544b4b84570e31fac420106b933416f25baa09678e81503c49f934134dd",
+      "variants_applied": [],
+      "version": "2026.10.23"
+    },
+    {
+      "arguments": {
+        "bootstrap": "autoreconf",
+        "configure": [
+          "--prefix=/usr",
+          "--with-regex=posix"
+        ],
+        "remove": [
+          "/usr/share/man"
+        ]
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "ncurses",
+            "reference": "ncurses"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          },
+          {
+            "package": "ncurses",
+            "reference": "ncurses"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "3aea3c94b0b0ea20ff89837f8021d813927ac3909ac4844b11fe93bf898c64f3",
+      "kind": "buildable",
+      "name": "less",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "7f46e9ff46216f3e560cd1f41ddf3b36b11eec0e",
+        "type": "git",
+        "url": "https://github.com/gwsw/less.git"
+      },
+      "source_tree_sha256": "a39630369219651c2468455e9513300d8df620843e101b8aecaf961959c08782",
+      "variants_applied": [],
+      "version": "712"
+    },
+    {
+      "arguments": {
+        "configure": [
+          "--prefix=/usr",
+          "--with-shared",
+          "--with-termlib",
+          "--enable-widec",
+          "--without-debug",
+          "--without-ada",
+          "--without-cxx-binding",
+          "--without-manpages",
+          "--without-tests",
+          "--with-default-terminfo-dir=/usr/share/terminfo",
+          "--disable-stripping"
+        ],
+        "strip": true
+      },
+      "builder": "configure",
+      "compiler": {
+        "name": "gcc",
+        "reason": "system"
+      },
+      "dependencies": {
+        "build": [
+          {
+            "revision": "4db0e8df15bef836558857c291c323add11d035c",
+            "tool": "gcc",
+            "version": "15.3.0"
+          },
+          {
+            "tool": "make",
+            "version": "4.4.1"
+          }
+        ],
+        "link": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ],
+        "run": [
+          {
+            "capability": "libc",
+            "package": "glibc",
+            "reference": "libc"
+          }
+        ]
+      },
+      "hashes": {
+        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "files": [],
+        "hooks": [],
+        "patches": []
+      },
+      "key": "3919cbcea1bb39017f9d40097d018554ed0e05451cfb62361c4a786ecdf909fe",
+      "kind": "buildable",
+      "name": "ncurses",
+      "parameters": {},
+      "provides": [],
+      "source": {
+        "revision": "0096bd402c4a9c8f39bd7ed266e1b8920327e4d8",
+        "type": "git",
+        "url": "https://github.com/ThomasDickey/ncurses-snapshots.git"
+      },
+      "source_tree_sha256": "cf8016834e748a1c58e7325de519aa1096e907ca52048a4a457b3ca0c5931169",
+      "variants_applied": [],
+      "version": "6.6"
+    }
+  ],
+  "compiler": {
+    "from": "defaults",
+    "name": "gcc"
+  },
+  "conditions": [
+    {
+      "dependency": "host-share",
+      "from": "reference-system",
+      "held": true,
+      "when": {
+        "devices": {
+          "has": "shared-directory"
+        }
+      }
+    },
+    {
+      "dependency": "linux",
+      "from": "base-files",
+      "held": true,
+      "when": {
+        "os": {
+          "eq": "linux"
+        }
+      }
+    },
+    {
+      "dependency": "linux",
+      "from": "theia",
+      "held": true,
+      "when": {
+        "os": {
+          "eq": "linux"
+        }
+      }
+    }
+  ],
+  "config": {
+    "linux-libre": {
+      "effective": {
+        "CONFIG_9P_FS": "y",
+        "CONFIG_DEVTMPFS": "y",
+        "CONFIG_I2C_BCM2835": "n",
+        "CONFIG_INOTIFY_USER": "y",
+        "CONFIG_MMC": "n",
+        "CONFIG_MMC_BCM2835": "n",
+        "CONFIG_NET_9P": "y",
+        "CONFIG_NET_9P_VIRTIO": "y",
+        "CONFIG_PINCTRL_BCM2835": "n",
+        "CONFIG_PREEMPT": "n",
+        "CONFIG_PROC_FS": "y",
+        "CONFIG_RTC_CLASS": "y",
+        "CONFIG_RTC_DRV_CMOS": "n",
+        "CONFIG_RTC_DRV_PL031": "y",
+        "CONFIG_RTC_HCTOSYS": "y",
+        "CONFIG_SERIAL_8250": "n",
+        "CONFIG_SERIAL_8250_BCM2835AUX": "n",
+        "CONFIG_SERIAL_8250_CONSOLE": "n",
+        "CONFIG_SERIAL_AMBA_PL011": "y",
+        "CONFIG_SERIAL_AMBA_PL011_CONSOLE": "y",
+        "CONFIG_SPI_BCM2835": "n",
+        "CONFIG_SYSFS": "y",
+        "CONFIG_TMPFS": "y",
+        "CONFIG_UNIX98_PTYS": "y",
+        "CONFIG_USB": "n",
+        "CONFIG_USB_DWC2": "n",
+        "CONFIG_USB_NET_SMSC95XX": "n",
+        "CONFIG_USB_USBNET": "n",
+        "CONFIG_VIRTIO": "y",
+        "CONFIG_VIRTIO_BLK": "y",
+        "CONFIG_VIRTIO_MMIO": "y",
+        "CONFIG_VIRTIO_NET": "y",
+        "CONFIG_VIRTIO_PCI": "n"
+      },
+      "format": "kconfig",
+      "required": {
+        "CONFIG_9P_FS": {
+          "source": {
+            "kind": "dependency",
+            "package": "host-share"
+          },
+          "value": "y"
+        },
+        "CONFIG_DEVTMPFS": {
+          "source": {
+            "kind": "dependency",
+            "package": "base-files"
+          },
+          "value": "y"
+        },
+        "CONFIG_INOTIFY_USER": {
+          "source": {
+            "kind": "dependency",
+            "package": "theia"
+          },
+          "value": "y"
+        },
+        "CONFIG_NET_9P": {
+          "source": {
+            "kind": "implied",
+            "option": "CONFIG_9P_FS"
+          },
+          "value": "y"
+        },
+        "CONFIG_NET_9P_VIRTIO": {
+          "source": {
+            "device_kind": "shared-directory",
+            "kind": "device",
+            "model": "virtio-9p-device"
+          },
+          "value": "y"
+        },
+        "CONFIG_PROC_FS": {
+          "source": {
+            "kind": "dependency",
+            "package": "runit"
+          },
+          "value": "y"
+        },
+        "CONFIG_RTC_CLASS": {
+          "source": {
+            "device_kind": "rtc",
+            "kind": "device",
+            "model": "pl031"
+          },
+          "value": "y"
+        },
+        "CONFIG_RTC_DRV_PL031": {
+          "source": {
+            "device_kind": "rtc",
+            "kind": "device",
+            "model": "pl031"
+          },
+          "value": "y"
+        },
+        "CONFIG_RTC_HCTOSYS": {
+          "source": {
+            "device_kind": "rtc",
+            "kind": "device",
+            "model": "pl031"
+          },
+          "value": "y"
+        },
+        "CONFIG_SERIAL_AMBA_PL011": {
+          "source": {
+            "device_kind": "serial",
+            "kind": "device",
+            "model": "pl011"
+          },
+          "value": "y"
+        },
+        "CONFIG_SERIAL_AMBA_PL011_CONSOLE": {
+          "source": {
+            "device_kind": "serial",
+            "kind": "device",
+            "model": "pl011"
+          },
+          "value": "y"
+        },
+        "CONFIG_SYSFS": {
+          "source": {
+            "kind": "dependency",
+            "package": "runit"
+          },
+          "value": "y"
+        },
+        "CONFIG_TMPFS": {
+          "source": {
+            "kind": "dependency",
+            "package": "base-files"
+          },
+          "value": "y"
+        },
+        "CONFIG_UNIX98_PTYS": {
+          "source": {
+            "kind": "dependency",
+            "package": "runit"
+          },
+          "value": "y"
+        },
+        "CONFIG_VIRTIO": {
+          "source": {
+            "kind": "implied",
+            "option": "CONFIG_VIRTIO_MMIO"
+          },
+          "value": "y"
+        },
+        "CONFIG_VIRTIO_BLK": {
+          "source": {
+            "device_kind": "block",
+            "kind": "device",
+            "model": "virtio-blk-device"
+          },
+          "value": "y"
+        },
+        "CONFIG_VIRTIO_MMIO": {
+          "source": {
+            "device_kind": "block",
+            "kind": "device",
+            "model": "virtio-blk-device"
+          },
+          "value": "y"
+        },
+        "CONFIG_VIRTIO_NET": {
+          "source": {
+            "device_kind": "network",
+            "kind": "device",
+            "model": "virtio-net-device"
+          },
+          "value": "y"
+        }
+      }
+    }
+  },
+  "facts": {
+    "machine": {
+      "block_devices": "unbounded",
+      "devices": [
+        "block",
+        "network",
+        "rtc",
+        "serial",
+        "shared-directory"
+      ],
+      "memory_mib": 8192,
+      "vcpus": 1
+    },
+    "target": {
+      "abi": "linux-gnu",
+      "arch": "aarch64",
+      "bits": 64,
+      "cpu_features": [
+        "fp",
+        "asimd"
+      ],
+      "endian": "little",
+      "isa": "armv8-a",
+      "libc": "glibc",
+      "mmu": true,
+      "os": "linux"
+    }
+  },
+  "images": {
+    "root": {
+      "exclude": [
+        "/usr/share/man",
+        "/usr/share/info",
+        "/usr/share/doc",
+        "/usr/share/locale"
+      ],
+      "filesystem_uuid": "16c1d1ff-3e77-5e17-b7cb-f0f0362714bf",
+      "format": "ext4",
+      "hash_seed": "629bb9e9-7978-5df8-b26f-5704aec4988e",
+      "readonly": true,
+      "strip": true
+    },
+    "volumes": [
+      {
+        "exclude": [],
+        "filesystem_uuid": "61864f8b-0969-5976-9212-1bc6bdd6d518",
+        "format": "ext4",
+        "hash_seed": "2abfd434-a219-57bd-8674-d8d04f6fd008",
+        "mount": "/opt/theia",
+        "name": "theia",
+        "packages": [
+          "theia"
+        ],
+        "readonly": true,
+        "strip": false
+      }
+    ]
+  },
+  "input_sha256": "d7eedad645b164abe4fdb9025385ace189a8bd5fa62cce47f4957135a4d65170",
+  "machine": {
+    "boot": {
+      "console": "ttyAMA0",
+      "kernel_arguments": [
+        "root=/dev/vda",
+        "ro",
+        "console=ttyAMA0"
+      ],
+      "method": "direct-kernel"
+    },
+    "devices": [
+      {
+        "kind": "serial",
+        "model": "pl011"
+      },
+      {
+        "kind": "rtc",
+        "model": "pl031"
+      },
+      {
+        "kind": "block",
+        "model": "virtio-blk-device"
+      },
+      {
+        "kind": "network",
+        "mode": "shared",
+        "model": "virtio-net-device"
+      },
+      {
+        "kind": "shared-directory",
+        "model": "virtio-9p-device",
+        "optional": true
+      }
+    ],
+    "limitations": [
+      "This profile requires macOS on Apple Silicon and UTM 5 or newer.",
+      "UTM shared networking has no port forwarding: open the guest's DHCP address.",
+      "UTM imports the disks into its bundle; it does not modify the immutable source images.",
+      "One vCPU: linux-libre's arm64 configuration has no SMP."
+    ],
+    "merged_from": [
+      "utm-virt-arm64-devbox",
+      "utm-virt-arm64"
+    ],
+    "name": "utm-virt-arm64-devbox",
+    "platform": "arm64",
+    "resources": {
+      "memory_mib": 8192,
+      "vcpus": 1
+    },
+    "runtime": {
+      "acceleration": "hvf",
+      "application": "UTM",
+      "backend": "utm",
+      "bundle_format": "utm",
+      "disk_import": "copy",
+      "host": {
+        "architecture": "arm64",
+        "os": "macos"
+      },
+      "machine": "virt",
+      "machine_options": [
+        "gic-version=3"
+      ],
+      "minimum_version": "5",
+      "virtualization_backend": "qemu"
+    },
+    "schema": "eclogite.machine/v0.1"
+  },
+  "mounts": {
+    "/": {
+      "from": "software.root",
+      "options": [
+        "ro"
+      ],
+      "source": "/dev/vda",
+      "type": "ext4"
+    },
+    "/mnt/shared": {
+      "from": "host-share",
+      "optional": true,
+      "options": [
+        "trans=virtio",
+        "version=9p2000.L",
+        "msize=262144"
+      ],
+      "source": "share",
+      "type": "9p"
+    },
+    "/opt/theia": {
+      "from": "software.volumes",
+      "options": [
+        "ro"
+      ],
+      "source": "/dev/vdb",
+      "type": "ext4"
+    },
+    "/run": {
+      "from": "software.tmpfs",
+      "source": "none",
+      "type": "tmpfs"
+    },
+    "/run/eclogite/config": {
+      "from": "runtime.config",
+      "options": [
+        "ro"
+      ],
+      "source": "/dev/vdd",
+      "type": "ext4"
+    },
+    "/tmp": {
+      "from": "software.tmpfs",
+      "source": "none",
+      "type": "tmpfs"
+    },
+    "/var/lib/devbox": {
+      "from": "software.state",
+      "source": "/dev/vdc",
+      "type": "ext4"
+    }
+  },
+  "owned_files": {
+    "/bin/getty": {
+      "capability": "system-utils",
+      "provider": "util-linux",
+      "target": "agetty",
+      "type": "symlink"
+    },
+    "/bin/sh": {
+      "capability": "sh",
+      "provider": "bash",
+      "target": "bash",
+      "type": "symlink"
+    },
+    "/bin/vi": {
+      "capability": "vi",
+      "provider": "vim",
+      "target": "vim",
+      "type": "symlink"
+    }
+  },
+  "platform": {
+    "architecture": "aarch64",
+    "cpu": {
+      "bits": 64,
+      "endian": "little",
+      "features": [
+        "fp",
+        "asimd"
+      ],
+      "isa": "armv8-a",
+      "mmu": true
+    },
+    "kernel_architecture": "arm64",
+    "name": "arm64",
+    "schema": "eclogite.platform/v0.1",
+    "triplet_cpu": "aarch64"
+  },
+  "runtime": {
+    "commands": {
+      "logs": {
+        "description": "follow the Theia and sshd logs",
+        "follow": [
+          "/var/log/theia/current",
+          "/var/log/sshd/current"
+        ]
+      },
+      "open": {
+        "description": "open Theia in the browser",
+        "open": "theia"
+      },
+      "restart-theia": {
+        "description": "restart the Theia service",
+        "guest": [
+          "sv",
+          "restart",
+          "theia"
+        ]
+      },
+      "ssh": {
+        "description": "ssh to the VM as the devbox user",
+        "ssh": "ssh"
+      }
+    },
+    "delivery": {
+      "device": "config-disk",
+      "mount": "/run/eclogite/config"
+    },
+    "endpoints": {
+      "ssh": {
+        "description": "OpenSSH, password login",
+        "port": 22,
+        "protocol": "ssh",
+        "user": "${USER}"
+      },
+      "theia": {
+        "description": "Eclipse Theia",
+        "port": "${PORT}",
+        "protocol": "http"
+      }
+    },
+    "settings": {
+      "DEVBOX_PASSWORD": {
+        "description": "Password of the login user, for SSH.",
+        "secret": true,
+        "type": "string"
+      },
+      "DEVBOX_USER": {
+        "default": "dev",
+        "description": "Login user for Theia's terminal and SSH; not root.",
+        "pattern": "^(?!root$)[a-z_][a-z0-9_-]*$",
+        "type": "string"
+      },
+      "HOSTNAME": {
+        "default": "devbox",
+        "description": "Guest hostname.",
+        "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+        "type": "string"
+      },
+      "THEIA_PORT": {
+        "default": 3000,
+        "description": "Port Theia listens on.",
+        "maximum": 65535,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "state": [
+      {
+        "format": "ext4",
+        "mount": "/var/lib/devbox",
+        "name": "devbox-state",
+        "size_mib": 16
+      }
+    ],
+    "values": {
+      "software": {
+        "GID": {
+          "host": "gid"
+        },
+        "HOSTNAME": {
+          "setting": "HOSTNAME"
+        },
+        "PASSWORD_HASH": {
+          "crypt_sha512": {
+            "setting": "DEVBOX_PASSWORD"
+          }
+        },
+        "PORT": {
+          "setting": "THEIA_PORT"
+        },
+        "UID": {
+          "host": "uid"
+        },
+        "USER": {
+          "setting": "DEVBOX_USER"
+        }
+      }
+    }
+  },
+  "schema": "eclogite.lock/v0.1",
+  "selected_by": {
+    "base": [
+      "software",
+      "reference-system",
+      "base"
+    ],
+    "base-files": [
+      "software",
+      "reference-system",
+      "base",
+      "base-files"
+    ],
+    "bash": [
+      "software",
+      "reference-system",
+      "base",
+      "runit",
+      "bash"
+    ],
+    "ca-certificates": [
+      "software",
+      "devbox",
+      "git",
+      "curl",
+      "ca-certificates"
+    ],
+    "console-login": [
+      "software",
+      "reference-system",
+      "base",
+      "console-login"
+    ],
+    "coreutils": [
+      "software",
+      "reference-system",
+      "base",
+      "runit",
+      "coreutils"
+    ],
+    "curl": [
+      "software",
+      "devbox",
+      "git",
+      "curl"
+    ],
+    "devbox": [
+      "software",
+      "devbox"
+    ],
+    "dhcpcd": [
+      "software",
+      "reference-system",
+      "network",
+      "dhcpcd"
+    ],
+    "diffutils": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "diffutils"
+    ],
+    "editor": [
+      "software",
+      "reference-system",
+      "editor"
+    ],
+    "findutils": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "findutils"
+    ],
+    "gawk": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "gawk"
+    ],
+    "gcc-runtime": [
+      "software",
+      "reference-system",
+      "base",
+      "glibc",
+      "gcc-runtime"
+    ],
+    "git": [
+      "software",
+      "devbox",
+      "git"
+    ],
+    "glibc": [
+      "software",
+      "reference-system",
+      "base",
+      "glibc"
+    ],
+    "gnu-utils": [
+      "software",
+      "reference-system",
+      "gnu-utils"
+    ],
+    "gnulib": [
+      "software",
+      "reference-system",
+      "base",
+      "runit",
+      "coreutils",
+      "gnulib"
+    ],
+    "grep": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "grep"
+    ],
+    "gzip": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "gzip"
+    ],
+    "host-share": [
+      "software",
+      "reference-system",
+      "host-share"
+    ],
+    "ide": [
+      "software",
+      "ide"
+    ],
+    "iproute2": [
+      "software",
+      "reference-system",
+      "network",
+      "iproute2"
+    ],
+    "less": [
+      "software",
+      "devbox",
+      "less"
+    ],
+    "linux-libre": [
+      "software",
+      "reference-system",
+      "base",
+      "base-files",
+      "linux-libre"
+    ],
+    "ncurses": [
+      "software",
+      "devbox",
+      "less",
+      "ncurses"
+    ],
+    "network": [
+      "software",
+      "reference-system",
+      "network"
+    ],
+    "nodejs": [
+      "software",
+      "ide",
+      "theia",
+      "nodejs"
+    ],
+    "openssh": [
+      "software",
+      "devbox",
+      "openssh"
+    ],
+    "openssl": [
+      "software",
+      "devbox",
+      "openssh",
+      "openssl"
+    ],
+    "procps-ng": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "procps-ng"
+    ],
+    "reference-system": [
+      "software",
+      "reference-system"
+    ],
+    "runit": [
+      "software",
+      "reference-system",
+      "base",
+      "runit"
+    ],
+    "sed": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "sed"
+    ],
+    "tar": [
+      "software",
+      "reference-system",
+      "gnu-utils",
+      "tar"
+    ],
+    "theia": [
+      "software",
+      "ide",
+      "theia"
+    ],
+    "util-linux": [
+      "software",
+      "reference-system",
+      "base",
+      "runit",
+      "util-linux"
+    ],
+    "vim": [
+      "software",
+      "reference-system",
+      "editor",
+      "vim"
+    ],
+    "zlib": [
+      "software",
+      "devbox",
+      "openssh",
+      "zlib"
+    ]
+  },
+  "services": {
+    "dhcpcd": {
+      "package": "dhcpcd",
+      "run": [
+        "dhcpcd",
+        "-B",
+        "-4",
+        "-q"
+      ]
+    },
+    "getty": {
+      "log": false,
+      "package": "console-login",
+      "restart_delay_seconds": 5,
+      "run": [
+        "setsid",
+        "-c",
+        "getty",
+        "-L",
+        "-n",
+        "-l",
+        "/bin/sh",
+        "115200",
+        "ttyAMA0",
+        "vt100"
+      ],
+      "stdin": "/dev/ttyAMA0"
+    },
+    "sshd": {
+      "create_directories": [
+        {
+          "mode": "0700",
+          "path": "/var/lib/devbox/etc/ssh"
+        },
+        "/run/sshd"
+      ],
+      "package": "devbox",
+      "run": [
+        "sh",
+        "-c",
+        "ssh-keygen -A -f /var/lib/devbox && exec /bin/sshd -D -e"
+      ]
+    },
+    "theia": {
+      "create_directories": [
+        "/mnt/shared/workspace",
+        {
+          "owner": "${USER}",
+          "path": "/mnt/shared/home/${USER}"
+        },
+        {
+          "mode": "0700",
+          "owner": "${USER}",
+          "path": "/run/user/${UID}"
+        }
+      ],
+      "directory": "/opt/theia/examples/browser",
+      "environment": {
+        "HOME": "/mnt/shared/home/${USER}",
+        "NODE_OPTIONS": "--max-old-space-size=6144",
+        "XDG_RUNTIME_DIR": "/run/user/${UID}"
+      },
+      "overridden": [
+        "create_directories",
+        "environment",
+        "user"
+      ],
+      "package": "theia",
+      "requires_mounts": [
+        "/mnt/shared"
+      ],
+      "run": [
+        "node",
+        "-r",
+        "/opt/theia/lib/keytar-stub.js",
+        "lib/backend/main.js",
+        "/mnt/shared/workspace",
+        "--hostname=0.0.0.0",
+        "--port=3000",
+        "--log-config=log-config.json",
+        "--plugins=local-dir:/opt/theia/plugins",
+        "--ovsx-router-config=../ovsx-router-config.json"
+      ],
+      "user": "${USER}"
+    }
+  },
+  "software": {
+    "commands": {
+      "logs": {
+        "description": "follow the Theia and sshd logs",
+        "follow": [
+          "/var/log/theia/current",
+          "/var/log/sshd/current"
+        ]
+      },
+      "open": {
+        "description": "open Theia in the browser",
+        "open": "theia"
+      },
+      "restart-theia": {
+        "description": "restart the Theia service",
+        "guest": [
+          "sv",
+          "restart",
+          "theia"
+        ]
+      },
+      "ssh": {
+        "description": "ssh to the VM as the devbox user",
+        "ssh": "ssh"
+      }
+    },
+    "endpoints": {
+      "ssh": {
+        "description": "OpenSSH, password login",
+        "port": 22,
+        "protocol": "ssh",
+        "user": "${USER}"
+      },
+      "theia": {
+        "description": "Eclipse Theia",
+        "port": "${PORT}",
+        "protocol": "http"
+      }
+    },
+    "evidence": {
+      "default": "warn-untested"
+    },
+    "image": {
+      "exclude": [
+        "/usr/share/man",
+        "/usr/share/info",
+        "/usr/share/doc",
+        "/usr/share/locale"
+      ],
+      "format": "ext4",
+      "strip": true
+    },
+    "name": "devbox",
+    "packages": [
+      "reference-system",
+      "ide",
+      "devbox"
+    ],
+    "parameters": {
+      "GID": {
+        "host": "gid"
+      },
+      "HOSTNAME": {
+        "setting": "HOSTNAME"
+      },
+      "NODE_HEAP": {
+        "divide": 4,
+        "multiply": 3,
+        "scale": "/machine/resources/memory_mib"
+      },
+      "PASSWORD_HASH": {
+        "crypt_sha512": {
+          "setting": "DEVBOX_PASSWORD"
+        }
+      },
+      "PORT": {
+        "setting": "THEIA_PORT"
+      },
+      "UID": {
+        "host": "uid"
+      },
+      "USER": {
+        "setting": "DEVBOX_USER"
+      }
+    },
+    "root": {
+      "hostname": "${HOSTNAME}",
+      "readonly": true,
+      "tmpfs": [
+        "/run",
+        "/tmp"
+      ]
+    },
+    "schema": "eclogite.software/v0.1",
+    "service_overrides": {
+      "theia": {
+        "create_directories": [
+          "/mnt/shared/workspace",
+          {
+            "owner": "${USER}",
+            "path": "/mnt/shared/home/${USER}"
+          },
+          {
+            "mode": "0700",
+            "owner": "${USER}",
+            "path": "/run/user/${UID}"
+          }
+        ],
+        "environment": {
+          "HOME": "/mnt/shared/home/${USER}",
+          "NODE_OPTIONS": "--max-old-space-size=${NODE_HEAP}",
+          "XDG_RUNTIME_DIR": "/run/user/${UID}"
+        },
+        "user": "${USER}"
+      }
+    },
+    "settings": {
+      "DEVBOX_PASSWORD": {
+        "description": "Password of the login user, for SSH.",
+        "secret": true,
+        "type": "string"
+      },
+      "DEVBOX_USER": {
+        "default": "dev",
+        "description": "Login user for Theia's terminal and SSH; not root.",
+        "pattern": "^(?!root$)[a-z_][a-z0-9_-]*$",
+        "type": "string"
+      },
+      "HOSTNAME": {
+        "default": "devbox",
+        "description": "Guest hostname.",
+        "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+        "type": "string"
+      },
+      "THEIA_PORT": {
+        "default": 3000,
+        "description": "Port Theia listens on.",
+        "maximum": 65535,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "state": [
+      {
+        "format": "ext4",
+        "mount": "/var/lib/devbox",
+        "name": "devbox-state",
+        "size_mib": 16
+      }
+    ],
+    "users": [
+      {
+        "description": "devbox",
+        "gid": "${GID}",
+        "group": "${USER}",
+        "home": "/mnt/shared/home/${USER}",
+        "name": "${USER}",
+        "password": "${PASSWORD_HASH}",
+        "shell": "/bin/bash",
+        "uid": "${UID}"
+      }
+    ],
+    "volumes": [
+      {
+        "format": "ext4",
+        "mount": "/opt/theia",
+        "name": "theia",
+        "packages": [
+          "theia"
+        ],
+        "readonly": true
+      }
+    ]
+  },
+  "system": {
+    "machine": {
+      "defined_in": "catalog:catalog",
+      "document_sha256": "418ce0acc53934ca3e50623d69ee5c9ab21c87c2f66f25d33dde784db2528dc9",
+      "name": "utm-virt-arm64-devbox"
+    },
+    "name": "utm-arm64-devbox",
+    "origin": {
+      "defined_in": "catalog:catalog",
+      "document_sha256": "bdc30030285436545485ea34820d4a0fec5c9e4f2b0b26fb5af2c9b9936a31bd",
+      "name": "utm-arm64-devbox"
+    },
+    "software": {
+      "defined_in": "catalog:catalog",
+      "document_sha256": "512761cdb2faee60235754ee5d4aee7d7a66da074ea9f50b8ddf7039d90677cb",
+      "name": "devbox"
+    }
+  },
+  "target": {
+    "abi": "linux-gnu",
+    "abi_from": "defaults",
+    "platform": "arm64",
+    "toolchain": {
+      "builder_image_sha256": "47eaba539c09168157123f100cf846032ee89ac50508ae1d08d72d780dda40d6",
+      "host": "aarch64",
+      "name": "linux-libre-vm",
+      "release": "dev-17dc8e902cf7",
+      "target_sha256": "bd57244c568502abb2a333b5dd660cf21d1c4e0658e9c4bc1259e43546628faf"
+    },
+    "triplet": "aarch64-linux-gnu"
+  },
+  "tests": [
+    {
+      "id": "boot-shell"
+    },
+    {
+      "id": "linux-libre:clock",
+      "timeout_seconds": 10
+    },
+    {
+      "id": "dhcpcd:dhcp",
+      "timeout_seconds": 60
+    },
+    {
+      "id": "theia:http-3000",
+      "timeout_seconds": 180
+    },
+    {
+      "id": "openssh:keygen",
+      "timeout_seconds": 20
+    },
+    {
+      "id": "openssl:version",
+      "timeout_seconds": 10
+    },
+    {
+      "id": "git:version",
+      "timeout_seconds": 10
+    },
+    {
+      "id": "curl:version",
+      "timeout_seconds": 10
+    },
+    {
+      "id": "shutdown"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-missing-file/catalog/packages/zz-files/package.jsonc:7:29: file files/absent.conf does not exist (/arguments/files/files~1absent.conf)
+1 problem
+exit 10

@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-predicate-two-keys/catalog/packages/zz-pred/package.jsonc:7:29: must have at most 1 property (/compatible/target)
+1 problem
+exit 10

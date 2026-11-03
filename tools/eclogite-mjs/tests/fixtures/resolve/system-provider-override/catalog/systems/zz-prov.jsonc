@@ -1,0 +1,1 @@
+{ "schema": "eclogite.system/v0.1", "name": "zz-prov", "machine": "qemu-virt-arm64", "software": "minimal-busybox", "providers": { "sh": "bash" } }

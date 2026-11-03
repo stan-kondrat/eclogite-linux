@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-alt",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "dependencies": { "run": [{ "first": ["zz-x86", "zz-mips"] }] }
+}

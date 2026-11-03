@@ -1,0 +1,4 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-extends-cycle/catalog/machines/zz-a.jsonc:1:65: extends cycle: zz-a -> zz-b -> zz-a (/extends)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-extends-cycle/catalog/machines/zz-b.jsonc:1:65: extends cycle: zz-b -> zz-a -> zz-b (/extends)
+2 problems
+exit 10

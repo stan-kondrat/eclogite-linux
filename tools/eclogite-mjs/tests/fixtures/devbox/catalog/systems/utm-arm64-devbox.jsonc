@@ -1,0 +1,6 @@
+{
+  "schema": "eclogite.system/v0.1",
+  "name": "utm-arm64-devbox",
+  "machine": "utm-virt-arm64-devbox",
+  "software": "devbox"
+}

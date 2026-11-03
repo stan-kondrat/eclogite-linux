@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-files",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "arguments": { "files": { "files/absent.conf": "/etc/absent.conf" } }
+}

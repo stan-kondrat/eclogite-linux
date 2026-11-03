@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-builder-argument/catalog/packages/zz-arg/package.jsonc:7:18: unknown property "configure" (/arguments/configure)
+1 problem
+exit 10

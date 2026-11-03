@@ -1,0 +1,4 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-device-model-kind/catalog/machines/zz-dev.jsonc:1:109: device model pl031 is a rtc, not a serial (/devices/0/kind)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-device-model-kind/catalog/machines/zz-dev.jsonc:1:165: device model "no-such-model" is not in devices.jsonc (/devices/1/model)
+2 problems
+exit 10

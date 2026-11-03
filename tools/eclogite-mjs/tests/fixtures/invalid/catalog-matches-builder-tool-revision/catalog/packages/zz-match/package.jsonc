@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-match",
+  "version": "1",
+  "source": { "type": "git", "url": "https://example.org/x.git", "revision": "0123456789abcdef0123456789abcdef01234567" },
+  "matches_builder_tool": "node",
+  "builder": "make"
+}

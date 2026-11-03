@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-op",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "compatible": { "machine": { "devices": { "ge": 2 } } }
+}

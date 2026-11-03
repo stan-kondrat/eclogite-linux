@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-bad-escape/catalog/packages/zz-esc/package.jsonc:4:16: invalid escape \q (/version)
+1 problem
+exit 10

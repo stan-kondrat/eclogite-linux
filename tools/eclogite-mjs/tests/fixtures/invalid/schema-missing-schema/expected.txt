@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-missing-schema/catalog/packages/zz-noschema/package.jsonc:1:1: missing required property "schema"
+1 problem
+exit 10

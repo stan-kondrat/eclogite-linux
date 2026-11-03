@@ -1,0 +1,2 @@
+eclogite-mjs: error: zz-set parameter WHO: setting NOPE is not defined by the software profile
+exit 11

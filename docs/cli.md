@@ -462,6 +462,19 @@ Planned stable exit classes are:
 | `22` | reproducibility or comparison mismatch |
 | `30` | cache, filesystem, or internal failure |
 
+## Reference implementation
+
+Until the C tool exists, [tools/eclogite-mjs](../tools/eclogite-mjs/README.md)
+implements `validate`, `resolve`, `lock`, `plan`, `graph` and `why` with the
+exit classes above, plus two commands of its own: `explain` (`plan` with the old
+and new value of every changed part of a package key) and `verify` (the
+conformance run over `tests/reference/`, exit 22 on a mismatch). Differences
+from the design: `--catalog` adds a root to the project's `catalog/`;
+`--machine` and `--software` also serve `resolve`, `lock`, `plan`, `graph` and `why`;
+`resolve` prints the resolution in the format of `tests/reference/golden/`;
+`lock --allow-unpinned` writes a development lock for values the catalog cannot
+pin yet; `plan --locked` and `explain --locked` make a missing or stale lock exit 11.
+
 ## Repository entry points
 
 There is no root Makefile: `eclogite` is the only entry point, locally and in

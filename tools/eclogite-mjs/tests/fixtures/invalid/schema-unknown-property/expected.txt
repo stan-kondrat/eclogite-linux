@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-unknown-property/catalog/packages/zz-unk/package.jsonc:7:3: unknown property "colour" (/colour)
+1 problem
+exit 10

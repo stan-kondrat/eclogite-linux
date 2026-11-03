@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-comment-in-json/catalog/systems/zz-json.json:2:3: comments are not allowed in .json
+1 problem
+exit 10

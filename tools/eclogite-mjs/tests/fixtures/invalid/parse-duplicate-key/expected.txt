@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-duplicate-key/catalog/packages/zz-dup/package.jsonc:4:3: duplicate key "name" (/name)
+1 problem
+exit 10

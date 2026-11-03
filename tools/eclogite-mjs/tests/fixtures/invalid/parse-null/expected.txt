@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/parse-null/catalog/packages/zz-null/package.jsonc:4:14: null is not allowed (/version)
+1 problem
+exit 10

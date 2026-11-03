@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/schema-bad-revision/catalog/packages/zz-rev/package.jsonc:5:78: must match pattern "^[0-9a-f]{40}$" (/source/revision)
+1 problem
+exit 10

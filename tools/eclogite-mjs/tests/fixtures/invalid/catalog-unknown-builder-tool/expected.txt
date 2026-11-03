@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-unknown-builder-tool/catalog/packages/zz-tool/package.jsonc:7:31: builder:rustc: no toolchain lists a tool "rustc" (/dependencies/build/0)
+1 problem
+exit 10

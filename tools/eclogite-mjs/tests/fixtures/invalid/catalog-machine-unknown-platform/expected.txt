@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-machine-unknown-platform/catalog/machines/zz-machine.jsonc:5:15: platform "arm65" does not exist (/platform)
+1 problem
+exit 10

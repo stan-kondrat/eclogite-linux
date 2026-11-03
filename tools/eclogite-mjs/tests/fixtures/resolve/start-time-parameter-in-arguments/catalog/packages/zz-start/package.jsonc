@@ -1,0 +1,9 @@
+{
+  "schema": "eclogite.package/v0.1",
+  "name": "zz-start",
+  "version": "1",
+  "source": { "type": "none" },
+  "builder": "files",
+  "parameters": { "WHO": { "setting": "NAME" } },
+  "arguments": { "symlinks": { "/bin/who": "${WHO}" } }
+}

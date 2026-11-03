@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-bad-operator/catalog/packages/zz-op/package.jsonc:7:45: operator ge does not apply to set fact devices (/compatible/machine/devices/ge)
+1 problem
+exit 10
