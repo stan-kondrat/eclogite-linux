@@ -1,0 +1,104 @@
+name: Builder
+
+# Runs Eclogite inside the builder the catalog pins: the linux-libre-vm dev
+# image of catalog/toolchains/linux-libre-vm.jsonc's "release", as a job
+# container (ghcr.io/stan-kondrat/linux-libre-vm-dev:<release>), on a native
+# runner of each builder host. Locally, the same commands run inside the dev
+# VM of that release (docs/ci.md, "Builder").
+#
+# Per host:
+#   - tests/builder/check: the container is the pinned release (identity
+#     files, tool manifest revisions, tool versions, every cross gcc);
+#   - the reference checks (validate, verify, tests) with the image's node;
+#   - lock the devbox system for this host and check that the lock names
+#     this builder.
+#
+# The devbox lock needs --allow-unpinned while theia's fetch hash is
+# "pending"; the toolchain itself is pinned.
+
+on:
+  pull_request:
+    paths:
+      - "catalog/**"
+      - "schemas/**"
+      - "tools/eclogite-mjs/**"
+      - "tests/**"
+      - "eclogite"
+      - ".github/workflows/builder.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "catalog/**"
+      - "schemas/**"
+      - "tools/eclogite-mjs/**"
+      - "tests/**"
+      - "eclogite"
+      - ".github/workflows/builder.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Pinned release
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Read the toolchain release
+        id: release
+        run: |
+          tag=$(node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            import { parseJsonc } from "./tools/eclogite-mjs/src/jsonc.mjs";
+            const f = "catalog/toolchains/linux-libre-vm.jsonc";
+            console.log(parseJsonc(readFileSync(f), f).value.release);')
+          case $tag in
+          v[0-9]*) ;;
+          *) echo "::error file=catalog/toolchains/linux-libre-vm.jsonc::release is '$tag', not a release tag"; exit 1 ;;
+          esac
+          echo "builder: ghcr.io/stan-kondrat/linux-libre-vm-dev:$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  builder:
+    name: Builder (${{ matrix.host }})
+    needs: release
+    runs-on: ${{ matrix.runner }}
+    container: ghcr.io/stan-kondrat/linux-libre-vm-dev:${{ needs.release.outputs.tag }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { host: aarch64, runner: ubuntu-24.04-arm }
+          - { host: x86_64, runner: ubuntu-24.04 }
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: The container is the pinned builder
+        run: tests/builder/check
+
+      - name: Validate the catalog
+        run: ./eclogite validate
+
+      - name: Verify golden files, locks and keys
+        run: tests/reference/run
+
+      - name: Install the test dependency (ajv)
+        working-directory: tools/eclogite-mjs
+        run: npm ci
+
+      - name: Fixtures and commands
+        working-directory: tools/eclogite-mjs
+        run: node --test tests/*.test.mjs
+
+      - name: Lock the devbox system for this host
+        run: |
+          ./eclogite lock -c catalog/systems/utm-arm64-devbox.jsonc --allow-unpinned -o devbox.lock.json
+          tests/builder/check --lock devbox.lock.json

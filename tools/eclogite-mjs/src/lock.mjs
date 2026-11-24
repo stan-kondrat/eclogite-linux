@@ -134,18 +134,27 @@ export function compileLock(idx, R, { systemDoc, systemAlias, projectDir, source
 
   // ---- toolchain identity and build environment
   // the schema does not accept "unreleased": a development lock names the
-  // toolchain by the hash of its document instead
+  // toolchain by the hash of its document instead, and its image and target
+  // archive by hashes of their catalog entries.
+  // A released toolchain is identified by the published assets for this
+  // build host: the dev image (builder.images) and the cross toolchain
+  // archive (targets.<triplet>.archives), as listed in its SHA256SUMS-dev.
   let release = R.toolchain.release;
+  const builderImage = R.toolchain.builder.images?.[host]?.image;
+  const targetArchive = R.toolchain.targets[R.triplet].archives?.[host];
   if (release === "unreleased") {
     unpinned.push(`toolchain ${R.toolchain.name}: release is "unreleased"`);
     release = `dev-${hashOf(R.toolchain).slice(0, 12)}`;
+  } else {
+    if (!builderImage) unpinned.push(`toolchain ${R.toolchain.name} ${release}: no builder image for host ${host}`);
+    if (!targetArchive) unpinned.push(`toolchain ${R.toolchain.name} ${release}: no ${R.triplet} archive for host ${host}`);
   }
   const toolchainIdentity = {
     name: R.toolchain.name,
     release,
     host,
-    builder_image_sha256: hashOf({ name: R.toolchain.name, release, host, builder: R.toolchain.builder, tools: R.toolchain.tools }),
-    target_sha256: hashOf({ triplet: R.triplet, target: R.toolchain.targets[R.triplet], compilers: R.toolchain.compilers }),
+    builder_image_sha256: builderImage?.sha256 ?? hashOf({ name: R.toolchain.name, release, host, builder: R.toolchain.builder, tools: R.toolchain.tools }),
+    target_sha256: targetArchive?.sha256 ?? hashOf({ triplet: R.triplet, target: R.toolchain.targets[R.triplet], compilers: R.toolchain.compilers }),
   };
   const buildEnvironment = {
     source_date_epoch: sourceDateEpoch,

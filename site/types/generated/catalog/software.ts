@@ -5,6 +5,111 @@
 
 import type { Software } from "../schema/input";
 
+/** catalog/software/devbox.jsonc */
+export const devbox = {
+  schema: "eclogite.software/v0.1",
+  name: "devbox",
+  packages: ["reference-system", "ide", "devbox"],
+  settings: {
+    HOSTNAME: {
+      description: "Guest hostname.",
+      type: "string",
+      default: "devbox",
+      pattern: "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+    },
+    DEVBOX_USER: {
+      description: "Login user for Theia's terminal and SSH; not root.",
+      type: "string",
+      default: "dev",
+      pattern: "^(?!root$)[a-z_][a-z0-9_-]*$",
+    },
+    DEVBOX_PASSWORD: {
+      description: "Password of the login user, for SSH.",
+      type: "string",
+      default: "dev",
+      secret: true,
+    },
+    THEIA_PORT: {
+      description: "Port Theia listens on.",
+      type: "integer",
+      default: 3000,
+      minimum: 1,
+      maximum: 65535,
+    },
+  },
+  parameters: {
+    HOSTNAME: { setting: "HOSTNAME" },
+    USER: { setting: "DEVBOX_USER" },
+    UID: { host: "uid" },
+    GID: { host: "gid" },
+    PASSWORD_HASH: { crypt_sha512: { setting: "DEVBOX_PASSWORD" } },
+    PORT: { setting: "THEIA_PORT" },
+    NODE_HEAP: { scale: "/machine/resources/memory_mib", multiply: 3, divide: 4 },
+  },
+  root: { hostname: "${HOSTNAME}", readonly: true, tmpfs: ["/run", "/tmp"] },
+  image: {
+    format: "ext4",
+    strip: true,
+    exclude: ["/usr/share/man", "/usr/share/info", "/usr/share/doc", "/usr/share/locale"],
+  },
+  volumes: [
+    {
+      name: "theia",
+      mount: "/opt/theia",
+      packages: ["theia"],
+      format: "ext4",
+      readonly: true,
+    },
+  ],
+  state: [{ name: "devbox-state", mount: "/var/lib/devbox", size_mib: 16, format: "ext4" }],
+  users: [
+    {
+      name: "${USER}",
+      uid: "${UID}",
+      group: "${USER}",
+      gid: "${GID}",
+      home: "/mnt/shared/home/${USER}",
+      shell: "/bin/bash",
+      password: "${PASSWORD_HASH}",
+      description: "devbox",
+    },
+  ],
+  service_overrides: {
+    theia: {
+      user: "${USER}",
+      environment: {
+        HOME: "/mnt/shared/home/${USER}",
+        NODE_OPTIONS: "--max-old-space-size=${NODE_HEAP}",
+        XDG_RUNTIME_DIR: "/run/user/${UID}",
+      },
+      create_directories: [
+        "/mnt/shared/workspace",
+        { path: "/mnt/shared/home/${USER}", owner: "${USER}" },
+        { path: "/run/user/${UID}", owner: "${USER}", mode: "0700" },
+      ],
+    },
+  },
+  endpoints: {
+    theia: { description: "Eclipse Theia", protocol: "http", port: "${PORT}" },
+    ssh: {
+      description: "OpenSSH, password login",
+      protocol: "ssh",
+      port: 22,
+      user: "${USER}",
+    },
+  },
+  commands: {
+    ssh: { description: "ssh to the VM as the devbox user", ssh: "ssh" },
+    open: { description: "open Theia in the browser", open: "theia" },
+    logs: {
+      description: "follow the Theia and sshd logs",
+      follow: ["/var/log/theia/current", "/var/log/sshd/current"],
+    },
+    "restart-theia": { description: "restart the Theia service", guest: ["sv", "restart", "theia"] },
+  },
+  evidence: { default: "warn-untested" },
+} satisfies Software;
+
 /** catalog/software/minimal.jsonc */
 export const minimal = {
   schema: "eclogite.software/v0.1",
@@ -82,4 +187,4 @@ export const theia = {
 } satisfies Software;
 
 /** Every document above, in name order. */
-export const all: Software[] = [minimal, minimalBusybox, reference, theia];
+export const all: Software[] = [devbox, minimal, minimalBusybox, reference, theia];

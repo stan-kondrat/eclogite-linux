@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+// Checks that this machine is the builder the catalog's toolchain names: a
+// linux-libre-vm dev VM or its container (ghcr.io/stan-kondrat/linux-libre-vm-dev)
+// of the pinned release. Run it inside the builder:
+//
+//   tests/builder/check [--lock LOCK] [--toolchain FILE] [--identity DIR] [--cross DIR]
+//
+//   --toolchain  catalog toolchain (default catalog/toolchains/linux-libre-vm.jsonc)
+//   --lock       also check that a lock was compiled against this release and host
+//   --identity   the image's release identity (default /usr/share/linux-libre-vm)
+//   --cross      the cross toolchains (default /opt/cross)
+//
+// Checks, each printed as "ok" or "FAIL":
+//   - the image says it is the toolchain's release (identity dir, release file);
+//   - MANIFEST-dev-<arch>.txt in the image lists the same source revision for
+//     every tool the catalog pins, and the same cross triplets as the
+//     catalog's targets that are not planned;
+//   - the native tools report the catalog's versions;
+//   - every such target's cross gcc compiles and links hello world.
+// Exit status: 0 all ok, 1 a check failed, 2 usage.
+
+import { readFileSync, existsSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { join, dirname } from "node:path";
+import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
+import { parseJsonc } from "../../tools/eclogite-mjs/src/jsonc.mjs";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const opts = { toolchain: join(ROOT, "catalog/toolchains/linux-libre-vm.jsonc"), identity: "/usr/share/linux-libre-vm", cross: "/opt/cross" };
+const argv = process.argv.slice(2);
+for (let i = 0; i < argv.length; i++) {
+  const k = argv[i].replace(/^--/, "");
+  if (!["toolchain", "lock", "identity", "cross"].includes(k) || argv[i + 1] === undefined) {
+    console.error(`usage: tests/builder/check [--lock LOCK] [--toolchain FILE] [--identity DIR] [--cross DIR]`);
+    process.exit(2);
+  }
+  opts[k] = argv[++i];
+}
+
+let failed = 0;
+const ok = (msg) => console.log(`ok   ${msg}`);
+const fail = (msg) => { console.log(`FAIL ${msg}`); failed++; };
+const check = (cond, good, bad) => (cond ? ok(good) : fail(bad));
+const run = (cmd, args) => {
+  const r = spawnSync(cmd, args, { encoding: "utf8" });
+  return r.error ? null : `${r.stdout}${r.stderr}`;
+};
+
+const tc = parseJsonc(readFileSync(opts.toolchain), opts.toolchain).value;
+const host = { arm64: "aarch64", x64: "x86_64" }[process.arch] ?? process.arch;
+const assetArch = { aarch64: "arm64", x86_64: "x86_64" }[host];
+console.log(`toolchain ${tc.name} ${tc.release}, host ${host}`);
+
+// ---- release identity
+const release = existsSync(join(opts.identity, "release")) ? readFileSync(join(opts.identity, "release"), "utf8").trim() : null;
+const commit = existsSync(join(opts.identity, "commit")) ? readFileSync(join(opts.identity, "commit"), "utf8").trim() : "?";
+if (release === null) fail(`${opts.identity}/release is missing: not a linux-libre-vm dev image with release identity (v0.4.0 container or later)`);
+else check(release === tc.release, `image is ${release} (commit ${commit.slice(0, 7)})`, `image is ${release}, the catalog pins ${tc.release}`);
+check(tc.builder.hosts.includes(host), `${host} is a builder host`, `${host} is not one of the builder hosts: ${tc.builder.hosts.join(", ")}`);
+
+// ---- tool manifest
+const manifestFile = join(opts.identity, `MANIFEST-dev-${assetArch}.txt`);
+const manifest = existsSync(manifestFile) ? readFileSync(manifestFile, "utf8") : null;
+if (manifest === null) fail(`${manifestFile} is missing`);
+else {
+  // "<revision> sources/toolchain/<tool>" lines; the catalog calls python python3
+  const revisions = new Map();
+  for (const m of manifest.matchAll(/^([0-9a-f]{40}) sources\/toolchain\/(\S+)$/gm)) revisions.set(m[2] === "python" ? "python3" : m[2], m[1]);
+  for (const [name, t] of Object.entries(tc.tools)) {
+    if (t.status === "planned" || !t.revision) continue;
+    const have = revisions.get(name);
+    check(have === t.revision, `${name} ${t.revision.slice(0, 12)}`, `${name}: manifest has ${have ?? "nothing"}, the catalog pins ${t.revision}`);
+  }
+  const shipped = new Set([...manifest.matchAll(/^triplet=(\S+)$/gm)].map((m) => m[1]));
+  const wanted = Object.entries(tc.targets).filter(([, t]) => t.status !== "planned").map(([n]) => n);
+  for (const t of wanted) if (!shipped.has(t)) fail(`target ${t}: not in the manifest`);
+  for (const t of shipped) if (!wanted.includes(t)) fail(`manifest ships ${t}, which the catalog does not list as a target`);
+  if (wanted.every((t) => shipped.has(t)) && [...shipped].every((t) => wanted.includes(t))) ok(`cross triplets: ${wanted.length}, same as the manifest`);
+}
+
+// ---- native tool versions
+const versions = {
+  gcc: () => run("gcc", ["-dumpfullversion"])?.trim(),
+  glibc: () => /(\d+\.\d+)\s*$/m.exec(run("ldd", ["--version"])?.split("\n")[0] ?? "")?.[1],
+  python3: () => /Python (\S+)/.exec(run("python3", ["--version"]) ?? "")?.[1],
+  node: () => run("node", ["--version"])?.trim().replace(/^v/, ""),
+  make: () => /GNU Make (\S+)/.exec(run("make", ["--version"]) ?? "")?.[1],
+  m4: () => /GNU M4\)? (\S+)/.exec(run("m4", ["--version"]) ?? "")?.[1],
+  bison: () => /GNU Bison\)? (\S+)/.exec(run("bison", ["--version"]) ?? "")?.[1],
+  flex: () => /flex (\S+)/.exec(run("flex", ["--version"]) ?? "")?.[1],
+};
+for (const [name, get] of Object.entries(versions)) {
+  const want = tc.tools[name]?.version;
+  if (!want || tc.tools[name].status === "planned") continue;
+  const have = get();
+  check(have === want, `${name} ${have}`, `${name}: found ${have ?? "nothing"}, the catalog says ${want}`);
+}
+
+// ---- cross compilers
+const tmp = mkdtempSync(join(tmpdir(), "eclogite-builder-"));
+try {
+  writeFileSync(join(tmp, "hello.c"), "#include <stdio.h>\nint main(void) { puts(\"hello\"); return 0; }\n");
+  for (const [triplet, t] of Object.entries(tc.targets)) {
+    if (t.status === "planned") continue;
+    const gcc = join(opts.cross, triplet, "bin", `${triplet}-gcc`);
+    if (!existsSync(gcc)) { fail(`${gcc} is missing`); continue; }
+    const r = spawnSync(gcc, ["-o", join(tmp, triplet), join(tmp, "hello.c")], { encoding: "utf8" });
+    check(r.status === 0, `${triplet}-gcc compiles hello world`, `${triplet}-gcc: ${(r.stderr || r.error?.message || "").trim()}`);
+  }
+} finally {
+  rmSync(tmp, { recursive: true, force: true });
+}
+
+// ---- lock
+if (opts.lock) {
+  const lt = JSON.parse(readFileSync(opts.lock, "utf8")).target.toolchain;
+  check(lt.name === tc.name && lt.release === release, `lock is for ${lt.name} ${lt.release}`, `lock is for ${lt.name} ${lt.release}, this image is ${release}`);
+  check(lt.host === host, `lock host ${lt.host}`, `lock host is ${lt.host}, this machine is ${host}`);
+  const image = tc.builder.images?.[host]?.image;
+  check(image && lt.builder_image_sha256 === image.sha256, `lock pins ${image?.file}`, `lock builder_image_sha256 ${lt.builder_image_sha256} is not the catalog's ${image?.file ?? "image"} for ${host}`);
+}
+
+console.log(failed ? `builder check: ${failed} failed` : "builder check: ok");
+process.exit(failed ? 1 : 0);

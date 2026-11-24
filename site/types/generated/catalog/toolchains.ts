@@ -10,12 +10,118 @@ export const linuxLibreVm = {
   schema: "eclogite.toolchain/v0.1",
   name: "linux-libre-vm",
   provider: "linux-libre-vm",
-  release: "unreleased",
-  builder: { hosts: ["aarch64", "x86_64"], resources: { vcpus: 4, memory_mib: 4096 } },
+  release: "v0.4.0",
+  builder: {
+    hosts: ["aarch64", "x86_64"],
+    images: {
+      aarch64: {
+        image: {
+          file: "linux-libre-vm-dev-arm64.img.xz",
+          sha256: "a9fc3f84117ea02cfb9cfa7000324334728246be43d7aa045a5a0e2fe6d60ebc",
+        },
+        kernel: {
+          file: "linux-libre-vmlinuz-dev-arm64",
+          sha256: "2cfa885d8b36c518f71198b8eba9b8e031350af77e046f65c6ae9bb4791241c5",
+        },
+      },
+      x86_64: {
+        image: {
+          file: "linux-libre-vm-dev-x86_64.img.xz",
+          sha256: "4ba72c52c1a8d1edd92f395b80459d39d190017c5e7c514c225c048d542565a9",
+        },
+        kernel: {
+          file: "linux-libre-vmlinuz-dev-x86_64",
+          sha256: "df136148f0f796dbf3a1f510de942bafde50d123c8a820185fdc1a755000b279",
+        },
+      },
+    },
+    resources: { vcpus: 4, memory_mib: 4096 },
+  },
   targets: {
-    "x86_64-linux-gnu": {},
-    "aarch64-linux-gnu": {},
-    "armv6-linux-gnueabihf": {},
+    "x86_64-linux-gnu": {
+      archives: {
+        aarch64: {
+          file: "cross-x86_64-linux-gnu.arm64.tar.gz",
+          sha256: "dd93fedaa8979c95d915d787393e3a0df128eba6e5214b3918f9ef4e4bdcb7db",
+        },
+        x86_64: {
+          file: "cross-x86_64-linux-gnu.x86_64.tar.gz",
+          sha256: "a705d5980c719d7292f66952491b36517fe99395fd1e252e40a92d2e9c156a89",
+        },
+      },
+    },
+    "aarch64-linux-gnu": {
+      archives: {
+        aarch64: {
+          file: "cross-aarch64-linux-gnu.arm64.tar.gz",
+          sha256: "72bea122295b41ce21ce45169b6e0cb24507abc5d5c33f05975cacbedcbb7d4e",
+        },
+        x86_64: {
+          file: "cross-aarch64-linux-gnu.x86_64.tar.gz",
+          sha256: "fcacd0c4b1a376e4affe3ed3e8fd3fa52e18028d2b22657509675573527a63be",
+        },
+      },
+    },
+    "armv6-linux-gnueabihf": {
+      archives: {
+        aarch64: {
+          file: "cross-armv6-linux-gnueabihf.arm64.tar.gz",
+          sha256: "eb00500c4a328d267bf3f04cc865798d6ee39c5b0524adfd90f738c45ba31376",
+        },
+        x86_64: {
+          file: "cross-armv6-linux-gnueabihf.x86_64.tar.gz",
+          sha256: "3e026446b726111b9038d01d456bd5382277a2078b1040c54368d281928110a7",
+        },
+      },
+    },
+    "armv7-linux-gnueabihf": {
+      archives: {
+        aarch64: {
+          file: "cross-armv7-linux-gnueabihf.arm64.tar.gz",
+          sha256: "130d3f5f9c02bb011d48759bfb7d934ece4421ca5aa2a6dd3ad554875a5524c5",
+        },
+        x86_64: {
+          file: "cross-armv7-linux-gnueabihf.x86_64.tar.gz",
+          sha256: "51ff2b9cb672702e86ee4f2578dd045c44dd8336f05aac1c607dcb5335be631d",
+        },
+      },
+    },
+    "i686-linux-gnu": {
+      archives: {
+        aarch64: {
+          file: "cross-i686-linux-gnu.arm64.tar.gz",
+          sha256: "483f4c7858ff681113795ed1b3de84d4b83dc34935ac6baa0073e1882e4d58c4",
+        },
+        x86_64: {
+          file: "cross-i686-linux-gnu.x86_64.tar.gz",
+          sha256: "0cf526f8f788359fb8d10592ff59e1509212efdd463877019ef7847f376a9929",
+        },
+      },
+    },
+    "i686-sse2-linux-gnu": {
+      archives: {
+        aarch64: {
+          file: "cross-i686-sse2-linux-gnu.arm64.tar.gz",
+          sha256: "7ce656fb5a2bff10d49791d9d440a1765d8403517c74455c202c8fd4b608092e",
+        },
+        x86_64: {
+          file: "cross-i686-sse2-linux-gnu.x86_64.tar.gz",
+          sha256: "fe7bb0f916c6caca8e07137821ba1f2aff5a5563c4115d34cf024e2d94b3f193",
+        },
+      },
+    },
+    "riscv64-linux-gnu": {
+      archives: {
+        aarch64: {
+          file: "cross-riscv64-linux-gnu.arm64.tar.gz",
+          sha256: "4f4d64246bc4f0376f23fd8392ce92d82cfa1b60b2ff135d8c968ebd6d12ab83",
+        },
+        x86_64: {
+          file: "cross-riscv64-linux-gnu.x86_64.tar.gz",
+          sha256: "26b58787ee6527a9cb4eafd43f74e4fea0467824e85b72a22c03331d62680ec1",
+        },
+      },
+    },
     "x86_64-linux-musl": { status: "planned" },
     "aarch64-linux-musl": { status: "planned" },
     "armv6-linux-musleabihf": { status: "planned" },

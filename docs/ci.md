@@ -28,6 +28,38 @@ mock lifecycle backend. A real UTM smoke test requires an Apple Silicon macOS
 runner with UTM 5 installed and Automation permission, so it is a separate
 environment-gated job rather than a prerequisite for ordinary pull requests.
 
+## Builder
+
+`.github/workflows/builder.yml` runs Eclogite inside the builder the catalog
+pins. It reads `release` from `catalog/toolchains/linux-libre-vm.jsonc` and
+uses the linux-libre-vm dev image of that release as the job container,
+on a native runner of each builder host (`ubuntu-24.04-arm` for `aarch64`,
+`ubuntu-24.04` for `x86_64`):
+
+```yaml
+container: ghcr.io/stan-kondrat/linux-libre-vm-dev:v0.4.0
+```
+
+The container is the root filesystem of the release's
+`linux-libre-vm-dev-<arch>.img.xz`. It has the same compilers, `/opt/cross`
+toolchains, glibc, perl, Python and Node.js, so pinning a new release in the
+catalog changes the CI builder too. The kernel is the runner's, not
+linux-libre, so builds must not depend on `uname`. Locally, the same commands
+run inside the dev VM of that release.
+
+`tests/builder/check` proves that a machine is that builder. It checks:
+
+- the release identity in `/usr/share/linux-libre-vm/`;
+- the source revisions in its `MANIFEST-dev-<arch>.txt` against the
+  catalog's `tools`;
+- the cross triplets against the catalog's `targets`;
+- the native tool versions;
+- that every cross gcc compiles hello world;
+- with `--lock`, that a lock names this release, host and dev image.
+
+The job then runs the reference checks and locks the devbox system for its
+host.
+
 ## Layer builds and publication
 
 GitHub Actions is the primary builder of package, kernel and image layers. For

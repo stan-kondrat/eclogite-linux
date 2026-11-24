@@ -1,0 +1,5 @@
+# /etc/profile: read by login shells. Sources every /etc/profile.d/*.sh.
+for f in /etc/profile.d/*.sh; do
+	[ -r "$f" ] && . "$f"
+done
+unset f

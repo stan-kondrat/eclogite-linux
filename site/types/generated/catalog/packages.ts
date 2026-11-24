@@ -291,6 +291,38 @@ export const curl = {
   tests: { version: { timeout_seconds: 10 } },
 } satisfies Package;
 
+/** catalog/packages/devbox/package.jsonc */
+export const devbox = {
+  schema: "eclogite.package/v0.1",
+  name: "devbox",
+  version: "1",
+  source: { type: "none" },
+  builder: "files",
+  compatible: {
+    machine: { all: [{ devices: { has: "shared-directory" } }, { devices: { has: "network" } }] },
+  },
+  dependencies: { run: ["openssh", "git", "less", "ca-certificates", "host-share", "init"] },
+  services: {
+    sshd: {
+      run: [
+        "sh",
+        "-c",
+        "ssh-keygen -A -f /var/lib/devbox && exec /bin/sshd -D -e -f /etc/ssh/devbox_sshd_config",
+      ],
+      create_directories: [{ path: "/var/lib/devbox/etc/ssh", mode: "0700" }, "/run/sshd"],
+    },
+  },
+  tests: { "ssh-22": { needs: ["nodejs"], timeout_seconds: 30 } },
+  arguments: {
+    files: {
+      "files/profile": "/etc/profile",
+      "files/profile.sh": "/etc/profile.d/devbox.sh",
+      "files/sshd.conf": "/etc/ssh/devbox_sshd_config",
+    },
+    symlinks: { "/usr/bin/env": "/bin/env", "/bin/pager": "less" },
+  },
+} satisfies Package;
+
 /** catalog/packages/dhcpcd/package.jsonc */
 export const dhcpcd = {
   schema: "eclogite.package/v0.1",
@@ -1174,4 +1206,4 @@ export const zlib = {
 } satisfies Package;
 
 /** Every document above, in name order. */
-export const all: Package[] = [base, baseFiles, bash, busybox, caCertificates, consoleLogin, coreutils, curl, dhcpcd, diffutils, editor, findutils, gawk, gccRuntime, git, glibc, gnuUtils, gnulib, grep, gzip, hostShare, ide, iproute2, less, linuxLibre, llvmRuntime, musl, ncurses, network, nodejs, openssh, openssl, procpsNg, referenceSystem, runit, sed, tar, theia, utilLinux, vim, zlib];
+export const all: Package[] = [base, baseFiles, bash, busybox, caCertificates, consoleLogin, coreutils, curl, devbox, dhcpcd, diffutils, editor, findutils, gawk, gccRuntime, git, glibc, gnuUtils, gnulib, grep, gzip, hostShare, ide, iproute2, less, linuxLibre, llvmRuntime, musl, ncurses, network, nodejs, openssh, openssl, procpsNg, referenceSystem, runit, sed, tar, theia, utilLinux, vim, zlib];

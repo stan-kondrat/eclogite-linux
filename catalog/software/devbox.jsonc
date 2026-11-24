@@ -1,9 +1,8 @@
 {
   "schema": "eclogite.software/v0.1",
   "name": "devbox",
-  // Fixture for the devbox features of the reference tool (settings,
-  // parameters, users, state, service_overrides, endpoints, commands); the
-  // devbox itself joins the catalog separately. Mirrors
+  // The devbox: an analogue of linux-devbox-vm (Theia on port 3000, SSH login
+  // as the host user's uid/gid, work kept on the share). Mirrors
   // site/types/examples/linux-devbox-vm-input.ts.
   "packages": ["reference-system", "ide", "devbox"],
   // the bundle's settings file (devbox.env in the script), applied at the next start

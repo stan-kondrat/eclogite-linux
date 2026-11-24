@@ -15,7 +15,7 @@ golden files in `tests/reference/golden/`.
 | `eclogite.machine/v0.1` | `machine.schema.json`: complete or derived (`extends`) | complete: schema, name, platform, resources, runtime, boot, devices; derived: schema, name, extends | aliases, status, gpio, limitations, references |
 | `eclogite.platform/v0.1` | `platform.schema.json` | schema, name, architecture, triplet_cpu, cpu, kernel_architecture | none |
 | `eclogite.abi/v0.1` | `abi.schema.json` | schema, name, os, libc, triplet, toolchain | none |
-| `eclogite.toolchain/v0.1` | `toolchain.schema.json` | schema, name, provider, release, builder, targets, compilers, tools | per-entry `status: planned` |
+| `eclogite.toolchain/v0.1` | `toolchain.schema.json` | schema, name, provider, release, builder, targets, compilers, tools | per-entry `status: planned`; `builder.images` and `targets.*.archives` (release assets per build host) |
 | `eclogite.package/v0.1` | `package.schema.json`: buildable or meta | buildable: schema, name, version, source, builder; meta: schema, name, dependencies.run | buildable: fetch, matches_builder_tool, compatible, provides, configurable, patches, parameters, dependencies, services, mounts, tests, arguments, variants; meta: provides |
 | `eclogite.facts/v0.1` | `facts.schema.json` | schema, facts | none |
 | `eclogite.devices/v0.1` | `devices.schema.json` | schema, devices | none |
@@ -126,7 +126,10 @@ holds the complete rules and the disagreements it found; the user-visible ones:
   order; maps are printed in key order; `build_order` is a topological order
   that takes the smallest name first.
 - **Pinning.** A lock refuses a `pending` fetch hash and an `unreleased`
-  toolchain; `--allow-unpinned` writes a development lock (zero digest,
+  toolchain. Against a release, `builder_image_sha256` and `target_sha256`
+  are the SHA-256 of the build host's dev image and cross toolchain archive
+  as published (`builder.images`, `targets.*.archives`); a missing entry is
+  unpinned. `--allow-unpinned` writes a development lock (zero digest,
   `dev-<hash>` release) for the conformance run only.
 - **Secrets.** The `default` of a `secret` setting never reaches the lock.
 - **Keys.** A package key hashes its recipe, source, patches, hooks, files,

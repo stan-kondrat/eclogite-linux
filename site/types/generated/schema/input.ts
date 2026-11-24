@@ -1022,17 +1022,25 @@ export interface Toolchain {
   name: Name;
   /** OPEN(13): a constant. */
   provider: "linux-libre-vm";
-  /** Release of the builder image. OPEN(13): or `"unreleased"`. */
+  /**
+   * Release of the builder image: a linux-libre-vm release tag, such as `v0.4.0`. OPEN(13): or `"unreleased"`.
+   */
   release: string;
   builder: {
     /** Build host architectures the builder image exists for. */
     hosts: string[];
+    /**
+     * Build host → the dev image and kernel the builder VM boots, as release assets. A lock against a release needs the entry of its build host.
+     */
+    images?: {
+      [key: string]: BuilderImage;
+    };
     /** Default builder VM size; `compatible.build` may raise it. */
     resources: Resources;
   };
   /** Target triplet → its cross toolchain and sysroot. OPEN(9) */
   targets: {
-    [key: string]: Planned;
+    [key: string]: Target;
   };
   /**
    * In fallback order, each mapped to the manifest tools it needs.
@@ -1048,17 +1056,33 @@ export interface Toolchain {
   };
 }
 
-/** Something the builder image does not ship yet; a system that needs it fails. */
-export interface Planned {
-  status?: "planned";
-}
-
 export interface Tool {
   status?: "planned";
   version?: string;
   /** A Git URL. OPEN(13): or `"tarball"`. */
   source: string;
   revision?: GitRevision;
+}
+
+/**
+ * A cross toolchain and sysroot. `archives` gives the release asset per build host; a lock against a release needs the entry of its build host. `planned`: the builder image does not ship it yet, and a system that needs it fails.
+ */
+export interface Target {
+  status?: "planned";
+  archives?: {
+    [key: string]: ReleaseAsset;
+  };
+}
+
+export interface BuilderImage {
+  image: ReleaseAsset;
+  kernel: ReleaseAsset;
+}
+
+/** A file of the release, as published, with its SHA-256 from the release checksums. */
+export interface ReleaseAsset {
+  file: string;
+  sha256: Sha256;
 }
 
 export interface Facts {

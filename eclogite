@@ -1,0 +1,14 @@
+#!/bin/sh
+# The project's `eclogite` entry point. Until the C tool in tools/eclogite/
+# exists, this runs the mjs reference implementation (tools/eclogite-mjs) with
+# the same arguments, so commands and docs can already say `./eclogite ...`.
+#
+#   ./eclogite validate
+#   ./eclogite lock -c utm-arm64-devbox
+#   ./eclogite verify
+#
+# Requires Node.js 20 or newer. Run from any directory; paths in arguments are
+# relative to the current directory.
+set -eu
+root=$(cd "$(dirname "$0")" && pwd)
+exec node "$root/tools/eclogite-mjs/bin/eclogite-mjs.mjs" "$@"

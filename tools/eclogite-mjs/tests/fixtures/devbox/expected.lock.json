@@ -83,7 +83,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "dec18e15b1d1ac350b74ab56481a877fd9a52137b187e493b2346ca4c465c38f",
+      "key": "825b781b2203e38c56e04acd95d629574dfff4a516eaf0247dc35b0cb8764a3c",
       "kind": "buildable",
       "name": "gnulib",
       "parameters": {},
@@ -302,7 +302,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "7f75c62b2a54c7dc7b937f4dbd0ce5f0add8f122f61798d496c2903ca0c0b3fd",
+      "key": "f1faa6e9787fa0fa3caf373ce5190eab4d6d2b79f2ccec480cb1fd265dd5efb6",
       "kind": "buildable",
       "name": "base-files",
       "parameters": {},
@@ -333,7 +333,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "ceddd7ca76052831b6834c5b0767dea4298b1566927b60446c51ca1c58b01e59",
+      "key": "719ac2b7a7d7ddb54cf75a4a96ca736eeb7a1167018fbae8ddc9a88e5162d723",
       "kind": "buildable",
       "name": "linux-libre",
       "parameters": {},
@@ -409,7 +409,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "e847e128962e022846bba20b8d05dd750d6794983142b933710c9933e8ce58ec",
+      "key": "aedaea27278b86f607b26c2a5b2118f9d0a9bac6c2ba06ecf938784f14ebd447",
       "kind": "buildable",
       "name": "glibc",
       "parameters": {},
@@ -485,7 +485,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "41ffe24eec069a780ea7cc54610048b394e4dbecdde314c5f750a49bcdab00cc",
+      "key": "d6925d1daff32f16102fda31fee070f3c31a324a4a24fea5c80f9baf2074b6b7",
       "kind": "buildable",
       "name": "gcc-runtime",
       "parameters": {},
@@ -603,7 +603,7 @@
           }
         ]
       },
-      "key": "b4df180c87803bec5d17ba424c7f3c0be7f5bca496a8d0b7aa125fc3aff3f6a7",
+      "key": "e20dce22a92e0cc42fc36fc2d32f54c9bc1ddb1a35615e720c98bf2c411853ca",
       "kind": "buildable",
       "name": "runit",
       "parameters": {},
@@ -655,7 +655,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "ed3c23c27f767a5f6a081fb75b404be3d69c6020684815f8f9d561fe15214157",
+      "key": "9d65466767e15deffa42de1f8d8575f00904415f4e5a9235a4ff5c0a236f4524",
       "kind": "buildable",
       "name": "bash",
       "parameters": {},
@@ -713,7 +713,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "ff425a4e3fc5093af4a7904daac801ac5719d2d90548180a3cd866b9e0827bc2",
+      "key": "d994da6d4fff1a609ea3dcc7f943e9a43588f999281e3dd4a673c5376608581a",
       "kind": "buildable",
       "name": "coreutils",
       "parameters": {},
@@ -773,7 +773,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "c2743a3034c0140b1b47fc54c43b1117c87fcb60f5a80ead07bfd7486effaeb4",
+      "key": "fe6b68712143080ca583628cbee96e97bf01a162f560018ee1c62697f7ade5cd",
       "kind": "buildable",
       "name": "util-linux",
       "parameters": {},
@@ -819,7 +819,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "d8bf00152d51067aeed1144da250c77139dd4c96b19222c96841714ab58caa40",
+      "key": "a89c105c7f500a93ffd9886e36a4f1358251339432886280b4c044b245c776b2",
       "kind": "buildable",
       "name": "console-login",
       "parameters": {
@@ -906,7 +906,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "41dcebddfd88d3569eda8020f1ec48e9bc3a2794d4043f21b181adcf674113c4",
+      "key": "fc3df8e3694827d2f15bb2a8cc11c289f4bb5718329a40fc946fcef3c1b47270",
       "kind": "buildable",
       "name": "grep",
       "parameters": {},
@@ -950,7 +950,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "fa77ca2f140fd4c56bdbf7144ad3ce7849cb21b160563b8166512a4253de6093",
+      "key": "68a8e92d99460878d63a0a2ff4b2d1b2119aa5a63f4e59abfa73c8a1f9371d07",
       "kind": "buildable",
       "name": "sed",
       "parameters": {},
@@ -988,7 +988,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "d82ba9032f5e75027a54da22587e28fd76bf030fc83da8c2e3781b011a9b4e69",
+      "key": "36a8371b1464c20d410707db34e778882153df601fad3cf58882de5cff9551b7",
       "kind": "buildable",
       "name": "gawk",
       "parameters": {},
@@ -1032,7 +1032,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "88ef26da7d01f8c1ce1de7709b0b8b14a6ae901fb9f939311c6b0122700800a4",
+      "key": "4d6c213616dcc810e99b270de4a071587cdb5527547bf75f66b39f9d9b9b9f07",
       "kind": "buildable",
       "name": "findutils",
       "parameters": {},
@@ -1076,7 +1076,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "9aaffeb22f81caa8cf8a3a43b8b52317d037344c14dbfa378886dd8a478b9c75",
+      "key": "c495d7934e9ced1fca7725ddf1baff755815c4801a7aed60eb0532aa9f72cf4a",
       "kind": "buildable",
       "name": "diffutils",
       "parameters": {},
@@ -1120,7 +1120,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "c4437f63aad54553dddd0edff883c76db827ecb833eb79667c806fed70a8af1d",
+      "key": "1a77a8d0d183686e713c6b5c5a7cb0aa683a00a9f260726067f7658a0dbd5947",
       "kind": "buildable",
       "name": "gzip",
       "parameters": {},
@@ -1164,7 +1164,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "51e9e570681f30b731c31343592d897b32602ce6dfeabbb2c823f00136096613",
+      "key": "c5bf1f969db8b19b90fb3095089b1e5f85c0023eae35b3a657eb0bc156883eae",
       "kind": "buildable",
       "name": "tar",
       "parameters": {},
@@ -1205,7 +1205,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "7165c8c24287b69f310d790fbdfc608cfddd33c22b370e43dacccdcad4f030cf",
+      "key": "641afcbf188daea3c85a1cd0d69ada198d95ed0d35d553e8e81bbf5f006fb826",
       "kind": "buildable",
       "name": "procps-ng",
       "parameters": {},
@@ -1258,7 +1258,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "a02a1ee588a8928353c0a84d425eb9e0cc304832275e5949d90bb6fb692c4718",
+      "key": "ca6ae0900e745f194e1e983667aab1e7c0b2fb61e226d2a50d0076a0d8ae5f16",
       "kind": "buildable",
       "name": "iproute2",
       "parameters": {},
@@ -1312,7 +1312,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "8199234e6aa31cdb68ffec8cedf4309def9a9b53a32ac1040db76eda92229797",
+      "key": "de47ee308428bf28b9c5674aa3c1aaf7d14528e629b8935a55e3fba11ff69dff",
       "kind": "buildable",
       "name": "dhcpcd",
       "parameters": {},
@@ -1385,7 +1385,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "fc6bdad811641eec15323f75a9d857d72c6ceffadae431be64e27e7a7624e28d",
+      "key": "cb893cdfe6c9eea8f0623e6c14570f481b454f953bd02b6856485ec01c9ea710",
       "kind": "buildable",
       "name": "vim",
       "parameters": {},
@@ -1424,7 +1424,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "2497c8b6c0867d25c9a27ac00c8953c862fb8a28b7ce343043ca9229f8852565",
+      "key": "5203fc751d750f0e77a781a830b82b17d23813d9a1467c1a219adf11ae21b0b4",
       "kind": "buildable",
       "name": "host-share",
       "parameters": {},
@@ -1585,7 +1585,7 @@
         ],
         "patches": []
       },
-      "key": "76b98c776eb31d5323b882e935fd3cc1e31092ed6f2e75f69065afd1a61c87fb",
+      "key": "6d0e886e62a4a543267b4bc2b79e2a2a891acbaf991ca556ad1ae5f3e652b459",
       "kind": "buildable",
       "name": "theia",
       "parameters": {},
@@ -1674,7 +1674,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "5cca62d54583a6748cea499dcc207c0ed6e5692ce85c141ed57d12cee79befe5",
+      "key": "13b7eb45896865b18c423a5581fde7b4d179bbbaeba8027e39a77fecf9364a88",
       "kind": "buildable",
       "name": "nodejs",
       "parameters": {},
@@ -1693,10 +1693,12 @@
     {
       "arguments": {
         "files": {
+          "files/profile": "/etc/profile",
           "files/profile.sh": "/etc/profile.d/devbox.sh",
-          "files/sshd.conf": "/etc/ssh/sshd_config.d/devbox.conf"
+          "files/sshd.conf": "/etc/ssh/devbox_sshd_config"
         },
         "symlinks": {
+          "/bin/pager": "less",
           "/usr/bin/env": "/bin/env"
         }
       },
@@ -1736,18 +1738,22 @@
         "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
         "files": [
           {
+            "path": "files/profile",
+            "sha256": "8b0aa8c551ba61aaf2b89c5381f4d7967ee8ebf837cd0a78edd4da15602c8941"
+          },
+          {
             "path": "files/profile.sh",
-            "sha256": "786a00f8d1dcacca76dc6ab6b21ab003dc5b18f37d84e1e2587b18bc6c2f4680"
+            "sha256": "bea9155eeca1913ba703818643e1189930514ec1be4e072ab4e71ee7bb6f1f06"
           },
           {
             "path": "files/sshd.conf",
-            "sha256": "58a3ac9639f62d86ee1aa6c38a587f926b7943d4a5c38f1f71537645963d7883"
+            "sha256": "6b4874b563ad5eca19d0efd642d9454aaa304d26c35902b5461f803f34800b4f"
           }
         ],
         "hooks": [],
         "patches": []
       },
-      "key": "99fd8fc341008a4e4c65d32b1006a53b645574d5ca95860b2538eec6807562bf",
+      "key": "6d5f7feee7da94d4bae7fe6653dc9fe8730267d485c25926b4c17b4f6bfb1177",
       "kind": "buildable",
       "name": "devbox",
       "parameters": {},
@@ -1841,7 +1847,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "81378621bc76e174a4a9c28aee9695636a43e050e42e940764277e705de8692b",
+      "key": "024420521e9f035ee0893c1b4d1bcfb2a5479a8c55614f6b2139ba2d2d1588d7",
       "kind": "buildable",
       "name": "openssh",
       "parameters": {},
@@ -1923,7 +1929,7 @@
         ],
         "patches": []
       },
-      "key": "66564034f81be5999efff80d54e3df9008b860e78bcfdcd9bbfe7ae0bad00b7d",
+      "key": "ddc705de44e9a44c29bb90f5ee5329b1ecc378e2ce3c55150c8cdc2c6d7e62d5",
       "kind": "buildable",
       "name": "openssl",
       "parameters": {},
@@ -1977,7 +1983,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "749eb637e77ef13de2cfa68f2ebbac4b2463f64ea2e2486bf970850e16ba31e1",
+      "key": "2b75ba0bcaec20b7265256a82b9e17ceba7f5b8716cec08ea77252555907183b",
       "kind": "buildable",
       "name": "zlib",
       "parameters": {},
@@ -2078,7 +2084,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "adfa4952210184b0463e5831db4964ef21c96864a546bf4d385ac602eb0f9133",
+      "key": "54a04989c37ec3d857b7f2f358da812578a653ba36913d0ea38e7c831feeb90f",
       "kind": "buildable",
       "name": "git",
       "parameters": {},
@@ -2185,7 +2191,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "04c14413962159209b6726da50c766c2ca0706d64a75437cb915aacb8ffa0cca",
+      "key": "950e9217a13e08e7364ad62c1e681bd043fc1da6d028fee6e84c56a27c8c4a4e",
       "kind": "buildable",
       "name": "curl",
       "parameters": {},
@@ -2227,7 +2233,7 @@
         ],
         "patches": []
       },
-      "key": "f7423717862bfa0840d198abe75828c5a42eb5e5d818428b27461394670602f1",
+      "key": "57eb3407db4a9621eb56ef21d191ebda03bf644cb2bea86de090ad2a28ac3633",
       "kind": "buildable",
       "name": "ca-certificates",
       "parameters": {},
@@ -2298,7 +2304,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "3aea3c94b0b0ea20ff89837f8021d813927ac3909ac4844b11fe93bf898c64f3",
+      "key": "7f66b2438fe1f4679d15535978c20c96df7e3ba64b23a1ae540a4368685f6e90",
       "kind": "buildable",
       "name": "less",
       "parameters": {},
@@ -2367,7 +2373,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "3919cbcea1bb39017f9d40097d018554ed0e05451cfb62361c4a786ecdf909fe",
+      "key": "faff4b284cbed0dc1ecef3c558659070d967c567f09c49f178bc1f1d5e577e8a",
       "kind": "buildable",
       "name": "ncurses",
       "parameters": {},
@@ -2631,18 +2637,18 @@
         "/usr/share/doc",
         "/usr/share/locale"
       ],
-      "filesystem_uuid": "16c1d1ff-3e77-5e17-b7cb-f0f0362714bf",
+      "filesystem_uuid": "8e3fabfc-3f01-5911-ae2a-c0d92ca7f257",
       "format": "ext4",
-      "hash_seed": "629bb9e9-7978-5df8-b26f-5704aec4988e",
+      "hash_seed": "d24d5abf-81c5-5e6b-b079-7969da3699e0",
       "readonly": true,
       "strip": true
     },
     "volumes": [
       {
         "exclude": [],
-        "filesystem_uuid": "61864f8b-0969-5976-9212-1bc6bdd6d518",
+        "filesystem_uuid": "8afd9741-2c05-568c-a5e2-9a89aa8df05d",
         "format": "ext4",
-        "hash_seed": "2abfd434-a219-57bd-8674-d8d04f6fd008",
+        "hash_seed": "bc40b9e9-f183-5305-826b-d2334fa6e6d6",
         "mount": "/opt/theia",
         "name": "theia",
         "packages": [
@@ -2653,7 +2659,7 @@
       }
     ]
   },
-  "input_sha256": "d7eedad645b164abe4fdb9025385ace189a8bd5fa62cce47f4957135a4d65170",
+  "input_sha256": "34c093ab1a663b6beae06ca09103b9f968ca35193c992f31ec067808b8be429c",
   "machine": {
     "boot": {
       "console": "ttyAMA0",
@@ -3184,7 +3190,7 @@
       "run": [
         "sh",
         "-c",
-        "ssh-keygen -A -f /var/lib/devbox && exec /bin/sshd -D -e"
+        "ssh-keygen -A -f /var/lib/devbox && exec /bin/sshd -D -e -f /etc/ssh/devbox_sshd_config"
       ]
     },
     "theia": {
@@ -3427,11 +3433,11 @@
     "abi_from": "defaults",
     "platform": "arm64",
     "toolchain": {
-      "builder_image_sha256": "47eaba539c09168157123f100cf846032ee89ac50508ae1d08d72d780dda40d6",
+      "builder_image_sha256": "a9fc3f84117ea02cfb9cfa7000324334728246be43d7aa045a5a0e2fe6d60ebc",
       "host": "aarch64",
       "name": "linux-libre-vm",
-      "release": "dev-17dc8e902cf7",
-      "target_sha256": "bd57244c568502abb2a333b5dd660cf21d1c4e0658e9c4bc1259e43546628faf"
+      "release": "v0.4.0",
+      "target_sha256": "72bea122295b41ce21ce45169b6e0cb24507abc5d5c33f05975cacbedcbb7d4e"
     },
     "triplet": "aarch64-linux-gnu"
   },
@@ -3450,6 +3456,10 @@
     {
       "id": "theia:http-3000",
       "timeout_seconds": 180
+    },
+    {
+      "id": "devbox:ssh-22",
+      "timeout_seconds": 30
     },
     {
       "id": "openssh:keygen",

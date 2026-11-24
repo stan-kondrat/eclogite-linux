@@ -178,5 +178,20 @@ export const utmVirtArm648g = {
   resources: { vcpus: 2, memory_mib: 8192 },
 } satisfies Machine;
 
+/** catalog/machines/utm-virt-arm64-devbox.jsonc */
+export const utmVirtArm64Devbox = {
+  schema: "eclogite.machine/v0.1",
+  name: "utm-virt-arm64-devbox",
+  aliases: ["devbox-vm"],
+  extends: "utm-virt-arm64",
+  resources: { vcpus: 1, memory_mib: 8192 },
+  limitations: [
+    "This profile requires macOS on Apple Silicon and UTM 5 or newer.",
+    "UTM shared networking has no port forwarding: open the guest's DHCP address.",
+    "UTM imports the disks into its bundle; it does not modify the immutable source images.",
+    "One vCPU: linux-libre's arm64 configuration has no SMP.",
+  ],
+} satisfies Machine;
+
 /** Every document above, in name order. */
-export const all: Machine[] = [qemuQ35X8664, qemuRaspi1apArmv6, qemuVirtArm64, raspberryPiModelB256mb, raspberryPiModelB512mb, utmVirtArm64, utmVirtArm648g];
+export const all: Machine[] = [qemuQ35X8664, qemuRaspi1apArmv6, qemuVirtArm64, raspberryPiModelB256mb, raspberryPiModelB512mb, utmVirtArm64, utmVirtArm648g, utmVirtArm64Devbox];

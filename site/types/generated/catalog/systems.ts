@@ -21,6 +21,14 @@ export const qemuX8664Reference = {
   software: "reference",
 } satisfies System;
 
+/** catalog/systems/utm-arm64-devbox.jsonc */
+export const utmArm64Devbox = {
+  schema: "eclogite.system/v0.1",
+  name: "utm-arm64-devbox",
+  machine: "utm-virt-arm64-devbox",
+  software: "devbox",
+} satisfies System;
+
 /** catalog/systems/utm-arm64-reference.jsonc */
 export const utmArm64Reference = {
   schema: "eclogite.system/v0.1",
@@ -38,4 +46,4 @@ export const utmArm64Theia = {
 } satisfies System;
 
 /** Every document above, in name order. */
-export const all: System[] = [qemuArm64Reference, qemuX8664Reference, utmArm64Reference, utmArm64Theia];
+export const all: System[] = [qemuArm64Reference, qemuX8664Reference, utmArm64Devbox, utmArm64Reference, utmArm64Theia];

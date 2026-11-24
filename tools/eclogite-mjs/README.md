@@ -6,6 +6,9 @@ compiler and verifier, in Node ES modules (no build step, one dependency:
 same results byte for byte; this tool is how format changes get tried while
 the formats are in development. Clarity beats speed here.
 
+Until the C tool exists, `./eclogite` at the repository root runs this tool
+(`./eclogite validate`, `./eclogite lock -c SYSTEM`, ...).
+
 ```sh
 cd tools/eclogite-mjs && npm ci              # once (installs ajv for the test)
 node bin/eclogite-mjs.mjs validate catalog   # parse, schemas, catalog checks
@@ -47,7 +50,7 @@ or stale lock, 22 `verify` mismatch, 30 internal.
 | `src/golden.mjs` | the golden projection |
 | `tests/fixtures/invalid/` | one directory per invalid input with the expected diagnostics |
 | `tests/fixtures/resolve/` | one directory per resolution error (and an override) with the expected output |
-| `tests/fixtures/devbox/` | the devbox as a second catalog root, and its expected lock |
+| `tests/fixtures/devbox/` | the expected lock of `catalog/systems/utm-arm64-devbox.jsonc` |
 
 The fixtures are the conformance corpus the C tool runs too: a case is a
 `catalog/` root laid next to the repository's, the command in the test file,

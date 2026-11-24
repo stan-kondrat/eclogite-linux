@@ -14,20 +14,14 @@ import { spawnSync } from "node:child_process";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, "../../..");
 const CLI = resolve(HERE, "../bin/eclogite-mjs.mjs");
-const DEVBOX = "tools/eclogite-mjs/tests/fixtures/devbox/catalog";
-const SYSTEM = `${DEVBOX}/systems/utm-arm64-devbox.jsonc`;
+const SYSTEM = "catalog/systems/utm-arm64-devbox.jsonc";
 
 const cli = (args, cwd = REPO) => spawnSync(process.execPath, [CLI, ...args], { cwd, encoding: "utf8" });
 
 test("validate catalog passes", () => {
   const r = cli(["validate", "catalog"]);
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /35 buildable/);
-});
-
-test("validate accepts the devbox fixture next to the catalog", () => {
-  const r = cli(["--catalog", DEVBOX, "validate", "catalog"]);
-  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /36 buildable/);
 });
 
 test("verify passes", () => {
@@ -36,7 +30,7 @@ test("verify passes", () => {
 });
 
 test("the devbox lock equals the stored lock and is byte-identical twice", () => {
-  const args = ["--catalog", DEVBOX, "--host", "aarch64", "lock", "--allow-unpinned", "-c", SYSTEM, "-o", "-"];
+  const args = ["--host", "aarch64", "lock", "--allow-unpinned", "-c", SYSTEM, "-o", "-"];
   const env = { ...process.env };
   delete env.SOURCE_DATE_EPOCH;
   const a = spawnSync(process.execPath, [CLI, ...args], { cwd: REPO, encoding: "utf8", env });
@@ -72,7 +66,7 @@ test("a one-field change gives an explained rebuild set, and the old lock is sta
   const work = mkdtempSync(join(tmpdir(), "eclogite-mjs-"));
   try {
     cpSync(join(REPO, "catalog"), join(work, "catalog"), { recursive: true });
-    const base = ["--project", work, "--catalog", join(REPO, DEVBOX), "-c", join(REPO, SYSTEM), "--host", "aarch64"];
+    const base = ["--project", work, "-c", join(work, SYSTEM), "--host", "aarch64"];
     const lockPath = join(work, "system.lock.json");
     const first = cli([...base, "lock", "--allow-unpinned", "-o", lockPath]);
     assert.equal(first.status, 0, first.stderr);
@@ -105,7 +99,7 @@ test("a one-field change gives an explained rebuild set, and the old lock is sta
 });
 
 test("why, graph and explain run on the devbox", () => {
-  const base = ["--catalog", DEVBOX, "-c", SYSTEM];
+  const base = ["-c", SYSTEM];
   const why = cli([...base, "why", "git"]);
   assert.equal(why.status, 0, why.stderr);
   assert.match(why.stdout, /software -> devbox -> git/);

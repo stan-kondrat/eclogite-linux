@@ -554,8 +554,10 @@ builder tools.
 - **Hook variables.** Hooks use provisional names (`SRC`, `WORK`, `OUT`,
   `FETCH`, `DESTDIR`, `DEP_<name>`, `TOOLCHAIN`, `TARGET_TRIPLET`, `CC`,
   `CXX`, `CFLAGS`, `LDFLAGS`) until the builder contract fixes them.
-- **Tool manifest format.** `linux-libre-vm` must publish it with each builder
-  image release; its format and signing are not yet defined.
+- **Tool manifest format.** Since v0.3.0, `linux-libre-vm` publishes
+  `MANIFEST-dev-<arch>.txt` (submodule commits, cross toolchain versions) and
+  `SHA256SUMS-dev` with each release; the catalog toolchain copies them by
+  hand. A machine-readable format and signing are not yet defined.
 - **PATH enforcement.** A constructed `PATH` catches undeclared tools found by
   name, but not a build system that hard-codes `/usr/bin/python3`. Since the
   builder image identity is in every key, this is a correctness check rather
