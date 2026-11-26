@@ -1,0 +1,4 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-initramfs-readonly/catalog/software/zz-initramfs.jsonc:6:43: an initramfs root is writable: set root.readonly to false (/root/readonly)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-initramfs-readonly/catalog/software/zz-initramfs.jsonc:7:37: free_mib does not apply to an initramfs (/image/free_mib)
+2 problems
+exit 10

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Eclogite Linux documentation for system JSON, catalog references, CLI workflows, architecture, VM bundles, storage, and CI.">
   <title>Documentation — Eclogite Linux</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20261015-7">
-  <script src="assets/catalog-data.js?v=20261015-7" defer></script>
-  <script src="assets/site.js?v=20261015-7" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=20261126-1">
+  <script src="assets/catalog-data.js?v=20261126-1" defer></script>
+  <script src="assets/site.js?v=20261126-1" defer></script>
 </head>
 <body data-page="docs">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -58,7 +58,7 @@
       </nav>
       <div class="docs-sidebar-note">
         <span>Current phase</span>
-        <p>Research, schemas, catalog, and interface design. The C builder is not implemented yet.</p>
+        <p>Milestone 1: building and booting the first system, minimal BusyBox from an initramfs. The JavaScript reference tool runs as <code>./eclogite</code>; the C tool follows in milestone 3.</p>
       </div>
     </aside>
 
@@ -118,6 +118,10 @@ eclogite graph --config system.json --format tree
 eclogite plan --config system.json
 eclogite lock --config system.json
 eclogite create --config system.json --fetch</code></pre>
+        <p>Today <code>./eclogite</code> at the repository root runs the reference tool, inside the <code>linux-libre-vm</code> dev VM or its container: <code>validate</code>, <code>lock</code>, <code>fetch</code> and <code>build</code> work; <code>image</code>, <code>test</code> and <code>create</code> are planned. The first system to try is <code>qemu-arm64-minimal-busybox</code> (<code>docs/minimal-busybox.md</code>).</p>
+        <pre><code>./eclogite lock  -c qemu-arm64-minimal-busybox
+./eclogite fetch -c qemu-arm64-minimal-busybox
+./eclogite build -c qemu-arm64-minimal-busybox</code></pre>
         <p><code>--machine</code> and <code>--software</code> remain available as an interactive shorthand. Scripts and CI should use <code>--config</code> so the complete intent is reviewable.</p>
         <p class="docs-source">Detailed source document: <code>docs/cli.md</code></p>
       </section>
@@ -175,7 +179,7 @@ VM bundle or hardware image</code></pre>
         <p class="docs-kicker">08 · Project status</p>
         <h2>Design first, then migrate package by package</h2>
         <p>GitHub CI will validate the C tool, schemas, catalog, plans, shell contracts, and generated site on Linux and macOS. Dedicated KVM-capable runners will build and publish signed layers. UTM receives a separate Apple Silicon smoke-test environment.</p>
-        <p>The current repository remains at the research and layout stage. No C host tool, generic builders, operational <code>vm.sh</code>, or GitHub workflows have been implemented yet.</p>
+        <p>Implemented so far: the reference tool <code>tools/eclogite-mjs</code> behind <code>./eclogite</code> (<code>validate</code>, <code>resolve</code>, <code>lock</code>, <code>plan</code>, <code>graph</code>, <code>why</code>, <code>fetch</code>, <code>build</code>), the <code>make</code>, <code>configure</code>, <code>files</code> and <code>linux-kernel</code> builders, and three workflows: the reference checks, the builder check inside the pinned <code>linux-libre-vm</code> v0.4.0 dev container on aarch64 and x86-64, and this site. Not yet: the image step, <code>vm.sh</code>, the C tool and remote layers.</p>
         <div class="docs-callout"><strong>Reference implementation</strong><p><code>linux-libre-vm</code> remains independent and buildable throughout the rewrite. Its images, kernel settings, runners, and boot tests are the compatibility oracle.</p></div>
         <p class="docs-source">Detailed source document: <code>docs/ci.md</code></p>
       </section>

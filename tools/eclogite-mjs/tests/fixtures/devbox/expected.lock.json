@@ -297,12 +297,12 @@
         ]
       },
       "hashes": {
-        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "f1faa6e9787fa0fa3caf373ce5190eab4d6d2b79f2ccec480cb1fd265dd5efb6",
+      "key": "ca98adca792dabadfd00590c2dfc8348948abdf92de8c3fc8c71e88c05299e53",
       "kind": "buildable",
       "name": "base-files",
       "parameters": {},
@@ -315,6 +315,10 @@
     },
     {
       "arguments": {
+        "defconfig": "allnoconfig",
+        "fragments": [
+          "base.config"
+        ],
         "image": "Image.gz"
       },
       "builder": "linux-kernel",
@@ -328,12 +332,17 @@
         "run": []
       },
       "hashes": {
-        "builder": "5c409cddacda71248affb6ada84b500e25dabd10b170181f4cc1ecda2984c4f9",
-        "files": [],
+        "builder": "943634f456def1791b415b1ae2dbf9e5be35c4f0f004a7136aa653ea5f8f6147",
+        "files": [
+          {
+            "path": "config/base.config",
+            "sha256": "ecad044a292ee657f9f60b6562a7a8fbca334516fd25b172a5851793bac4a288"
+          }
+        ],
         "hooks": [],
         "patches": []
       },
-      "key": "719ac2b7a7d7ddb54cf75a4a96ca736eeb7a1167018fbae8ddc9a88e5162d723",
+      "key": "9864914b93ca353c81e96aa11f01d28fd485c68f7b472e77944efef47da71080",
       "kind": "buildable",
       "name": "linux-libre",
       "parameters": {},
@@ -354,44 +363,19 @@
     },
     {
       "arguments": {
-        "configure": [
-          "--prefix=/usr",
-          "--disable-werror"
-        ],
-        "out_of_tree": true,
-        "remove": [
-          "/usr/include",
-          "/usr/share/i18n",
-          "/usr/share/info",
-          "/usr/libexec/getconf",
-          "/var/db",
-          "**/*.a"
-        ]
+        "hooks": {
+          "install": [
+            "install"
+          ]
+        }
       },
-      "builder": "configure",
-      "compiler": {
-        "name": "gcc",
-        "reason": "system"
-      },
+      "builder": "files",
       "dependencies": {
         "build": [
           {
-            "revision": "4db0e8df15bef836558857c291c323add11d035c",
-            "tool": "gcc",
-            "version": "15.3.0"
-          },
-          {
-            "revision": "8e6e75d9102e39bed2a2b279203a396741180f12",
-            "tool": "python3",
-            "version": "3.14.8"
-          },
-          {
-            "tool": "bison",
-            "version": "3.8.2"
-          },
-          {
-            "tool": "make",
-            "version": "4.4.1"
+            "revision": "f762ccf84f122d1354f103a151cba8bde797d521",
+            "tool": "glibc",
+            "version": "2.43"
           }
         ],
         "link": [],
@@ -404,12 +388,17 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [],
-        "hooks": [],
+        "hooks": [
+          {
+            "name": "install",
+            "sha256": "79fdefaf5686e6a59c53548e374f702c9945f2315aeb97637a6fa7cfff76457e"
+          }
+        ],
         "patches": []
       },
-      "key": "aedaea27278b86f607b26c2a5b2118f9d0a9bac6c2ba06ecf938784f14ebd447",
+      "key": "7fe3726e7067778181bcba5c84b7c87c7fb6b8744fb5fb79da341c32d0ced0ff",
       "kind": "buildable",
       "name": "glibc",
       "parameters": {},
@@ -417,57 +406,26 @@
         "libc"
       ],
       "source": {
-        "revision": "f762ccf84f122d1354f103a151cba8bde797d521",
-        "type": "git",
-        "url": "https://sourceware.org/git/glibc.git"
+        "type": "none"
       },
-      "source_tree_sha256": "8bee804061ffbb2d364bc914d973689b55738bddb1c5924a4619a3c524e78c87",
       "variants_applied": [],
       "version": "2.43"
     },
     {
       "arguments": {
-        "configure": [
-          "--prefix=/usr",
-          "--enable-languages=c,c++",
-          "--disable-multilib",
-          "--disable-bootstrap",
-          "--disable-nls"
-        ],
-        "install_targets": [
-          "install-target-libgcc",
-          "install-target-libstdc++-v3",
-          "install-target-libatomic"
-        ],
-        "make_targets": [
-          "all-target-libgcc",
-          "all-target-libstdc++-v3",
-          "all-target-libatomic"
-        ],
-        "out_of_tree": true,
-        "remove": [
-          "/usr/include",
-          "/usr/share",
-          "**/*.a",
-          "**/*.la",
-          "**/*-gdb.py"
-        ]
+        "hooks": {
+          "install": [
+            "install"
+          ]
+        }
       },
-      "builder": "configure",
-      "compiler": {
-        "name": "gcc",
-        "reason": "system"
-      },
+      "builder": "files",
       "dependencies": {
         "build": [
           {
             "revision": "4db0e8df15bef836558857c291c323add11d035c",
             "tool": "gcc",
             "version": "15.3.0"
-          },
-          {
-            "tool": "make",
-            "version": "4.4.1"
           }
         ],
         "link": [
@@ -480,12 +438,17 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [],
-        "hooks": [],
+        "hooks": [
+          {
+            "name": "install",
+            "sha256": "a54ddaa901cf42cf4c9c44c01ea6d399eb3d60a0b1cb53089fb4e342cedd4846"
+          }
+        ],
         "patches": []
       },
-      "key": "d6925d1daff32f16102fda31fee070f3c31a324a4a24fea5c80f9baf2074b6b7",
+      "key": "029eded586399a23c257490117c6986e56e9c345ab36302903c700b5d47873b8",
       "kind": "buildable",
       "name": "gcc-runtime",
       "parameters": {},
@@ -494,11 +457,8 @@
         "c++-runtime"
       ],
       "source": {
-        "revision": "4db0e8df15bef836558857c291c323add11d035c",
-        "type": "git",
-        "url": "https://gcc.gnu.org/git/gcc.git"
+        "type": "none"
       },
-      "source_tree_sha256": "637d6b0df6897d2b0ba647980843d97a2686fbb8d453a6f082ec560277b129b8",
       "variants_applied": [],
       "version": "15.3.0"
     },
@@ -567,7 +527,7 @@
         ]
       },
       "hashes": {
-        "builder": "c32099cebe32599598a5b20564f181f3ee9d9fce06c3164feaf75d7c6472cf8f",
+        "builder": "134e5a27646c71868e39ec3856a538eedb1f9843c3c2975a52cce634a03a7d1f",
         "files": [
           {
             "path": "files/etc/runit/1",
@@ -603,7 +563,7 @@
           }
         ]
       },
-      "key": "e20dce22a92e0cc42fc36fc2d32f54c9bc1ddb1a35615e720c98bf2c411853ca",
+      "key": "7b5bff40d8b195e972848ef8b6fa36db46cd0c25ffc702bde5b1c8c767d4191c",
       "kind": "buildable",
       "name": "runit",
       "parameters": {},
@@ -650,12 +610,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "9d65466767e15deffa42de1f8d8575f00904415f4e5a9235a4ff5c0a236f4524",
+      "key": "1453c074f3535cd4b063648b51905572ff0d5bac765923262e5b600ac26a0954",
       "kind": "buildable",
       "name": "bash",
       "parameters": {},
@@ -708,12 +668,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "d994da6d4fff1a609ea3dcc7f943e9a43588f999281e3dd4a673c5376608581a",
+      "key": "b2fcd5f5031868b4aabac44a2b49fd4b9a469878b8b47d3590aeded5e0802ab9",
       "kind": "buildable",
       "name": "coreutils",
       "parameters": {},
@@ -768,12 +728,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "fe6b68712143080ca583628cbee96e97bf01a162f560018ee1c62697f7ade5cd",
+      "key": "5664dd4130fbe47744eb3311acb87975769007c70d951c613ccbbf158d658a38",
       "kind": "buildable",
       "name": "util-linux",
       "parameters": {},
@@ -814,12 +774,12 @@
         ]
       },
       "hashes": {
-        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "a89c105c7f500a93ffd9886e36a4f1358251339432886280b4c044b245c776b2",
+      "key": "e477505790d39790f31ac5e34045c407e1f53f2a7930a34ffb8933c5e0e3632c",
       "kind": "buildable",
       "name": "console-login",
       "parameters": {
@@ -901,12 +861,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "fc3df8e3694827d2f15bb2a8cc11c289f4bb5718329a40fc946fcef3c1b47270",
+      "key": "8d6769d6388c7e99b9baf122235d1f97e31f02980ffa907079431e022ac790a0",
       "kind": "buildable",
       "name": "grep",
       "parameters": {},
@@ -945,12 +905,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "68a8e92d99460878d63a0a2ff4b2d1b2119aa5a63f4e59abfa73c8a1f9371d07",
+      "key": "6f7fb6cd33ce7c97758ce2c1b8047d9b12d2c8aa07c79e163f61348bc636dfaa",
       "kind": "buildable",
       "name": "sed",
       "parameters": {},
@@ -983,12 +943,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "36a8371b1464c20d410707db34e778882153df601fad3cf58882de5cff9551b7",
+      "key": "7ec5008757893d3c79857326ef1cd7ef9a22dbf448bc2f6541bb46cc57387840",
       "kind": "buildable",
       "name": "gawk",
       "parameters": {},
@@ -1027,12 +987,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "4d6c213616dcc810e99b270de4a071587cdb5527547bf75f66b39f9d9b9b9f07",
+      "key": "54c861efecae1dfa9c7ea9c4ee562e68bbef20b48cfdc287d169ebc1d783e647",
       "kind": "buildable",
       "name": "findutils",
       "parameters": {},
@@ -1071,12 +1031,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "c495d7934e9ced1fca7725ddf1baff755815c4801a7aed60eb0532aa9f72cf4a",
+      "key": "579e1912ac9cf3f2e126e6e40381ab21bd23f042407cd02305bca1655e1323e9",
       "kind": "buildable",
       "name": "diffutils",
       "parameters": {},
@@ -1115,12 +1075,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "1a77a8d0d183686e713c6b5c5a7cb0aa683a00a9f260726067f7658a0dbd5947",
+      "key": "16e25a862458a90cf3b7864800f631e4e2d1784c2ac6e7abf77a6f8788008049",
       "kind": "buildable",
       "name": "gzip",
       "parameters": {},
@@ -1159,12 +1119,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "c5bf1f969db8b19b90fb3095089b1e5f85c0023eae35b3a657eb0bc156883eae",
+      "key": "f8d9e27dffb57ab8f28fc4e8416f7837e13763d371303f38546c17a505c1b7da",
       "kind": "buildable",
       "name": "tar",
       "parameters": {},
@@ -1200,12 +1160,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "641afcbf188daea3c85a1cd0d69ada198d95ed0d35d553e8e81bbf5f006fb826",
+      "key": "0b1adcecc4373cf10291526e481f1315da1a5d8eaf4e37a3eb2ab136f67e490e",
       "kind": "buildable",
       "name": "procps-ng",
       "parameters": {},
@@ -1253,12 +1213,12 @@
         "run": []
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "ca6ae0900e745f194e1e983667aab1e7c0b2fb61e226d2a50d0076a0d8ae5f16",
+      "key": "58ebcc2f6b500ec594cbafd42debb8bd43fbfed2f8354bb484536c25a746fdac",
       "kind": "buildable",
       "name": "iproute2",
       "parameters": {},
@@ -1307,12 +1267,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "de47ee308428bf28b9c5674aa3c1aaf7d14528e629b8935a55e3fba11ff69dff",
+      "key": "1668a7532dd2c7afb16f87de7e69a32a2ee6dfbfe5a7c4e0d0f5f8e8398d8d23",
       "kind": "buildable",
       "name": "dhcpcd",
       "parameters": {},
@@ -1380,12 +1340,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "cb893cdfe6c9eea8f0623e6c14570f481b454f953bd02b6856485ec01c9ea710",
+      "key": "e3f35b0f4e3734951b1ddd38a1b5f4c38d6c8461c484cfb9ebbe7b84bd8d23c9",
       "kind": "buildable",
       "name": "vim",
       "parameters": {},
@@ -1419,12 +1379,12 @@
         ]
       },
       "hashes": {
-        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "5203fc751d750f0e77a781a830b82b17d23813d9a1467c1a219adf11ae21b0b4",
+      "key": "335fdc064f9071656eb3f5682ab2d7a329421ddc855dcef2318c96cdf9debaee",
       "kind": "buildable",
       "name": "host-share",
       "parameters": {},
@@ -1585,7 +1545,7 @@
         ],
         "patches": []
       },
-      "key": "6d0e886e62a4a543267b4bc2b79e2a2a891acbaf991ca556ad1ae5f3e652b459",
+      "key": "2422c75246d4cf59d6349df54d2b6faf6cc0851374f724c73ea9783f9672457d",
       "kind": "buildable",
       "name": "theia",
       "parameters": {},
@@ -1669,12 +1629,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "13b7eb45896865b18c423a5581fde7b4d179bbbaeba8027e39a77fecf9364a88",
+      "key": "1b2e5640326e79488e8d1ef5c58f8e6fce4e8a8bc7367446c8600de2c5a80d92",
       "kind": "buildable",
       "name": "nodejs",
       "parameters": {},
@@ -1735,7 +1695,7 @@
         ]
       },
       "hashes": {
-        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [
           {
             "path": "files/profile",
@@ -1753,7 +1713,7 @@
         "hooks": [],
         "patches": []
       },
-      "key": "6d5f7feee7da94d4bae7fe6653dc9fe8730267d485c25926b4c17b4f6bfb1177",
+      "key": "06af818357ce746af33bf4db109d4eba91896d16d3a5a9ddbd09993f7a960b39",
       "kind": "buildable",
       "name": "devbox",
       "parameters": {},
@@ -1842,12 +1802,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "024420521e9f035ee0893c1b4d1bcfb2a5479a8c55614f6b2139ba2d2d1588d7",
+      "key": "290ffb7b20b7377dd99c36d62aa43064afbab69c0a5f1d92a772a583840a8d98",
       "kind": "buildable",
       "name": "openssh",
       "parameters": {},
@@ -1919,7 +1879,7 @@
         ]
       },
       "hashes": {
-        "builder": "c32099cebe32599598a5b20564f181f3ee9d9fce06c3164feaf75d7c6472cf8f",
+        "builder": "134e5a27646c71868e39ec3856a538eedb1f9843c3c2975a52cce634a03a7d1f",
         "files": [],
         "hooks": [
           {
@@ -1929,7 +1889,7 @@
         ],
         "patches": []
       },
-      "key": "ddc705de44e9a44c29bb90f5ee5329b1ecc378e2ce3c55150c8cdc2c6d7e62d5",
+      "key": "5cb2582c56f3a2693cfd466e6b268a146e2d63cceb0782a4a0b9f749a662fd65",
       "kind": "buildable",
       "name": "openssl",
       "parameters": {},
@@ -1978,12 +1938,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "2b75ba0bcaec20b7265256a82b9e17ceba7f5b8716cec08ea77252555907183b",
+      "key": "6ffe7ebca9428fcb4906ad950468c3aee5eca2f8b1e635959021e23c4ffd47be",
       "kind": "buildable",
       "name": "zlib",
       "parameters": {},
@@ -2079,12 +2039,12 @@
         ]
       },
       "hashes": {
-        "builder": "c32099cebe32599598a5b20564f181f3ee9d9fce06c3164feaf75d7c6472cf8f",
+        "builder": "134e5a27646c71868e39ec3856a538eedb1f9843c3c2975a52cce634a03a7d1f",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "54a04989c37ec3d857b7f2f358da812578a653ba36913d0ea38e7c831feeb90f",
+      "key": "435a9bb1bc40ae4401932c73baea2ab5a30f5e893b32f4570572e7048baf2377",
       "kind": "buildable",
       "name": "git",
       "parameters": {},
@@ -2186,12 +2146,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "950e9217a13e08e7364ad62c1e681bd043fc1da6d028fee6e84c56a27c8c4a4e",
+      "key": "4708562c1dfdf43b819aab0f2b19ca861aef722edfac2fa921ce8f5c31a23565",
       "kind": "buildable",
       "name": "curl",
       "parameters": {},
@@ -2223,7 +2183,7 @@
         "run": []
       },
       "hashes": {
-        "builder": "fd6b53504ed50e8f0dd9f4a6ca41f5415a48704da06126b44e1240c45fbbc84a",
+        "builder": "76181f62f15258c11b5303e44ffacab464ccc4a3780abdd07cb7acc413d4c3d3",
         "files": [],
         "hooks": [
           {
@@ -2233,7 +2193,7 @@
         ],
         "patches": []
       },
-      "key": "57eb3407db4a9621eb56ef21d191ebda03bf644cb2bea86de090ad2a28ac3633",
+      "key": "3780c90d0f7f92621541721228dc577173e7dc83e2456127e88eae53c742be15",
       "kind": "buildable",
       "name": "ca-certificates",
       "parameters": {},
@@ -2299,12 +2259,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "7f66b2438fe1f4679d15535978c20c96df7e3ba64b23a1ae540a4368685f6e90",
+      "key": "3f8f1082f5e19a91ff4bf7d3d99491770bfcdaa928c22eb03a7eef0f7b304885",
       "kind": "buildable",
       "name": "less",
       "parameters": {},
@@ -2368,12 +2328,12 @@
         ]
       },
       "hashes": {
-        "builder": "74ab19c4db4fd67feddafc0285d6360efdc3b1ee2d75696127f233b878179bc8",
+        "builder": "f5b880831e3e6df44e0da047ec34c711e54ccbf95ee4bf54d626e74e0083bae6",
         "files": [],
         "hooks": [],
         "patches": []
       },
-      "key": "faff4b284cbed0dc1ecef3c558659070d967c567f09c49f178bc1f1d5e577e8a",
+      "key": "653f5d1b0563f9272ce723403e84f8478c2e5a7eafe3c96402198ed996553478",
       "kind": "buildable",
       "name": "ncurses",
       "parameters": {},
@@ -2637,18 +2597,18 @@
         "/usr/share/doc",
         "/usr/share/locale"
       ],
-      "filesystem_uuid": "8e3fabfc-3f01-5911-ae2a-c0d92ca7f257",
+      "filesystem_uuid": "95c570b4-d4fa-52c4-b5da-c67ccb36185c",
       "format": "ext4",
-      "hash_seed": "d24d5abf-81c5-5e6b-b079-7969da3699e0",
+      "hash_seed": "9b4c4661-036e-59ee-addd-82d7c14a4af2",
       "readonly": true,
       "strip": true
     },
     "volumes": [
       {
         "exclude": [],
-        "filesystem_uuid": "8afd9741-2c05-568c-a5e2-9a89aa8df05d",
+        "filesystem_uuid": "c5fdb7fe-0697-5d77-a866-6d26ca5eba00",
         "format": "ext4",
-        "hash_seed": "bc40b9e9-f183-5305-826b-d2334fa6e6d6",
+        "hash_seed": "2569d438-6322-5782-94ea-3bb8423a6bfe",
         "mount": "/opt/theia",
         "name": "theia",
         "packages": [
@@ -2659,7 +2619,7 @@
       }
     ]
   },
-  "input_sha256": "34c093ab1a663b6beae06ca09103b9f968ca35193c992f31ec067808b8be429c",
+  "input_sha256": "83b204e40b3ed789fad6c56d57bfe20fda2f754bea529f4d5b48fdf3e8bae84a",
   "machine": {
     "boot": {
       "console": "ttyAMA0",

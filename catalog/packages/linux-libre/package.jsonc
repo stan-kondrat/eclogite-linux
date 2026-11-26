@@ -66,6 +66,15 @@
     "target": { "os": { "eq": "linux" } }
   },
   "builder": "linux-kernel",
+  // Decided 2026-11-27: a small kernel. allnoconfig, then base.config (what
+  // every Eclogite system needs: initramfs, ELF and scripts, TTY, basic
+  // networking), then the options dependents, the software and the machine's
+  // devices require. The architecture defconfig built drivers for every SoC
+  // and took hours on one CPU.
+  "arguments": {
+    "defconfig": "allnoconfig",
+    "fragments": ["base.config"]
+  },
   "tests": {
     // The guest clock comes from the machine's RTC (catalog/devices.jsonc);
     // a board without one, such as the Raspberry Pi 1, skips the test

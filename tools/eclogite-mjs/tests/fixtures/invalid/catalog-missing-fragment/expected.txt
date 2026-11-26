@@ -1,0 +1,3 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-missing-fragment/catalog/packages/zz-kernel/package.jsonc:8:32: config fragment config/absent.config does not exist (/arguments/fragments/0)
+1 problem
+exit 10

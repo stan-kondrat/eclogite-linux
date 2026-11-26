@@ -5,7 +5,8 @@
   "description": "TypeScript types for the website, generated from the JSON Schemas in ../../schemas.",
   "scripts": {
     "types": "node generate.mjs generate",
-    "check": "node generate.mjs check"
+    "check": "node generate.mjs check && node catalog-data.mjs --check",
+    "site-data": "node catalog-data.mjs"
   },
   "devDependencies": {
     "ajv": "8.17.1",

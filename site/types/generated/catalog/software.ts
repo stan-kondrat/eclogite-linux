@@ -156,6 +156,28 @@ export const minimalBusybox = {
   evidence: { default: "warn-untested" },
 } satisfies Software;
 
+/** catalog/software/minimal-busybox-initramfs.jsonc */
+export const minimalBusyboxInitramfs = {
+  schema: "eclogite.software/v0.1",
+  name: "minimal-busybox-initramfs",
+  packages: ["base", "busybox"],
+  root: { hostname: "eclogite", readonly: false, tmpfs: ["/run", "/tmp"] },
+  image: {
+    format: "initramfs",
+    strip: true,
+    exclude: [
+      "/usr/include",
+      "/usr/share/man",
+      "/usr/share/info",
+      "/usr/share/doc",
+      "/usr/share/locale",
+      "**/*.a",
+      "**/*.la",
+    ],
+  },
+  evidence: { default: "warn-untested" },
+} satisfies Software;
+
 /** catalog/software/reference.jsonc */
 export const reference = {
   schema: "eclogite.software/v0.1",
@@ -187,4 +209,4 @@ export const theia = {
 } satisfies Software;
 
 /** Every document above, in name order. */
-export const all: Software[] = [devbox, minimal, minimalBusybox, reference, theia];
+export const all: Software[] = [devbox, minimal, minimalBusybox, minimalBusyboxInitramfs, reference, theia];

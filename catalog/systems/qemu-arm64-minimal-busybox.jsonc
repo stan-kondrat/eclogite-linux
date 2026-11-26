@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.system/v0.1",
+  "name": "qemu-arm64-minimal-busybox",
+  // M1: the smallest bootable system, booted from an initramfs in QEMU so the
+  // check can run in CI (kernel + initramfs, no disk)
+  "machine": "qemu-virt-arm64",
+  "software": "minimal-busybox-initramfs"
+}

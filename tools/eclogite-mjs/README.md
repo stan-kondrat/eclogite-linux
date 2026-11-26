@@ -28,13 +28,17 @@ node --test tests/*.test.mjs                 # fixtures and the commands above
 | `graph ... [--kind packages\|full] [--format tree\|dot\|json]` | The package graph: run, build and link edges. |
 | `why ... NODE [--all]` | Why a package is in the closure (the visit-order chain from `software`), or with `--all` every path; for a capability, its provider and reason. |
 | `verify [--update]` | Golden files, lock validity, byte-identical relocking, key recomputation, `tests/reference/lock-hashes.json`. Rewrites reference files only with `--update`, listing each. |
+| `fetch ... [--lock FILE] [--source NAME]... [--force] [--cache-dir DIR]` | Download the git sources of the current lock (missing or stale: exit 11) into bare mirrors and read-only trees `sources/<source-key>/` in the cache (default `~/.cache/eclogite`). The only network command; a source that fails is exit 12. |
+| `build ... [NODE...] [--keep-going] [--keep-work] [--jobs N] [--no-builder-check]` | Build the lock's packages with `builders/<name>/build.sh` into read-only layers `layers/<key>/` in the cache, in `build_order`; a complete layer is a hit. Must run in the builder the lock names. A failure is exit 20 with the log tail. |
 | `canonical FILE` | Print a document in canonical JSON (what hashes are computed over). |
 
 Options: `--catalog DIR` (repeatable; added to the project's `catalog/`, a
 duplicate name is an error), `--project DIR`, `--host ARCH` (build host,
-default the running machine's), `--source-date-epoch N`, `--allow-unpinned`.
-Exit codes follow `docs/cli.md`: 0, 2 usage, 10 invalid input, 11 resolution
-or stale lock, 22 `verify` mismatch, 30 internal.
+default the running machine's), `--source-date-epoch N`, `--allow-unpinned`,
+`--cache-dir DIR`. Exit codes follow `docs/cli.md`: 0, 2 usage, 10 invalid
+input, 11 resolution or stale lock, 12 source not fetched or not verified, 20
+build failure, 22
+`verify` mismatch, 30 internal.
 
 ## Layout
 
@@ -46,6 +50,8 @@ or stale lock, 22 `verify` mismatch, 30 internal.
 | `src/facts.mjs` | facts and predicates |
 | `src/resolve.mjs` | `docs/resolution.md`, one section per step |
 | `src/lock.mjs` | the lock, keys and hashes |
+| `src/sources.mjs`, `src/cmd-fetch.mjs` | the source cache (mirrors, source keys, read-only trees) and `fetch` |
+| `src/build.mjs`, `src/cmd-build.mjs` | package builds: work trees, step environment, hooks, layout, layers, and `build` |
 | `src/canonical.mjs` | canonical JSON, SHA-256, pretty printing |
 | `src/golden.mjs` | the golden projection |
 | `tests/fixtures/invalid/` | one directory per invalid input with the expected diagnostics |

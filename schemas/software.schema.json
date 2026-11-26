@@ -192,13 +192,18 @@
       "title": "Filesystem",
       "const": "ext4"
     },
+    "rootFormat": {
+      "title": "RootFormat",
+      "description": "`ext4`: a disk image, the root block device of the machine's `root=`.\n`initramfs`: a gzip-compressed cpio (newc) archive that the kernel unpacks\ninto RAM and runs `/init` from; the root is writable (`root.readonly` must be\nfalse), uses no block device, and `size_mib`/`free_mib` do not apply.",
+      "enum": ["ext4", "initramfs"]
+    },
     "rootImage": {
       "title": "RootImage",
       "description": "`strip` and `exclude` are applied while the image is composed, so package\nkeys do not change.",
       "type": "object",
       "properties": {
         "format": {
-          "$ref": "#/$defs/filesystem"
+          "$ref": "#/$defs/rootFormat"
         },
         "strip": {
           "description": "Default: false.",

@@ -23,6 +23,7 @@ on:
       - "schemas/**"
       - "tools/eclogite-mjs/**"
       - "tests/**"
+      - "builders/**"
       - "eclogite"
       - ".github/workflows/builder.yml"
   push:
@@ -33,6 +34,7 @@ on:
       - "schemas/**"
       - "tools/eclogite-mjs/**"
       - "tests/**"
+      - "builders/**"
       - "eclogite"
       - ".github/workflows/builder.yml"
   workflow_dispatch:

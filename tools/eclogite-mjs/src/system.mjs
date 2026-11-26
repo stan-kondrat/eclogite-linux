@@ -38,6 +38,11 @@ export function loadSystem(opts) {
     if (opts.machine || opts.software) throw new ExitError(EXIT.usage, "--config cannot be combined with --machine or --software");
     const abs = resolvePath(opts.config);
     let doc = [...idx.kinds.system.values()].find((d) => d.abs === abs);
+    // not a file: a system of the catalog by name, such as -c utm-arm64-devbox
+    if (!doc && !existsSync(abs)) {
+      doc = idx.find("system", opts.config);
+      if (!doc) throw new ExitError(EXIT.usage, `--config ${opts.config}: no such file, and no catalog system of that name`);
+    }
     if (!doc) {
       const r = loadDocument(abs, "system", schemasDir(opts));
       if (r.diagnostics.length) {

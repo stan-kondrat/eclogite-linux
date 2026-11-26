@@ -49,7 +49,8 @@
   }
 
   function coreCount(machine) {
-    return Number(machine.resources && (machine.resources.cores || machine.resources.vcpus)) || 1;
+    var r = machine.resources || {};
+    return Number(r.cores || (r.cpu && r.cpu.cores) || r.vcpus) || 1;
   }
 
   function platformName(machine) {
@@ -110,7 +111,7 @@
         '<div><dt>platform</dt><dd>' + escapeHtml(platformName(machine)) + '</dd></div>' +
         '<div><dt>cpu</dt><dd>' + escapeHtml(cpuModel(machine)) + ' × ' + coreCount(machine) + '</dd></div>' +
         '<div><dt>memory</dt><dd>' + escapeHtml(memory) + ' MiB</dd></div>' +
-        '<div><dt>model</dt><dd>' + escapeHtml(machine.runtime.machine) + '</dd></div>' +
+        '<div><dt>model</dt><dd>' + escapeHtml(machine.runtime.machine || machine.runtime.board) + '</dd></div>' +
         '</dl>' +
         '<div class="machine-device-list">' + devices.slice(0, 5).map(function (device) {
           return '<span>' + escapeHtml(typeof device === "string" ? device : device.model) + '</span>';
@@ -179,13 +180,14 @@
       model: cpuInput.value.trim() || "unresolved",
       cores: Number(coresInput.value) || 1
     };
-    if (source.resources.soc) {
-      cpu.soc = source.resources.soc;
+    var soc = source.resources.soc || (source.resources.cpu && source.resources.cpu.soc);
+    if (soc) {
+      cpu.soc = soc;
     }
 
     var boot = { method: source.boot.method };
     if (source.boot.console) { boot.console = source.boot.console; }
-    if (source.boot.media) { boot.boot_media = source.boot.media; }
+    if (source.boot.media || source.boot.bootMedia) { boot.boot_media = source.boot.media || source.boot.bootMedia; }
     if (source.boot.firmwarePolicy) { boot.firmware_policy = source.boot.firmwarePolicy; }
 
     var definition = {
@@ -226,7 +228,7 @@
     cpuInput.value = cpuModel(machine);
     coresInput.value = String(coreCount(machine));
     memoryInput.value = String(machine.resources.memoryMiB);
-    runtimeModelInput.value = machine.runtime.machine;
+    runtimeModelInput.value = machine.runtime.machine || machine.runtime.board;
     updateOutput();
     if (shouldScroll) {
       document.querySelector(".machine-builder").scrollIntoView({ behavior: "smooth", block: "start" });

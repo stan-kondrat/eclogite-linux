@@ -467,7 +467,7 @@ Planned stable exit classes are:
 Until the C tool exists, [tools/eclogite-mjs](../tools/eclogite-mjs/README.md)
 is the `eclogite` command: `./eclogite` at the repository root is a POSIX sh
 wrapper that runs it with the same arguments. It implements `validate`,
-`resolve`, `lock`, `plan`, `graph` and `why` with the exit classes above, plus
+`resolve`, `lock`, `plan`, `graph`, `why`, `fetch` and `build` with the exit classes above, plus
 two commands of its own: `explain` (`plan` with the old and new value of every
 changed part of a package key) and `verify` (the conformance run over
 `tests/reference/`, exit 22 on a mismatch). Differences
@@ -476,6 +476,30 @@ from the design: `--catalog` adds a root to the project's `catalog/`;
 `resolve` prints the resolution in the format of `tests/reference/golden/`;
 `lock --allow-unpinned` writes a development lock for values the catalog cannot
 pin yet; `plan --locked` and `explain --locked` make a missing or stale lock exit 11.
+
+`fetch` is implemented for git sources: it reads the current lock (a missing
+or stale one exits 11), puts each locked commit in a bare mirror under
+`git/mirrors/` and materializes it as a read-only tree under
+`sources/<source-key>/` in the cache (`--cache-dir`, see
+[storage](storage.md#package-source-cache)); a source it cannot download or
+verify exits 12. The source key is the SHA-256 of the URL and commit; patches
+are applied later, into a build's work directory. A complete entry is never
+replaced; `--force` replaces an incomplete one. Fixed-output fetch hooks and
+remote layers are reported as skipped, not done yet.
+
+`build` runs on the machine itself, which must be the builder the lock names
+(`tests/builder/check --lock`; `--no-builder-check` skips that for a dev VM
+without the release identity files). It builds the lock's packages in
+`build_order` with [builders/](../builders/README.md) into immutable layers
+`layers/<key>/` in the cache; a complete layer is a hit. `build NODE...`
+builds those packages and their build and link dependencies. A failed
+package exits 20 with the tail of its log (`state/<system>/logs/<package>.log`);
+`--keep-going` continues with packages that do not depend on it, and
+`--keep-work` keeps the temporary build directory. `--work-dir DIR` puts the
+temporary build directories on another filesystem than the cache: needed when
+the cache is on a 9p share, which has no writable shared `mmap` (the kernel's
+`relacheck` uses it); layers are then copied into the cache. `--no-cache` and network
+isolation are not implemented yet (the dev image has no user namespaces).
 
 ## Repository entry points
 

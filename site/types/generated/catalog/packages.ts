@@ -410,29 +410,12 @@ export const gccRuntime = {
   schema: "eclogite.package/v0.1",
   name: "gcc-runtime",
   version: "15.3.0",
-  source: {
-    type: "git",
-    url: "https://gcc.gnu.org/git/gcc.git",
-    revision: "4db0e8df15bef836558857c291c323add11d035c",
-  },
-  matches_builder_tool: "gcc",
+  source: { type: "none" },
   provides: ["cc-runtime", "c++-runtime"],
   compatible: { build: { compiler: { eq: "gcc" } } },
-  builder: "configure",
-  dependencies: { build: ["builder:gcc", "builder:make"], link: ["libc"] },
-  arguments: {
-    out_of_tree: true,
-    configure: [
-      "--prefix=/usr",
-      "--enable-languages=c,c++",
-      "--disable-multilib",
-      "--disable-bootstrap",
-      "--disable-nls",
-    ],
-    make_targets: ["all-target-libgcc", "all-target-libstdc++-v3", "all-target-libatomic"],
-    install_targets: ["install-target-libgcc", "install-target-libstdc++-v3", "install-target-libatomic"],
-    remove: ["/usr/include", "/usr/share", "**/*.a", "**/*.la", "**/*-gdb.py"],
-  },
+  builder: "files",
+  dependencies: { build: ["builder:gcc"], link: ["libc"] },
+  arguments: { hooks: { install: ["install"] } },
 } satisfies Package;
 
 /** catalog/packages/git/package.jsonc */
@@ -473,34 +456,12 @@ export const glibc = {
   schema: "eclogite.package/v0.1",
   name: "glibc",
   version: "2.43",
-  source: {
-    type: "git",
-    url: "https://sourceware.org/git/glibc.git",
-    revision: "f762ccf84f122d1354f103a151cba8bde797d521",
-  },
-  matches_builder_tool: "glibc",
+  source: { type: "none" },
   provides: ["libc"],
-  compatible: {
-    build: { compiler: { eq: "gcc" } },
-    target: { all: [{ os: { eq: "linux" } }, { libc: { eq: "glibc" } }] },
-  },
-  builder: "configure",
-  dependencies: {
-    build: ["builder:gcc", "builder:python3", "builder:bison", "builder:make"],
-    run: ["cc-runtime"],
-  },
-  arguments: {
-    out_of_tree: true,
-    configure: ["--prefix=/usr", "--disable-werror"],
-    remove: [
-      "/usr/include",
-      "/usr/share/i18n",
-      "/usr/share/info",
-      "/usr/libexec/getconf",
-      "/var/db",
-      "**/*.a",
-    ],
-  },
+  compatible: { target: { all: [{ os: { eq: "linux" } }, { libc: { eq: "glibc" } }] } },
+  builder: "files",
+  dependencies: { build: ["builder:glibc"], run: ["cc-runtime"] },
+  arguments: { hooks: { install: ["install"] } },
 } satisfies Package;
 
 /** catalog/packages/gnu-utils/package.jsonc */
@@ -675,6 +636,7 @@ export const linuxLibre = {
   },
   compatible: { target: { os: { eq: "linux" } } },
   builder: "linux-kernel",
+  arguments: { defconfig: "allnoconfig", fragments: ["base.config"] },
   tests: { clock: { when: { devices: { has: "rtc" } }, timeout_seconds: 10 } },
   variants: [
     { when: { arch: { eq: "aarch64" } }, arguments: { image: "Image.gz" } },

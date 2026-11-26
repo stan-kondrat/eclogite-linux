@@ -17,7 +17,7 @@ site/
   assets/site.js             shared navigation and catalog statistics
   assets/graph.js            SVG graph interaction and package inspector
   assets/machines.js         machine filters, profile cards, and JSON builder
-  assets/catalog-data.js     temporary generated-data snapshot
+  assets/catalog-data.js     generated from catalog/ (types/catalog-data.mjs)
   types/                     TypeScript types of every document format
 ```
 
@@ -48,8 +48,11 @@ npm run types   # regenerate after a schema or catalog change
 npm run check   # stale or invalid input, strict schema compile, everything type-checks, examples validate
 ```
 
-The checked-in `catalog-data.js` is a temporary snapshot for this design phase;
-it is not a second authoritative package database. Once the host tool exists,
+`assets/catalog-data.js` is generated from `catalog/` by
+`types/catalog-data.mjs` (`npm run site-data`); descriptions, which the catalog
+has no field for, are in `types/descriptions.json`. `npm run check` fails when
+it is stale or a catalog entry has no description. It is not a second
+authoritative package database. Once the host tool exists,
 `eclogite site` will parse the catalog's JSONC or JSON, validate every object
 against versioned JSON Schema, resolve the selected graphs, and regenerate all
 website data and package pages from that resolved model. The graph keeps

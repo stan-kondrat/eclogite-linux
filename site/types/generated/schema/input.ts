@@ -628,9 +628,13 @@ export type CmakeArguments = {
 } & CommonArguments;
 
 /**
- * A Linux-family kernel: applies its config fragments, then the config that dependents, the software profile and the machine's devices require, runs olddefconfig, verifies every required option and builds the image.
+ * A Linux-family kernel: starts from its base configuration (`defconfig`), applies its config fragments, then the config that dependents, the software profile and the machine's devices require, runs olddefconfig, verifies every required option and builds the image.
  */
 export type LinuxKernelArguments = {
+  /**
+   * The base configuration target, such as `allnoconfig` (the package's fragments then add what every system needs) or `bcm2835_defconfig`. Default: `defconfig`.
+   */
+  defconfig?: string;
   /** Files in the package's config/ directory, applied in order. */
   fragments?: Name[];
   /** Such as bzImage or Image.gz, usually set per architecture by a variant. */
@@ -859,11 +863,19 @@ export interface Software {
 export type Filesystem = "ext4";
 
 /**
+ * `ext4`: a disk image, the root block device of the machine's `root=`.
+ * `initramfs`: a gzip-compressed cpio (newc) archive that the kernel unpacks
+ * into RAM and runs `/init` from; the root is writable (`root.readonly` must be
+ * false), uses no block device, and `size_mib`/`free_mib` do not apply.
+ */
+export type RootFormat = "ext4" | "initramfs";
+
+/**
  * `strip` and `exclude` are applied while the image is composed, so package
  * keys do not change.
  */
 export type RootImage = {
-  format: Filesystem;
+  format: RootFormat;
   /** Default: false. */
   strip?: boolean;
   exclude?: GuestPathPattern[];

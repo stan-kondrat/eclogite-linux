@@ -1,0 +1,82 @@
+{
+  "packages": {
+    "base-files": "Filesystem skeleton, users and /bin/sh that every system needs.",
+    "bash": "GNU Bourne Again Shell and the system's /bin/sh implementation.",
+    "busybox": "One static binary providing the shell, core, system and text utilities, DHCP client, ip and vi.",
+    "ca-certificates": "Mozilla CA bundle for TLS clients, installed as a file.",
+    "console-login": "Root login on the machine's serial console, whichever console the machine names.",
+    "coreutils": "Essential GNU file, text, and shell utilities.",
+    "curl": "URL transfer library and tool; git's HTTPS transport.",
+    "dhcpcd": "Small DHCP client used by the default network service.",
+    "diffutils": "GNU tools for comparing files and directories.",
+    "findutils": "GNU find, xargs, and file discovery tools.",
+    "gawk": "GNU implementation of the AWK text-processing language.",
+    "gcc-runtime": "GCC's target runtimes libgcc_s, libstdc++ and libatomic, copied from the pinned cross toolchain; the default cc-runtime and c++-runtime.",
+    "git": "Distributed version control, built with HTTPS support.",
+    "glibc": "GNU C library copied from the pinned cross toolchain sysroot: the guest loader, shared libraries, ldconfig and getent.",
+    "gnulib": "Source-only portability modules used during GNU package bootstrap; not installed in the guest.",
+    "grep": "GNU regular-expression search utilities.",
+    "gzip": "GNU gzip compression and decompression tools.",
+    "host-share": "Mounts the VM bundle's share at /mnt/shared over 9p; selected only on machines with a shared directory.",
+    "iproute2": "Linux network configuration and inspection utilities, including ip and ss.",
+    "less": "Terminal pager.",
+    "linux-libre": "Deblobbed Linux kernel, built as an ordinary package graph node for both target platforms.",
+    "llvm-runtime": "LLVM's compiler-rt, libunwind, libc++ and libc++abi: the alternative cc-runtime and c++-runtime.",
+    "musl": "The musl C library, the libc of the linux-musl ABI.",
+    "ncurses": "Terminal handling library and terminfo database used by less.",
+    "nodejs": "Node.js runtime built from source at the same revision as the builder's node.",
+    "openssh": "OpenSSH sshd, ssh-keygen and clients, with the sshd privilege-separation account.",
+    "openssl": "OpenSSL 3.x TLS and crypto library linked by curl, git and OpenSSH.",
+    "procps-ng": "Process inspection tools such as ps, top, free, and uptime.",
+    "runit": "Init and service supervisor: stage scripts and the supervision of every package's services.",
+    "sed": "GNU stream editor.",
+    "tar": "GNU archive creation and extraction utility.",
+    "theia": "Eclipse Theia browser IDE: offline npm build, plugins, and a service on port 3000.",
+    "util-linux": "Core Linux system utilities, terminals, mounts, and disk tools.",
+    "vim": "Tiny-feature Vim build for console editing.",
+    "zlib": "Compression library that curl, git and OpenSSH link.",
+    "devbox": "The devbox account setup: sshd with host keys on the state volume, the login profile, and the ssh-22 test."
+  },
+  "metapackages": {
+    "base": "What boot itself uses: init, console login, shell, coreutils and util-linux.",
+    "editor": "Interactive console editor.",
+    "gnu-utils": "The GNU text, file, archive and process tools: the default provider of utils.",
+    "ide": "Browser IDE served from the guest.",
+    "network": "Network configuration and DHCP client.",
+    "reference-system": "Complete userland matching the linux-libre-vm reference build."
+  },
+  "platforms": {
+    "arm64": "ARMv8-A baseline software target with the GNU ABI and glibc.",
+    "armv6-bcm2835": "ARMv6ZK/VFP software target for BCM2835 and ARM1176JZF-S machines.",
+    "x86_64": "x86-64 baseline software target with the GNU ABI and glibc."
+  },
+  "machines": {
+    "qemu-virt-arm64": "QEMU virt ARM64 machine with direct kernel boot and virtio devices.",
+    "qemu-q35-x86_64": "QEMU q35 x86-64 machine with direct kernel boot and virtio PCI devices.",
+    "utm-virt-arm64": "UTM 5 ARM64 virtual machine for Apple Silicon, using the QEMU backend with HVF, direct kernel boot, and an imported disk copy.",
+    "utm-virt-arm64-8g": "The UTM ARM64 machine with 2 vCPUs and 8 GiB of memory, for an IDE server.",
+    "raspberry-pi-model-b-256mb": "Physical Raspberry Pi Model B with BCM2835, 256 MiB of memory, 26-pin GPIO, and SD-card boot.",
+    "raspberry-pi-model-b-512mb": "Physical Raspberry Pi Model B with BCM2835, 512 MiB of memory, 26-pin GPIO, and SD-card boot.",
+    "qemu-raspi1ap-armv6": "QEMU ARMv6 BCM2835 target using raspi1ap; it models Raspberry Pi 1 Model A+, not Model B.",
+    "utm-virt-arm64-devbox": "The UTM ARM64 machine sized like linux-devbox-vm: 1 vCPU and 8 GiB of memory, for building and running Theia."
+  },
+  "software": {
+    "minimal-busybox": "The minimal system with BusyBox as the shell and utilities.",
+    "minimal": "The smallest bootable system: base only, a root shell on the serial console, stripped.",
+    "reference": "The complete linux-libre-vm reference userland, for any compatible machine's platform.",
+    "theia": "The reference system plus the Theia browser IDE, with /opt/theia on its own volume.",
+    "devbox": "An analogue of linux-devbox-vm: SSH login as the host user, git, Node.js and the Theia IDE, with state kept across image replacement.",
+    "minimal-busybox-initramfs": "minimal-busybox booted from RAM: the same closure in an initramfs, so it needs no disk image."
+  },
+  "toolchains": {
+    "linux-libre-vm": "The builder image: cross toolchains by triplet, gcc (clang planned), and the tool manifest."
+  },
+  "systems": {
+    "qemu-arm64-reference": "Reference composition of the QEMU virt ARM64 machine and the reference software.",
+    "qemu-x86_64-reference": "Reference composition of the QEMU q35 x86-64 machine and the reference software.",
+    "utm-arm64-reference": "Reference composition of the UTM ARM64 machine and the reference software for Apple Silicon hosts.",
+    "utm-arm64-theia": "The Theia IDE on an 8-GiB UTM ARM64 machine, with the workspace on the bundle share.",
+    "qemu-arm64-minimal-busybox": "The first system Eclogite builds and boots (M1): minimal BusyBox from an initramfs on the QEMU virt ARM64 machine.",
+    "utm-arm64-devbox": "The devbox on the UTM ARM64 devbox machine (M2)."
+  }
+}

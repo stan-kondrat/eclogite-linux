@@ -95,8 +95,6 @@
     "diffutils": "gcc",
     "findutils": "gcc",
     "gawk": "gcc",
-    "gcc-runtime": "gcc",
-    "glibc": "gcc",
     "grep": "gcc",
     "gzip": "gcc",
     "iproute2": "gcc",

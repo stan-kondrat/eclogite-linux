@@ -69,8 +69,6 @@
   },
   "compilers": {
     "busybox": "gcc",
-    "gcc-runtime": "gcc",
-    "glibc": "gcc",
     "linux-libre": "gcc",
     "runit": "gcc"
   },

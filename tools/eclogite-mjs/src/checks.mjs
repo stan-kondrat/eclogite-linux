@@ -89,6 +89,9 @@ export function checkCatalog(docs, { whole = true } = {}) {
     for (const src of Object.keys(args.files ?? {})) {
       if (!pathExists(d, src)) report(d, `${ptr}/files/${src.replace(/~/g, "~0").replace(/\//g, "~1")}`, `file ${src} does not exist`, true);
     }
+    (Array.isArray(args.fragments) ? args.fragments : []).forEach((f, i) => {
+      if (!pathExists(d, `config/${f}`)) report(d, `${ptr}/fragments/${i}`, `config fragment config/${f} does not exist`);
+    });
   }
 
   // ---- packages
@@ -188,6 +191,12 @@ export function checkCatalog(docs, { whole = true } = {}) {
     if (s.compiler && !compilerNames.has(s.compiler)) report(d, "/compiler", `no toolchain lists compiler ${JSON.stringify(s.compiler)}`);
     refs(d, s.packages, "/packages", "package");
     providers(d, s.providers, "/providers");
+    // the kernel unpacks an initramfs into a writable RAM filesystem: it
+    // cannot be read-only, and it has no size of its own
+    if (s.image?.format === "initramfs") {
+      if (s.root?.readonly) report(d, "/root/readonly", "an initramfs root is writable: set root.readonly to false");
+      for (const f of ["size_mib", "free_mib"]) if (s.image[f] !== undefined) report(d, `/image/${f}`, `${f} does not apply to an initramfs`, true);
+    }
     for (const [i, v] of (s.volumes ?? []).entries()) {
       v.packages.forEach((n, j) => { if (!idx.kinds.package.has(n)) report(d, `/volumes/${i}/packages/${j}`, `package ${JSON.stringify(n)} does not exist`); });
     }

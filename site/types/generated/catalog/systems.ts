@@ -5,6 +5,14 @@
 
 import type { System } from "../schema/input";
 
+/** catalog/systems/qemu-arm64-minimal-busybox.jsonc */
+export const qemuArm64MinimalBusybox = {
+  schema: "eclogite.system/v0.1",
+  name: "qemu-arm64-minimal-busybox",
+  machine: "qemu-virt-arm64",
+  software: "minimal-busybox-initramfs",
+} satisfies System;
+
 /** catalog/systems/qemu-arm64-reference.jsonc */
 export const qemuArm64Reference = {
   schema: "eclogite.system/v0.1",
@@ -46,4 +54,4 @@ export const utmArm64Theia = {
 } satisfies System;
 
 /** Every document above, in name order. */
-export const all: System[] = [qemuArm64Reference, qemuX8664Reference, utmArm64Devbox, utmArm64Reference, utmArm64Theia];
+export const all: System[] = [qemuArm64MinimalBusybox, qemuArm64Reference, qemuX8664Reference, utmArm64Devbox, utmArm64Reference, utmArm64Theia];

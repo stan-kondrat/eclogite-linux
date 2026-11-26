@@ -79,17 +79,30 @@ build-side tools in version 1.
 
 ### Base runtime
 
+Decided 2026-11-27: **the linux-libre-vm dev image is the base builder
+environment.** What it and its cross toolchains already ship is taken from
+them, not rebuilt from source; Eclogite builds only what they do not provide.
+
 Two packages, which every dynamically linked program in the guest depends on,
-are built from the **same source revisions** as the builder image's cross
-toolchain:
+are therefore copied from the target's cross toolchain
+(`/opt/cross/<triplet>`) by an install hook of the `files` builder:
 
-| Package | Source | Why the revision must match |
+| Package | Copied from | Why it must be the toolchain's |
 |---|---|---|
-| `glibc` | glibc git, the toolchain sysroot's revision | programs are linked against the sysroot's glibc and require its symbol versions at runtime |
-| `gcc-runtime` | GCC git, the toolchain compiler's revision; builds only `libgcc_s`, `libstdc++`, `libatomic` | C++ programs require the `GLIBCXX_*` / `GCC_*` symbol versions of the compiler that linked them |
+| `glibc` | the sysroot: the loader, shared libraries, NSS modules, `ldconfig`, `getent` | programs are linked against the sysroot's glibc and require its symbol versions at runtime |
+| `gcc-runtime` | the toolchain's `lib64` (or `lib`): `libgcc_s`, `libstdc++`, `libatomic` | C++ programs require the `GLIBCXX_*` / `GCC_*` symbol versions of the compiler that linked them |
 
-The lock verifies both revisions against the tool manifest. A mismatch is a
-resolution error, not a warning.
+Shipping the very libraries every guest program was linked against is the
+closest ABI match. Each declares the matching `builder:glibc` or `builder:gcc`
+build dependency, which puts the toolchain's revision in its key, and the
+toolchain archive's hash is in every key anyway. Building them was also
+impractical: glibc takes about an hour per target on one CPU, and GCC's
+target libraries need GCC itself built, with GMP, MPFR and MPC the image does
+not ship. Headers, static libraries and start files stay in the sysroot, the
+link-time copy.
+
+A tool the image lacks is added to the linux-libre-vm dev image, not built as
+an Eclogite package.
 
 ### Language runtimes with native extensions
 
@@ -119,8 +132,6 @@ package's source revision. See
 "matches_builder_tool": "node",
 ```
 
-`glibc` and `gcc-runtime` use the same field against the toolchain's `glibc`
-and `gcc` entries.
 
 Updating Node.js is therefore a coordinated change: a new `linux-libre-vm`
 builder image release first, then the Eclogite package revision.
@@ -140,7 +151,6 @@ from the builder image's native side:
 |---|---|---|
 | `nodejs` | native GCC as `CC_host`/`CXX_host` for V8's `mksnapshot`, `torque` and other generators; `configure --cross-compiling --dest-cpu=<arch>` | cross GCC as `CC`/`CXX` |
 | `python3` | `builder:python3` as `--with-build-python`, which is why the revisions must match | cross GCC, `--host=<triplet>` |
-| `glibc`, `gcc-runtime` | native GCC for build-time generators | cross GCC |
 
 Resolution checks the builder image supports the target before planning:
 

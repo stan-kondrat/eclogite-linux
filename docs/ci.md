@@ -61,6 +61,12 @@ run inside the dev VM of that release.
 The job then runs the reference checks and locks the devbox system for its
 host.
 
+Hosted CI does not build packages: a closure takes hours (kernel, glibc, gcc)
+and hosted runners keep no layer cache. Builds run locally in the dev VM until
+dedicated runners build each layer once per input key and publish it (remote
+layers). The container runs as root, which ignores the read-only layer and
+source modes; the tests check the modes instead.
+
 ## Layer builds and publication
 
 GitHub Actions is the primary builder of package, kernel and image layers. For

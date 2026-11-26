@@ -11,7 +11,7 @@ golden files in `tests/reference/golden/`.
 |---|---|---|---|
 | `eclogite.config/v0.1` | `eclogite.schema.json` | schema, system, machines, software, platforms, abis, toolchains, packages, facts, devices, defaults | none |
 | `eclogite.system/v0.1` | `system.schema.json` | schema, name, machine, software | abi, compiler, providers |
-| `eclogite.software/v0.1` | `software.schema.json` | schema, name, packages, root, image | aliases, abi, compiler, providers, volumes, evidence |
+| `eclogite.software/v0.1` | `software.schema.json` | schema, name, packages, root, image (`format`: `ext4` or `initramfs`) | aliases, abi, compiler, providers, volumes, evidence |
 | `eclogite.machine/v0.1` | `machine.schema.json`: complete or derived (`extends`) | complete: schema, name, platform, resources, runtime, boot, devices; derived: schema, name, extends | aliases, status, gpio, limitations, references |
 | `eclogite.platform/v0.1` | `platform.schema.json` | schema, name, architecture, triplet_cpu, cpu, kernel_architecture | none |
 | `eclogite.abi/v0.1` | `abi.schema.json` | schema, name, os, libc, triplet, toolchain | none |

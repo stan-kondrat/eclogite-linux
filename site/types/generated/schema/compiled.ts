@@ -567,7 +567,7 @@ export interface CompiledTest {
 }
 
 export interface CompiledImage {
-  format: Input.Filesystem;
+  format: Input.RootFormat;
   readonly: boolean;
   /**
    * The filesystem's UUID, derived from the image's inputs rather than drawn
@@ -590,7 +590,7 @@ export type CompiledVolume = {
   mount: Input.GuestPath;
   packages: Input.PackageName[];
 } & {
-  format: Input.Filesystem;
+  format: Input.RootFormat;
   readonly: boolean;
   /**
    * The filesystem's UUID, derived from the image's inputs rather than drawn

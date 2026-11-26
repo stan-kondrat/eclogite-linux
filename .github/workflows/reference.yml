@@ -61,8 +61,8 @@ jobs:
         working-directory: tools/eclogite-mjs
         run: node --test tests/*.test.mjs
 
-      - name: Generated site types are current
+      - name: Generated site types and data are current
         working-directory: site/types
         run: |
           npm ci
-          node generate.mjs check
+          npm run check

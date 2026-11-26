@@ -216,6 +216,8 @@ export function compileLock(idx, R, { systemDoc, systemAlias, projectDir, source
     const hookNames = new Set(Object.values(args.hooks ?? {}).flat());
     if (p.fetch) hookNames.add(p.fetch.hook);
     const filePaths = new Set(Object.keys(args.files ?? {}));
+    // linux-kernel config fragments are inputs of the build like files
+    for (const f of args.fragments ?? []) filePaths.add(`config/${f}`);
     if (p.provides && !Array.isArray(p.provides)) for (const o of Object.values(p.provides)) for (const f of Object.keys(o.files ?? {})) filePaths.add(f);
     entry.hashes = {
       patches,
@@ -352,9 +354,12 @@ export function compileLock(idx, R, { systemDoc, systemAlias, projectDir, source
   const mounts = {};
   const sw = R.software;
   const rootImage = { format: sw.image.format };
-  mounts["/"] = { type: rootImage.format, source: root, ...(sw.root.readonly && { options: ["ro"] }), from: "software.root" };
+  // an initramfs is already the root when /init runs: no fstab entry, and the
+  // first block device is free for volumes and state
+  const initramfs = rootImage.format === "initramfs";
+  if (!initramfs) mounts["/"] = { type: rootImage.format, source: root, ...(sw.root.readonly && { options: ["ro"] }), from: "software.root" };
   for (const t of sw.root.tmpfs) mounts[t] = { type: "tmpfs", source: "none", from: "software.tmpfs" };
-  let disk = 1;
+  let disk = initramfs ? 0 : 1;
   for (const v of sw.volumes ?? []) {
     mounts[v.mount] = { type: v.format, source: diskAt(disk++), ...(v.readonly && { options: ["ro"] }), from: "software.volumes" };
   }

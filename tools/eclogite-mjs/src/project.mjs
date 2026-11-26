@@ -26,7 +26,7 @@ export class ExitError extends Error {
   }
 }
 
-export const EXIT = { ok: 0, usage: 2, invalid: 10, resolution: 11, mismatch: 22, internal: 30 };
+export const EXIT = { ok: 0, usage: 2, invalid: 10, resolution: 11, source: 12, builder: 20, mismatch: 22, internal: 30 };
 
 /** Load roots plus loose files, check, and return { idx, docs, diagnostics }. */
 export function loadAndCheck({ roots, files = [], opts }) {

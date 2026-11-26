@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Explore the Eclogite Linux package catalog and interactive dependency graph.">
   <title>Software catalog — Eclogite Linux</title>
-  <link rel="stylesheet" href="assets/styles.css?v=20261015-7">
-  <script src="assets/catalog-data.js?v=20261015-7" defer></script>
-  <script src="assets/site.js?v=20261015-7" defer></script>
-  <script src="assets/graph.js?v=20261015-7" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=20261126-1">
+  <script src="assets/catalog-data.js?v=20261126-1" defer></script>
+  <script src="assets/site.js?v=20261126-1" defer></script>
+  <script src="assets/graph.js?v=20261126-1" defer></script>
 </head>
 <body data-page="packages">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 
     <aside class="catalog-status" aria-label="Catalog implementation status">
       <span>migration snapshot</span>
-      <p>The graph below mirrors the current JSONC reference fixtures imported from <code>linux-libre-vm</code>. It is useful for reviewing names and dependency shape, but the fixtures are not yet reproducibly buildable. Meta-packages are ordinary packages with run dependencies only; each machine selects its platform, and the platform names the <code>linux-libre-vm</code> toolchain that builds for it.</p>
+      <p>The graph below is generated from <code>catalog/</code> (<code>site/types/catalog-data.mjs</code>). The minimal BusyBox closure builds with <code>./eclogite build</code>; the other packages are not built yet. Meta-packages are ordinary packages with run dependencies only; each machine selects its platform, and the platform names the <code>linux-libre-vm</code> toolchain that builds for it.</p>
     </aside>
 
     <section class="graph-app" aria-labelledby="graph-title">
@@ -147,7 +147,7 @@
           <p class="eyebrow">Catalog index</p>
           <h2 id="package-index-title">Package definitions</h2>
         </div>
-        <p id="package-result-count">18 packages</p>
+        <p id="package-result-count">36 packages</p>
       </div>
       <div id="package-grid" class="package-grid"></div>
     </section>

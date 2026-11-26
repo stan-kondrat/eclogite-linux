@@ -56,8 +56,6 @@
   "compilers": {
     "bash": "gcc",
     "coreutils": "gcc",
-    "gcc-runtime": "gcc",
-    "glibc": "gcc",
     "linux-libre": "gcc",
     "runit": "gcc",
     "util-linux": "gcc"

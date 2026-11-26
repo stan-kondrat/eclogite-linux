@@ -1,0 +1,31 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "minimal-busybox-initramfs",
+  // minimal-busybox booted from RAM: the same closure, but the root is an
+  // initramfs the image step writes itself (cpio newc + gzip), so it needs no
+  // mkfs.ext4 in the builder. The first image Eclogite boots (M1); the ext4
+  // root of minimal-busybox follows once the dev image ships e2fsprogs.
+  "packages": ["base", "busybox"],
+  "root": {
+    "hostname": "eclogite",
+    // the kernel's rootfs is writable; nothing persists across boots anyway
+    "readonly": false,
+    "tmpfs": ["/run", "/tmp"]
+  },
+  "image": {
+    "format": "initramfs",
+    "strip": true,
+    "exclude": [
+      "/usr/include",
+      "/usr/share/man",
+      "/usr/share/info",
+      "/usr/share/doc",
+      "/usr/share/locale",
+      "**/*.a",
+      "**/*.la"
+    ]
+  },
+  "evidence": {
+    "default": "warn-untested"
+  }
+}

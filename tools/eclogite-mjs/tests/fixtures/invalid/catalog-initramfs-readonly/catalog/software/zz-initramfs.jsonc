@@ -1,0 +1,8 @@
+{
+  "schema": "eclogite.software/v0.1",
+  "name": "zz-initramfs",
+  "packages": ["base", "busybox"],
+  // an initramfs root is writable and has no size of its own
+  "root": { "hostname": "zz", "readonly": true, "tmpfs": ["/run"] },
+  "image": { "format": "initramfs", "free_mib": 16 }
+}

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "LinuxKernelArguments",
-  "description": "A Linux-family kernel: applies its config fragments, then the config that dependents, the software profile and the machine's devices require, runs olddefconfig, verifies every required option and builds the image.",
+  "description": "A Linux-family kernel: starts from its base configuration (`defconfig`), applies its config fragments, then the config that dependents, the software profile and the machine's devices require, runs olddefconfig, verifies every required option and builds the image.",
   "type": "object",
   "allOf": [
     {
@@ -9,6 +9,11 @@
     }
   ],
   "properties": {
+    "defconfig": {
+      "description": "The base configuration target, such as `allnoconfig` (the package's fragments then add what every system needs) or `bcm2835_defconfig`. Default: `defconfig`.",
+      "type": "string",
+      "pattern": "^[a-z0-9_]+config$"
+    },
     "fragments": {
       "description": "Files in the package's config/ directory, applied in order.",
       "type": "array",
