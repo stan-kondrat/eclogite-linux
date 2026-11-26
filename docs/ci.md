@@ -55,7 +55,8 @@ run inside the dev VM of that release.
 - the cross triplets against the catalog's `targets`;
 - the native tool versions;
 - that every cross gcc compiles hello world;
-- with `--lock`, that a lock names this release, host and dev image.
+- with `--lock`, that a lock names this release, host, dev image and cross
+  toolchain archive.
 
 The job then runs the reference checks and locks the devbox system for its
 host.

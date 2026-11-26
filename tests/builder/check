@@ -6,7 +6,8 @@
 //   tests/builder/check [--lock LOCK] [--toolchain FILE] [--identity DIR] [--cross DIR]
 //
 //   --toolchain  catalog toolchain (default catalog/toolchains/linux-libre-vm.jsonc)
-//   --lock       also check that a lock was compiled against this release and host
+//   --lock       also check that a lock was compiled against this release and host:
+//                its builder_image_sha256 and target_sha256 are the catalog's assets
 //   --identity   the image's release identity (default /usr/share/linux-libre-vm)
 //   --cross      the cross toolchains (default /opt/cross)
 //
@@ -114,11 +115,16 @@ try {
 
 // ---- lock
 if (opts.lock) {
-  const lt = JSON.parse(readFileSync(opts.lock, "utf8")).target.toolchain;
+  const lockTarget = JSON.parse(readFileSync(opts.lock, "utf8")).target;
+  const lt = lockTarget.toolchain;
   check(lt.name === tc.name && lt.release === release, `lock is for ${lt.name} ${lt.release}`, `lock is for ${lt.name} ${lt.release}, this image is ${release}`);
   check(lt.host === host, `lock host ${lt.host}`, `lock host is ${lt.host}, this machine is ${host}`);
   const image = tc.builder.images?.[host]?.image;
   check(image && lt.builder_image_sha256 === image.sha256, `lock pins ${image?.file}`, `lock builder_image_sha256 ${lt.builder_image_sha256} is not the catalog's ${image?.file ?? "image"} for ${host}`);
+  // the cross toolchain of the lock's target: the catalog's archive hash, since
+  // /opt/cross holds it unpacked (the manifest and hello-world checks cover the disk)
+  const archive = tc.targets[lockTarget.triplet]?.archives?.[host];
+  check(archive && lt.target_sha256 === archive.sha256, `lock pins ${archive?.file}`, `lock target_sha256 ${lt.target_sha256} is not the catalog's ${archive?.file ?? `${lockTarget.triplet} archive`} for ${host}`);
 }
 
 console.log(failed ? `builder check: ${failed} failed` : "builder check: ok");

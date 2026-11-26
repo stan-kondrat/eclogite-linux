@@ -1,0 +1,34 @@
+{
+  "schema": "eclogite.toolchain/v0.1",
+  "name": "zz-hosts",
+  "provider": "linux-libre-vm",
+  "release": "v0.4.0",
+  "builder": {
+    "hosts": ["aarch64", "x86_64"],
+    "resources": { "vcpus": 1, "memory_mib": 1024 },
+    // "arm64" is the asset name, not the build host: it would never be found
+    "images": {
+      "aarch64": {
+        "image": { "file": "dev-arm64.img.xz", "sha256": "a9fc3f84117ea02cfb9cfa7000324334728246be43d7aa045a5a0e2fe6d60ebc" },
+        "kernel": { "file": "vmlinuz-dev-arm64", "sha256": "2cfa885d8b36c518f71198b8eba9b8e031350af77e046f65c6ae9bb4791241c5" }
+      },
+      "arm64": {
+        "image": { "file": "dev-arm64.img.xz", "sha256": "a9fc3f84117ea02cfb9cfa7000324334728246be43d7aa045a5a0e2fe6d60ebc" },
+        "kernel": { "file": "vmlinuz-dev-arm64", "sha256": "2cfa885d8b36c518f71198b8eba9b8e031350af77e046f65c6ae9bb4791241c5" }
+      }
+    }
+  },
+  "targets": {
+    // no x86_64 archive
+    "aarch64-linux-gnu": {
+      "archives": {
+        "aarch64": { "file": "cross-aarch64-linux-gnu.arm64.tar.gz", "sha256": "72bea122295b41ce21ce45169b6e0cb24507abc5d5c33f05975cacbedcbb7d4e" }
+      }
+    },
+    "x86_64-linux-musl": { "status": "planned" }
+  },
+  "compilers": { "gcc": ["gcc"] },
+  "tools": {
+    "gcc": { "version": "15.3.0", "source": "https://gcc.gnu.org/git/gcc.git", "revision": "4db0e8df15bef836558857c291c323add11d035c" }
+  }
+}

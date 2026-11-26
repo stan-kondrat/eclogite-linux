@@ -128,8 +128,10 @@ holds the complete rules and the disagreements it found; the user-visible ones:
 - **Pinning.** A lock refuses a `pending` fetch hash and an `unreleased`
   toolchain. Against a release, `builder_image_sha256` and `target_sha256`
   are the SHA-256 of the build host's dev image and cross toolchain archive
-  as published (`builder.images`, `targets.*.archives`); a missing entry is
-  unpinned. `--allow-unpinned` writes a development lock (zero digest,
+  as published (`builder.images`, `targets.*.archives`). Both tables are
+  keyed by build host: `validate` rejects a key that is not in
+  `builder.hosts`, and, for a release, a host or shipped target without an
+  entry. `--allow-unpinned` writes a development lock (zero digest,
   `dev-<hash>` release) for the conformance run only.
 - **Secrets.** The `default` of a `secret` setting never reaches the lock.
 - **Keys.** A package key hashes its recipe, source, patches, hooks, files,
@@ -137,3 +139,8 @@ holds the complete rules and the disagreements it found; the user-visible ones:
   effective config, platform, toolchain, build environment and the keys of its
   build and link dependencies; services, accounts, mounts, tests and run
   dependencies are outside it.
+  For a release, the toolchain part is the published asset hashes only, not
+  the catalog's `compilers` and `tools`: a package's key changes when the
+  compiler chosen for it changes (`compiler`) or a `builder:<tool>` it
+  builds with changes version or revision (its build dependencies), and
+  `tests/builder/check` fails when `tools` disagree with the image.

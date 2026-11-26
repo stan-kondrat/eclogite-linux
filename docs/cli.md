@@ -466,10 +466,11 @@ Planned stable exit classes are:
 
 Until the C tool exists, [tools/eclogite-mjs](../tools/eclogite-mjs/README.md)
 is the `eclogite` command: `./eclogite` at the repository root is a POSIX sh
-wrapper that runs it with the same arguments. It implements `validate`, `resolve`, `lock`, `plan`, `graph` and `why` with the
-exit classes above, plus two commands of its own: `explain` (`plan` with the old
-and new value of every changed part of a package key) and `verify` (the
-conformance run over `tests/reference/`, exit 22 on a mismatch). Differences
+wrapper that runs it with the same arguments. It implements `validate`,
+`resolve`, `lock`, `plan`, `graph` and `why` with the exit classes above, plus
+two commands of its own: `explain` (`plan` with the old and new value of every
+changed part of a package key) and `verify` (the conformance run over
+`tests/reference/`, exit 22 on a mismatch). Differences
 from the design: `--catalog` adds a root to the project's `catalog/`;
 `--machine` and `--software` also serve `resolve`, `lock`, `plan`, `graph` and `why`;
 `resolve` prints the resolution in the format of `tests/reference/golden/`;

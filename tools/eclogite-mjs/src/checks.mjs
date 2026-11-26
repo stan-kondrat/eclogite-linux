@@ -231,6 +231,27 @@ export function checkCatalog(docs, { whole = true } = {}) {
     for (const [c, tools] of Object.entries(d.value.compilers ?? {})) {
       tools.forEach((t, i) => { if (!(t in (d.value.tools ?? {}))) report(d, `/compilers/${c}/${i}`, `tool ${JSON.stringify(t)} is not in tools`); });
     }
+    // Release assets are looked up by build host: a key that is not a host
+    // would never be found, and the lock would silently count it as unpinned.
+    // A release (not "unreleased") must pin every host's image and every
+    // shipped target's archive.
+    const hosts = d.value.builder?.hosts ?? [];
+    const released = d.value.release !== "unreleased";
+    const perHost = (table, ptr, what) => {
+      if (!table) {
+        if (released) report(d, ptr.replace(/\/[^/]+$/, ""), `release ${d.value.release} has no ${ptr.split("/").pop()}: every build host needs its ${what}`);
+        return;
+      }
+      for (const h of Object.keys(table)) {
+        if (!hosts.includes(h)) report(d, `${ptr}/${h}`, `${JSON.stringify(h)} is not a builder host (${hosts.join(", ")})`, true);
+      }
+      if (released) for (const h of hosts) if (!(h in table)) report(d, ptr, `no ${what} for build host ${h}`, true);
+    };
+    perHost(d.value.builder?.images, "/builder/images", "dev image");
+    for (const [triplet, t] of Object.entries(d.value.targets ?? {})) {
+      if (t?.status === "planned") continue;
+      perHost(t?.archives, `/targets/${triplet}/archives`, `${triplet} archive`);
+    }
   }
   const dd = idx.single.defaults;
   if (dd) {

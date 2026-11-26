@@ -1,0 +1,5 @@
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-toolchain-unknown-host/catalog/toolchains/zz-hosts.jsonc:10:5: no dev image for build host x86_64 (/builder/images)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-toolchain-unknown-host/catalog/toolchains/zz-hosts.jsonc:15:7: "arm64" is not a builder host (aarch64, x86_64) (/builder/images/arm64)
+tools/eclogite-mjs/tests/fixtures/invalid/catalog-toolchain-unknown-host/catalog/toolchains/zz-hosts.jsonc:24:7: no aarch64-linux-gnu archive for build host x86_64 (/targets/aarch64-linux-gnu/archives)
+3 problems
+exit 10
